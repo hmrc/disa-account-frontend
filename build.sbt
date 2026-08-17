@@ -29,7 +29,6 @@ lazy val microservice = Project("disa-account-frontend", file("."))
   .settings(CodeCoverageSettings.settings: _*)
   .settings(PlayKeys.playDefaultPort := 12104)
 
-
 lazy val it = project
   .enablePlugins(PlayScala)
   .dependsOn(microservice % "test->test")
