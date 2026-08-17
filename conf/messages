@@ -1,2 +1,45 @@
-service.name = disa-account-frontend
+service.name = Manage ISAs
 service.text = This is your new service
+
+site.continue = Continue
+site.govuk = GOV.UK
+site.signIn = Sign in
+site.signOut = Sign out
+
+error.prefix = Error
+error.title.prefix = Error:
+error.summary.title = There is a problem
+
+sectionTitle.orgDetails = Organisation details
+
+enterYourOrganisationAddress.title = Enter your organisation’s address
+enterYourOrganisationAddress.heading = Enter your organisation’s address
+enterYourOrganisationAddress.addressLine1 = Address line 1
+enterYourOrganisationAddress.addressLine2 = Address line 2 (optional)
+enterYourOrganisationAddress.townOrCity = Town or city
+enterYourOrganisationAddress.postcode = Postcode
+enterYourOrganisationAddress.changeOfCircumstances = Change of organisation’s address
+enterYourOrganisationAddress.error.addressLine1.required = Enter address line 1, typically the building and street
+enterYourOrganisationAddress.error.addressLine1.length = Address line 1 must be 35 characters or less
+enterYourOrganisationAddress.error.addressLine2.length = Address line 2 must be 35 characters or less
+enterYourOrganisationAddress.error.townOrCity.required = Enter town or city
+enterYourOrganisationAddress.error.postcode.required = Enter your postcode in the correct format, for example, AA1 1AA
+enterYourOrganisationAddress.error.postcode.invalid = Enter a postcode, like AA1 1AA
+enterYourOrganisationAddress.error.postcode.tooShort = Post code is too short. Enter a postcode, like AA1 1AA
+enterYourOrganisationAddress.error.postcode.tooLong = Post code is too long. Enter a postcode, like AA1 1AA
+
+unauthorised.title = You cannot access this service
+unauthorised.heading = You cannot access this service
+unauthorised.body = You need to be signed in with an organisation that is enrolled to manage ISAs to use this service.
+
+changeOfCircumstances.title = Change of circumstances
+changeOfCircumstances.heading = Change of circumstances
+
+timeout.title = You’re about to be signed out
+timeout.message = For security reasons, you will be signed out of this service in
+timeout.keepAlive = Stay signed in
+timeout.signOut = Sign out
+
+signedOut.title = For your security, we signed you out
+signedOut.heading = For your security, we signed you out
+signedOut.guidance = We did not save your answers.

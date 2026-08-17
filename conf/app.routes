@@ -2,3 +2,15 @@
 
 ->         /hmrc-frontend           hmrcfrontend.Routes
 GET        /assets/*file            controllers.Assets.versioned(path = "/public", file: Asset)
+
+GET        /enter-your-organisation-address    uk.gov.hmrc.disaaccountfrontend.controllers.EnterYourOrganisationAddressController.onPageLoad()
+POST       /enter-your-organisation-address    uk.gov.hmrc.disaaccountfrontend.controllers.EnterYourOrganisationAddressController.onSubmit()
+
+GET        /unauthorised                       uk.gov.hmrc.disaaccountfrontend.controllers.UnauthorisedController.onPageLoad()
+
+GET        /change-of-circumstances            uk.gov.hmrc.disaaccountfrontend.controllers.ChangeOfCircumstancesController.onPageLoad()
+
+GET        /refresh-session                    uk.gov.hmrc.disaaccountfrontend.controllers.KeepAliveController.keepAlive()
+
+GET        /sign-out                           uk.gov.hmrc.disaaccountfrontend.controllers.auth.AuthController.signOut()
+GET        /signed-out                         uk.gov.hmrc.disaaccountfrontend.controllers.auth.SignedOutController.onPageLoad()

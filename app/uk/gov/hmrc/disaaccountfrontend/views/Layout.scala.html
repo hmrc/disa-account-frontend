@@ -15,20 +15,41 @@
  *@
 
 @import uk.gov.hmrc.disaaccountfrontend.config.AppConfig
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcStandardPage
-@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.HmrcStandardPageParams
+@import uk.gov.hmrc.disaaccountfrontend.controllers.auth.{routes => authRoutes}
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcStandardPage, HmrcTimeoutDialogHelper}
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.{HmrcStandardPageParams, ServiceURLs, TemplateOverrides}
 
 @this(
   appConfig: AppConfig,
-  hmrcStandardPage: HmrcStandardPage
+  hmrcStandardPage: HmrcStandardPage,
+  hmrcTimeoutDialogHelper: HmrcTimeoutDialogHelper
 )
 
-@(pageTitle: Option[String] = None)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
+@(pageTitle: Option[String] = None, timeout: Boolean = true, showSignOut: Boolean = true)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
+
+@head = {
+  @if(timeout) {
+    @hmrcTimeoutDialogHelper(
+      signOutUrl = authRoutes.AuthController.signOut().url,
+      keepAliveUrl = Some(KeepAliveController.keepAlive().url),
+      timeout = Some(appConfig.timeout),
+      countdown = Some(appConfig.countdown),
+      keepAliveButtonText = Some(messages("timeout.keepAlive")),
+      signOutButtonText = Some(messages("timeout.signOut")),
+      title = Some(messages("timeout.title")),
+      message = Some(messages("timeout.message"))
+    )
+  }
+}
 
 @hmrcStandardPage(
   HmrcStandardPageParams(
     pageTitle = pageTitle,
-    isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled
+    isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled,
+    templateOverrides = TemplateOverrides(additionalHeadBlock = Some(head)),
+    serviceURLs = ServiceURLs(
+      signOutUrl = if (showSignOut) Some(authRoutes.AuthController.signOut().url) else None
+    )
   )
 )(contentBlock)
 

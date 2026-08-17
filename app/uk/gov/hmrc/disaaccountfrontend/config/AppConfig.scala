@@ -18,10 +18,25 @@ package uk.gov.hmrc.disaaccountfrontend.config
 
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 @Singleton
-class AppConfig @Inject() (config: Configuration) {
+class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig) {
 
   val welshLanguageSupportEnabled: Boolean =
     config.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)
+
+  lazy val disaAccountBaseUrl: String = servicesConfig.baseUrl(serviceName = "disa-account")
+
+  val loginUrl: String         = config.get[String]("urls.login")
+  val loginContinueUrl: String = config.get[String]("urls.loginContinue")
+  val signOutUrl: String       = config.get[String]("urls.signOut")
+
+  val timeout: Int   = config.get[Int]("timeout-dialog.timeout")
+  val countdown: Int = config.get[Int]("timeout-dialog.countdown")
+
+  val manageIsaEnrolmentKey: String = config.get[String]("enrolments.manageIsa")
+  val zrefIdentifierKey: String     = config.get[String]("enrolments.zrefIdentifierKey")
+
+  val cacheTtl: Long = config.get[Long]("cache.ttlInSeconds")
 }
