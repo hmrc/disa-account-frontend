@@ -56,7 +56,7 @@ class EnterYourOrganisationAddressControllerSpec extends BaseUnitSpec {
       running(application) {
         val result = route(application, FakeRequest(GET, onPageLoadUrl)).value
 
-        status(result)          shouldBe OK
+        status(result)        shouldBe OK
         contentAsString(result) should include("1 Test Street")
         contentAsString(result) should not include "9 Stale Street"
       }
@@ -70,7 +70,7 @@ class EnterYourOrganisationAddressControllerSpec extends BaseUnitSpec {
       running(application) {
         val result = route(application, FakeRequest(GET, onPageLoadUrl)).value
 
-        status(result)          shouldBe OK
+        status(result)        shouldBe OK
         contentAsString(result) should include("1 Test Street")
       }
     }
@@ -83,7 +83,7 @@ class EnterYourOrganisationAddressControllerSpec extends BaseUnitSpec {
       running(application) {
         val result = route(application, FakeRequest(GET, onPageLoadUrl)).value
 
-        status(result)          shouldBe OK
+        status(result)        shouldBe OK
         contentAsString(result) should not include "1 Test Street"
       }
     }

@@ -33,7 +33,7 @@ class SignedOutControllerSpec extends BaseUnitSpec {
       running(application) {
         val result = route(application, FakeRequest(GET, signedOutUrl)).value
 
-        status(result)          shouldBe OK
+        status(result)        shouldBe OK
         contentAsString(result) should include("For your security, we signed you out")
         contentAsString(result) should include("We did not save your answers.")
         contentAsString(result) should include("Sign in")

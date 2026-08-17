@@ -52,11 +52,12 @@ class RegistrationConnector @Inject() (
           case Left(error)    => Future.failed(error)
         }
     }.map(Some(_))
-      .recover { case err: UpstreamErrorResponse if err.statusCode == 404 =>
-        logger.info(
-          s"[RegistrationConnector][getRegistrationDetails] No registration details found in disa-account for zref: [$zref]"
-        )
-        None
+      .recover {
+        case err: UpstreamErrorResponse if err.statusCode == 404 =>
+          logger.info(
+            s"[RegistrationConnector][getRegistrationDetails] No registration details found in disa-account for zref: [$zref]"
+          )
+          None
       }
   }
 }

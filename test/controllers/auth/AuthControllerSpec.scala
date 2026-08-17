@@ -39,7 +39,7 @@ class AuthControllerSpec extends BaseUnitSpec {
       running(application) {
         val result = route(application, FakeRequest(GET, signOutUrl)).value
 
-        status(result)               shouldBe SEE_OTHER
+        status(result)             shouldBe SEE_OTHER
         redirectLocation(result).get should startWith("http://localhost:9553/bas-gateway/sign-out-without-state")
         redirectLocation(result).get should include("signed-out")
         verify(mockUserAnswersRepository).clear(testSessionId)
@@ -55,7 +55,7 @@ class AuthControllerSpec extends BaseUnitSpec {
       running(application) {
         val result = route(application, FakeRequest(GET, signOutUrl)).value
 
-        status(result)               shouldBe SEE_OTHER
+        status(result)             shouldBe SEE_OTHER
         redirectLocation(result).get should startWith("http://localhost:9553/bas-gateway/sign-out-without-state")
       }
     }

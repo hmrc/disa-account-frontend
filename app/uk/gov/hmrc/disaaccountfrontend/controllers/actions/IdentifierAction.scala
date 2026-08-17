@@ -58,15 +58,15 @@ class AuthenticatedIdentifierAction @Inject() (
         (zref, credentials, sessionId) match {
           case (Some(zref), Some(creds), Some(sessionId)) =>
             block(IdentifierRequest(request, zref, creds.providerId, sessionId))
-          case (None, _, _)                                =>
+          case (None, _, _)                               =>
             logger.warn(
               s"[AuthenticatedIdentifierAction][invokeBlock] User with enrolment [$enrolmentKey] was missing identifier [$identifierKey]"
             )
             Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
-          case (_, None, _)                                =>
+          case (_, None, _)                               =>
             logger.warn("[AuthenticatedIdentifierAction][invokeBlock] User with DISA enrolment was missing credentials")
             Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
-          case (_, _, None)                                =>
+          case (_, _, None)                               =>
             logger.warn("[AuthenticatedIdentifierAction][invokeBlock] Request was missing a session ID")
             Future.successful(Redirect(config.loginUrl, Map("continue" -> Seq(config.loginContinueUrl))))
         }

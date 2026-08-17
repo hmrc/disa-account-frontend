@@ -77,7 +77,7 @@ class DataRetrievalActionSpec extends BaseUnitSpec {
         .callRefine(IdentifierRequest(FakeRequest(), testZref, testCredentialId, testSessionId))
         .futureValue
 
-      result.isLeft shouldBe true
+      result.isLeft                                shouldBe true
       status(Future.successful(result.left.value)) shouldBe INTERNAL_SERVER_ERROR
     }
   }
