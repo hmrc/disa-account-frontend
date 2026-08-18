@@ -24,7 +24,11 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.disaaccountfrontend.config.ErrorHandler
 import uk.gov.hmrc.disaaccountfrontend.connectors.RegistrationConnector
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.DataRetrievalActionImpl
+import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.LongTermAssetFunds
+import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct.CashIsas
 import uk.gov.hmrc.disaaccountfrontend.models.requests.{DataRequest, IdentifierRequest}
+import uk.gov.hmrc.disaaccountfrontend.models.{SessionUpdates, UserAnswers}
+import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
 import utils.BaseUnitSpec
 
 import scala.concurrent.Future
@@ -33,49 +37,137 @@ class DataRetrievalActionSpec extends BaseUnitSpec {
 
   val errorHandler: ErrorHandler = app.injector.instanceOf[ErrorHandler]
 
-  class Harness(registrationConnector: RegistrationConnector, errorHandler: ErrorHandler)
-      extends DataRetrievalActionImpl(registrationConnector, errorHandler) {
+  class Harness(
+    registrationConnector: RegistrationConnector,
+    userAnswersRepository: UserAnswersRepository,
+    errorHandler: ErrorHandler
+  ) extends DataRetrievalActionImpl(registrationConnector, userAnswersRepository, errorHandler) {
     def callRefine[A](request: IdentifierRequest[A]): Future[Either[Result, DataRequest[A]]] = refine(request)
   }
 
+  private def action = new Harness(mockRegistrationConnector, mockUserAnswersRepository, errorHandler)
+
   "DataRetrievalAction.refine" should {
 
-    "carry forward the registration details fetched from disa-account" in {
+    "convert registration details into effective answers when there are no session answers" in {
       val request = FakeRequest()
       when(mockRegistrationConnector.getRegistrationDetails(eqTo(testZref))(any()))
-        .thenReturn(Future.successful(Some(testRegistrationDetails)))
+        .thenReturn(Future.successful(Some(testRegistrationDetailsWithInnovativeFinanceIsa)))
+      when(mockUserAnswersRepository.get(testSessionId)).thenReturn(Future.successful(None))
 
-      val action = new Harness(mockRegistrationConnector, errorHandler)
       val result = action
         .callRefine(IdentifierRequest(request, testZref, testCredentialId, testSessionId))
         .futureValue
 
       result shouldBe Right(
-        DataRequest(request, testZref, testCredentialId, testSessionId, Some(testRegistrationDetails))
+        DataRequest(
+          request,
+          testZref,
+          testCredentialId,
+          testSessionId,
+          sessionAnswers = None,
+          effectiveAnswers = SessionUpdates(
+            correspondenceAddress = Some(testCorrespondenceAddress),
+            organisationTelephoneNumber = Some(testOrgTelephoneNumber),
+            isaProducts = Some(testIsaProductSelections),
+            innovativeFinancialProducts = Some(testInnovativeFinancialProductSelections)
+          )
+        )
       )
     }
 
-    "carry forward None when disa-account has nothing to prefill" in {
-      val request = FakeRequest()
-      when(mockRegistrationConnector.getRegistrationDetails(eqTo(testZref))(any()))
-        .thenReturn(Future.successful(None))
+    "prefer session answers field by field while falling back for unanswered fields" in {
+      val request      = FakeRequest()
+      val updates      = SessionUpdates(
+        organisationTelephoneNumber = Some("07777777777"),
+        isaProducts = Some(Seq(CashIsas)),
+        innovativeFinancialProducts = Some(Seq(LongTermAssetFunds))
+      )
+      val savedAnswers = UserAnswers(testSessionId, updates)
 
-      val action = new Harness(mockRegistrationConnector, errorHandler)
+      when(mockRegistrationConnector.getRegistrationDetails(eqTo(testZref))(any()))
+        .thenReturn(Future.successful(Some(testRegistrationDetailsWithInnovativeFinanceIsa)))
+      when(mockUserAnswersRepository.get(testSessionId)).thenReturn(Future.successful(Some(savedAnswers)))
+
       val result = action
         .callRefine(IdentifierRequest(request, testZref, testCredentialId, testSessionId))
         .futureValue
 
-      result shouldBe Right(DataRequest(request, testZref, testCredentialId, testSessionId, None))
+      result shouldBe Right(
+        DataRequest(
+          request,
+          testZref,
+          testCredentialId,
+          testSessionId,
+          sessionAnswers = Some(savedAnswers),
+          effectiveAnswers = SessionUpdates(
+            correspondenceAddress = Some(testCorrespondenceAddress),
+            organisationTelephoneNumber = Some("07777777777"),
+            isaProducts = Some(Seq(CashIsas)),
+            innovativeFinancialProducts = Some(Seq(LongTermAssetFunds))
+          )
+        )
+      )
+    }
+
+    "retain explicitly empty session selections instead of restoring registration answers" in {
+      val request      = FakeRequest()
+      val savedAnswers = UserAnswers(
+        testSessionId,
+        SessionUpdates(
+          isaProducts = Some(Seq.empty),
+          innovativeFinancialProducts = Some(Seq.empty)
+        )
+      )
+
+      when(mockRegistrationConnector.getRegistrationDetails(eqTo(testZref))(any()))
+        .thenReturn(Future.successful(Some(testRegistrationDetailsWithInnovativeFinanceIsa)))
+      when(mockUserAnswersRepository.get(testSessionId)).thenReturn(Future.successful(Some(savedAnswers)))
+
+      val result = action
+        .callRefine(IdentifierRequest(request, testZref, testCredentialId, testSessionId))
+        .futureValue
+
+      result.value.effectiveAnswers.isaProducts                 shouldBe Some(Seq.empty)
+      result.value.effectiveAnswers.innovativeFinancialProducts shouldBe Some(Seq.empty)
+    }
+
+    "use empty effective answers when neither source has answers" in {
+      val request = FakeRequest()
+      when(mockRegistrationConnector.getRegistrationDetails(eqTo(testZref))(any()))
+        .thenReturn(Future.successful(None))
+      when(mockUserAnswersRepository.get(testSessionId)).thenReturn(Future.successful(None))
+
+      val result = action
+        .callRefine(IdentifierRequest(request, testZref, testCredentialId, testSessionId))
+        .futureValue
+
+      result shouldBe Right(
+        DataRequest(request, testZref, testCredentialId, testSessionId, None, SessionUpdates())
+      )
     }
 
     "return an InternalServerError and not admit the request when the call to disa-account fails" in {
       when(mockRegistrationConnector.getRegistrationDetails(eqTo(testZref))(any()))
         .thenReturn(Future.failed(new RuntimeException("Boom")))
+      when(mockUserAnswersRepository.get(testSessionId)).thenReturn(Future.successful(None))
 
-      val action = new Harness(mockRegistrationConnector, errorHandler)
-      val result = action
-        .callRefine(IdentifierRequest(FakeRequest(), testZref, testCredentialId, testSessionId))
-        .futureValue
+      val result = await(
+        action.callRefine(IdentifierRequest(FakeRequest(), testZref, testCredentialId, testSessionId))
+      )
+
+      result.isLeft                                shouldBe true
+      status(Future.successful(result.left.value)) shouldBe INTERNAL_SERVER_ERROR
+    }
+
+    "return an InternalServerError and not admit the request when session retrieval fails" in {
+      when(mockRegistrationConnector.getRegistrationDetails(eqTo(testZref))(any()))
+        .thenReturn(Future.successful(Some(testRegistrationDetails)))
+      when(mockUserAnswersRepository.get(testSessionId)).thenReturn(Future.failed(new RuntimeException("Boom")))
+
+      val result = await(
+        action.callRefine(IdentifierRequest(FakeRequest(), testZref, testCredentialId, testSessionId))
+      )
 
       result.isLeft                                shouldBe true
       status(Future.successful(result.left.value)) shouldBe INTERNAL_SERVER_ERROR

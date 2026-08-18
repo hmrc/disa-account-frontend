@@ -21,7 +21,8 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction}
 import uk.gov.hmrc.disaaccountfrontend.forms.InnovativeFinancialProductsFormProvider
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct
-import uk.gov.hmrc.disaaccountfrontend.models.{EffectiveAnswers, SessionUpdates, UserAnswers}
+import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct.InnovativeFinanceIsas
+import uk.gov.hmrc.disaaccountfrontend.models.{SessionUpdates, UserAnswers}
 import uk.gov.hmrc.disaaccountfrontend.navigation.{InnovativeFinancialProductsPage, Navigator}
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
 import uk.gov.hmrc.disaaccountfrontend.views.html.InnovativeFinancialProductsView
@@ -45,45 +46,37 @@ class InnovativeFinancialProductsController @Inject() (
 
   private val form = formProvider()
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData).async { implicit request =>
-    userAnswersRepository.get(request.sessionId).map { sessionAnswers =>
-      val effectiveAnswers = EffectiveAnswers.from(request.registrationDetails, sessionAnswers.map(_.updates))
+  def onPageLoad(): Action[AnyContent] = (identify andThen getData) { implicit request =>
+    if (request.effectiveAnswers.isaProducts.exists(_.contains(InnovativeFinanceIsas))) {
+      val preparedForm = request.effectiveAnswers.innovativeFinancialProducts
+        .fold(form)(answer => form.fill(answer.toSet))
 
-      if (effectiveAnswers.hasInnovativeFinanceIsa) {
-        val preparedForm = effectiveAnswers.innovativeFinancialProducts
-          .fold(form)(answer => form.fill(answer.toSet))
-
-        Ok(view(preparedForm))
-      } else {
-        Redirect(navigator.nextPage(InnovativeFinancialProductsPage))
-      }
+      Ok(view(preparedForm))
+    } else {
+      Redirect(routes.ChangeOfCircumstancesController.onPageLoad())
     }
   }
 
   def onSubmit(): Action[AnyContent] = (identify andThen getData).async { implicit request =>
-    userAnswersRepository.get(request.sessionId).flatMap { sessionAnswers =>
-      val effectiveAnswers = EffectiveAnswers.from(request.registrationDetails, sessionAnswers.map(_.updates))
+    if (!request.effectiveAnswers.isaProducts.exists(_.contains(InnovativeFinanceIsas))) {
+      Future.successful(Redirect(routes.ChangeOfCircumstancesController.onPageLoad()))
+    } else {
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
+          answer => {
+            val orderedAnswer = InnovativeFinancialProduct.values.filter(answer.contains)
+            val updates       = request.sessionAnswers
+              .map(_.updates)
+              .getOrElse(SessionUpdates())
+              .copy(innovativeFinancialProducts = Some(orderedAnswer))
 
-      if (!effectiveAnswers.hasInnovativeFinanceIsa) {
-        Future.successful(Redirect(navigator.nextPage(InnovativeFinancialProductsPage)))
-      } else {
-        form
-          .bindFromRequest()
-          .fold(
-            formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
-            answer => {
-              val orderedAnswer = InnovativeFinancialProduct.values.filter(answer.contains)
-              val updates       = sessionAnswers
-                .map(_.updates)
-                .getOrElse(SessionUpdates())
-                .copy(innovativeFinancialProducts = Some(orderedAnswer))
-
-              userAnswersRepository
-                .set(UserAnswers(id = request.sessionId, updates = updates))
-                .map(_ => Redirect(navigator.nextPage(InnovativeFinancialProductsPage, updates)))
-            }
-          )
-      }
+            userAnswersRepository
+              .set(UserAnswers(id = request.sessionId, updates = updates))
+              .map(_ => Redirect(navigator.nextPage(InnovativeFinancialProductsPage, updates)))
+          }
+        )
     }
   }
 }

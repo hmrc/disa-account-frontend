@@ -44,13 +44,9 @@ class OrganisationTelephoneNumberController @Inject() (
 
   private val form = formProvider("organisationTelephoneNumber")
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData).async { implicit request =>
-    userAnswersRepository.get(request.sessionId).map { existing =>
-      val cachedTelephoneNumber = existing.flatMap(_.updates.organisationTelephoneNumber)
-      val telephoneNumber       = cachedTelephoneNumber.orElse(request.registrationDetails.flatMap(_.orgTelephoneNumber))
-      val preparedForm          = telephoneNumber.fold(form)(form.fill)
-      Ok(view(preparedForm))
-    }
+  def onPageLoad(): Action[AnyContent] = (identify andThen getData) { implicit request =>
+    val preparedForm = request.effectiveAnswers.organisationTelephoneNumber.fold(form)(form.fill)
+    Ok(view(preparedForm))
   }
 
   def onSubmit(): Action[AnyContent] = identify.async { implicit request =>

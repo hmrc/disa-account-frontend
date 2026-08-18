@@ -20,8 +20,7 @@ import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import play.api.test.Helpers._
 import play.api.test._
-import uk.gov.hmrc.disaaccountfrontend.models.registration.OrganisationDetails
-import uk.gov.hmrc.disaaccountfrontend.models.{SessionUpdates, UserAnswers}
+import uk.gov.hmrc.disaaccountfrontend.models.SessionUpdates
 import utils.BaseUnitSpec
 
 import scala.concurrent.Future
@@ -41,31 +40,10 @@ class EnterYourOrganisationAddressControllerSpec extends BaseUnitSpec {
 
   "EnterYourOrganisationAddressController.onPageLoad" should {
 
-    "return 200 OK prefilled from the cache when saved answers already exist, in preference to disa-account" in {
-      val disaAccountAddress = testCorrespondenceAddress.copy(addressLine1 = Some("9 Stale Street"))
-      val disaAccountDetails =
-        testRegistrationDetails.copy(organisationDetails = Some(OrganisationDetails(Some(disaAccountAddress))))
-
-      when(mockUserAnswersRepository.get(testSessionId))
-        .thenReturn(
-          Future.successful(Some(UserAnswers(testSessionId, SessionUpdates(Some(testCorrespondenceAddress)))))
-        )
-
-      val application = applicationBuilder(registrationDetails = Some(disaAccountDetails)).build()
-
-      running(application) {
-        val result = route(application, FakeRequest(GET, onPageLoadUrl)).value
-
-        status(result)        shouldBe OK
-        contentAsString(result) should include("1 Test Street")
-        contentAsString(result) should not include "9 Stale Street"
-      }
-    }
-
-    "return 200 OK prefilled from disa-account when there are no cached answers" in {
-      when(mockUserAnswersRepository.get(testSessionId)).thenReturn(Future.successful(None))
-
-      val application = applicationBuilder(registrationDetails = Some(testRegistrationDetails)).build()
+    "return 200 OK prefilled from the effective answers supplied by the retrieval action" in {
+      val application = applicationBuilder(
+        effectiveAnswers = SessionUpdates(correspondenceAddress = Some(testCorrespondenceAddress))
+      ).build()
 
       running(application) {
         val result = route(application, FakeRequest(GET, onPageLoadUrl)).value
@@ -76,9 +54,7 @@ class EnterYourOrganisationAddressControllerSpec extends BaseUnitSpec {
     }
 
     "return 200 OK with an empty form when there is nothing to prefill" in {
-      when(mockUserAnswersRepository.get(testSessionId)).thenReturn(Future.successful(None))
-
-      val application = applicationBuilder(registrationDetails = None).build()
+      val application = applicationBuilder().build()
 
       running(application) {
         val result = route(application, FakeRequest(GET, onPageLoadUrl)).value

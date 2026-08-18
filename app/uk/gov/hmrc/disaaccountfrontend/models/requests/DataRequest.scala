@@ -17,12 +17,13 @@
 package uk.gov.hmrc.disaaccountfrontend.models.requests
 
 import play.api.mvc.{Request, WrappedRequest}
-import uk.gov.hmrc.disaaccountfrontend.models.registration.RegistrationDetails
+import uk.gov.hmrc.disaaccountfrontend.models.{SessionUpdates, UserAnswers}
 
 case class DataRequest[A](
   request: Request[A],
   zReference: String,
   credentialId: String,
   sessionId: String,
-  registrationDetails: Option[RegistrationDetails]
+  sessionAnswers: Option[UserAnswers],
+  effectiveAnswers: SessionUpdates
 ) extends WrappedRequest[A](request)
