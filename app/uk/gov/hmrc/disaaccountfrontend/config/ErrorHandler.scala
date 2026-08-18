@@ -17,7 +17,8 @@
 package uk.gov.hmrc.disaaccountfrontend.config
 
 import play.api.i18n.MessagesApi
-import play.api.mvc.RequestHeader
+import play.api.mvc.Results.InternalServerError
+import play.api.mvc.{RequestHeader, Result}
 import play.twirl.api.Html
 import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
 import uk.gov.hmrc.disaaccountfrontend.views.html.ErrorTemplate
@@ -38,4 +39,7 @@ class ErrorHandler @Inject() (
     message: String
   )(implicit request: RequestHeader): Future[Html] =
     Future.successful(errorTemplate(pageTitle, heading, message))
+
+  def internalServerError(implicit request: RequestHeader): Future[Result] =
+    internalServerErrorTemplate.map(InternalServerError(_))
 }

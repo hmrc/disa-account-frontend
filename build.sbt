@@ -13,9 +13,21 @@ lazy val microservice = Project("disa-account-frontend", file("."))
     // suppress warnings in generated routes files
     scalacOptions += "-Wconf:src=routes/.*:s",
     scalacOptions += "-Wconf:msg=unused import&src=html/.*:s",
-    pipelineStages := Seq(gzip)
+    pipelineStages := Seq(gzip),
+    TwirlKeys.templateImports ++= Seq(
+      "play.twirl.api.HtmlFormat",
+      "play.twirl.api.HtmlFormat._",
+      "uk.gov.hmrc.govukfrontend.views.html.components._",
+      "uk.gov.hmrc.hmrcfrontend.views.html.components._",
+      "uk.gov.hmrc.hmrcfrontend.views.html.helpers._",
+      "uk.gov.hmrc.hmrcfrontend.views.config._",
+      "uk.gov.hmrc.disaaccountfrontend.views.ViewUtils._",
+      "uk.gov.hmrc.disaaccountfrontend.controllers.routes._",
+      "uk.gov.hmrc.disaaccountfrontend.viewmodels.govuk.all._"
+    )
   )
   .settings(CodeCoverageSettings.settings: _*)
+  .settings(PlayKeys.playDefaultPort := 12104)
 
 lazy val it = project
   .enablePlugins(PlayScala)
