@@ -14,18 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.models
+package uk.gov.hmrc.disaaccountfrontend.viewmodels.govuk
 
-import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.{InnovativeFinancialProduct, IsaProduct}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.{Fieldset, Legend}
 
-case class SessionUpdates(
-  correspondenceAddress: Option[CorrespondenceAddress] = None,
-  organisationTelephoneNumber: Option[String] = None,
-  isaProducts: Option[Seq[IsaProduct]] = None,
-  innovativeFinancialProducts: Option[Seq[InnovativeFinancialProduct]] = None
-)
+trait FieldsetFluency {
 
-object SessionUpdates {
-  implicit val format: OFormat[SessionUpdates] = Json.format[SessionUpdates]
+  object FieldsetViewModel {
+    def apply(legend: Legend): Fieldset = Fieldset(legend = Some(legend))
+  }
 }

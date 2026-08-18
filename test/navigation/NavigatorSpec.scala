@@ -16,8 +16,11 @@
 
 package navigation
 
+import uk.gov.hmrc.disaaccountfrontend.controllers.routes.ChangeOfCircumstancesController
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.OrganisationTelephoneNumberController
-import uk.gov.hmrc.disaaccountfrontend.navigation.{EnterYourOrganisationAddressPage, Navigator, OrganisationTelephoneNumberPage}
+import uk.gov.hmrc.disaaccountfrontend.models.SessionUpdates
+import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.{CrowdFundedDebentures, PeertopeerLoansUsingAPlatformWith36hPermissions}
+import uk.gov.hmrc.disaaccountfrontend.navigation.{EnterYourOrganisationAddressPage, InnovativeFinancialProductsPage, Navigator, OrganisationTelephoneNumberPage}
 import utils.BaseUnitSpec
 
 class NavigatorSpec extends BaseUnitSpec {
@@ -32,6 +35,22 @@ class NavigatorSpec extends BaseUnitSpec {
 
     "go from OrganisationTelephoneNumberPage back to itself until the next page in the journey exists" in {
       navigator.nextPage(OrganisationTelephoneNumberPage) shouldBe OrganisationTelephoneNumberController.onPageLoad()
+    }
+
+    "temporarily go from InnovativeFinancialProductsPage to change of circumstances when the platform option is selected" in {
+      val answers = SessionUpdates(
+        innovativeFinancialProducts = Some(Seq(PeertopeerLoansUsingAPlatformWith36hPermissions))
+      )
+
+      navigator.nextPage(InnovativeFinancialProductsPage, answers) shouldBe
+        ChangeOfCircumstancesController.onPageLoad()
+    }
+
+    "go from InnovativeFinancialProductsPage to change of circumstances when the platform option is not selected" in {
+      val answers = SessionUpdates(innovativeFinancialProducts = Some(Seq(CrowdFundedDebentures)))
+
+      navigator.nextPage(InnovativeFinancialProductsPage, answers) shouldBe
+        ChangeOfCircumstancesController.onPageLoad()
     }
   }
 }

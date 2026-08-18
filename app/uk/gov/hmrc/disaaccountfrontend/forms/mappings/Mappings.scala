@@ -19,9 +19,17 @@ package uk.gov.hmrc.disaaccountfrontend.forms.mappings
 import forms.mappings.Constraints
 import play.api.data.FieldMapping
 import play.api.data.Forms.of
+import uk.gov.hmrc.disaaccountfrontend.models.Enumerable
 
 trait Mappings extends Formatters with Constraints {
 
   protected def text(errorKey: String = "error.required", args: Seq[String] = Seq.empty): FieldMapping[String] =
     of(stringFormatter(errorKey, args))
+
+  protected def enumerable[A](
+    requiredKey: String = "error.required",
+    invalidKey: String = "error.invalid",
+    args: Seq[String] = Seq.empty
+  )(implicit ev: Enumerable[A]): FieldMapping[A] =
+    of(enumerableFormatter[A](requiredKey, invalidKey, args))
 }

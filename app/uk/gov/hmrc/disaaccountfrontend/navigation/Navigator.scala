@@ -17,16 +17,32 @@
 package uk.gov.hmrc.disaaccountfrontend.navigation
 
 import play.api.mvc.Call
+import uk.gov.hmrc.disaaccountfrontend.controllers.routes.ChangeOfCircumstancesController
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.OrganisationTelephoneNumberController
+import uk.gov.hmrc.disaaccountfrontend.models.SessionUpdates
+import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
 
 import javax.inject.{Inject, Singleton}
 
 @Singleton
 class Navigator @Inject() () {
 
-  def nextPage(page: Page): Call = page match {
+  def nextPage(page: Page, answers: SessionUpdates = SessionUpdates()): Call = page match {
     case EnterYourOrganisationAddressPage => OrganisationTelephoneNumberController.onPageLoad()
     // TODO: replace with the next page in the journey once it exists.
     case OrganisationTelephoneNumberPage  => OrganisationTelephoneNumberController.onPageLoad()
+    case InnovativeFinancialProductsPage  => innovativeFinancialProductsNextPage(answers)
   }
+
+  private def innovativeFinancialProductsNextPage(answers: SessionUpdates): Call =
+    answers.innovativeFinancialProducts match {
+      case Some(products) if products.contains(PeertopeerLoansUsingAPlatformWith36hPermissions) =>
+        peerToPeerPlatformQuestionPage
+      case _                                                                                    =>
+        ChangeOfCircumstancesController.onPageLoad()
+    }
+
+  private def peerToPeerPlatformQuestionPage: Call =
+    // TODO: Replace this fallback with the peer-to-peer platform question when that page is implemented.
+    ChangeOfCircumstancesController.onPageLoad()
 }

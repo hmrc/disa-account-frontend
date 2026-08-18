@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.models
+package uk.gov.hmrc.disaaccountfrontend.models.isaproducts
 
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.{InnovativeFinancialProduct, IsaProduct}
 
-case class SessionUpdates(
-  correspondenceAddress: Option[CorrespondenceAddress] = None,
-  organisationTelephoneNumber: Option[String] = None,
+case class IsaProducts(
   isaProducts: Option[Seq[IsaProduct]] = None,
-  innovativeFinancialProducts: Option[Seq[InnovativeFinancialProduct]] = None
+  innovativeFinancialProducts: Option[Seq[InnovativeFinancialProduct]] = None,
+  p2pPlatform: Option[String] = None,
+  p2pPlatformNumber: Option[String] = None
 )
 
-object SessionUpdates {
-  implicit val format: OFormat[SessionUpdates] = Json.format[SessionUpdates]
+object IsaProducts {
+  implicit val format: OFormat[IsaProducts] = Json.format[IsaProducts]
 }

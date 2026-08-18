@@ -19,6 +19,9 @@ package utils
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments}
 import uk.gov.hmrc.disaaccountfrontend.models.CorrespondenceAddress
+import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.{CrowdFundedDebentures, PeertopeerLoansAndHave36hPermissions}
+import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct.{CashIsas, InnovativeFinanceIsas}
+import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
 import uk.gov.hmrc.disaaccountfrontend.models.registration.{OrganisationDetails, RegistrationDetails}
 
 trait TestData {
@@ -48,4 +51,19 @@ trait TestData {
       )
     )
   )
+
+  val testIsaProductSelections: Seq[IsaProduct] = Seq(CashIsas, InnovativeFinanceIsas)
+
+  val testInnovativeFinancialProductSelections: Seq[InnovativeFinancialProduct] =
+    Seq(PeertopeerLoansAndHave36hPermissions, CrowdFundedDebentures)
+
+  val testRegistrationDetailsWithInnovativeFinanceIsa: RegistrationDetails =
+    testRegistrationDetails.copy(
+      isaProducts = Some(
+        IsaProducts(
+          isaProducts = Some(testIsaProductSelections),
+          innovativeFinancialProducts = Some(testInnovativeFinancialProductSelections)
+        )
+      )
+    )
 }

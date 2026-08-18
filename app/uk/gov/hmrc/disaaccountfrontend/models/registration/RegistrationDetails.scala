@@ -18,6 +18,7 @@ package uk.gov.hmrc.disaaccountfrontend.models.registration
 
 import play.api.libs.json.{Json, Reads}
 import uk.gov.hmrc.disaaccountfrontend.models.CorrespondenceAddress
+import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
 
 case class OrganisationDetails(
   correspondenceAddress: Option[CorrespondenceAddress] = None,
@@ -28,9 +29,17 @@ object OrganisationDetails {
   implicit val reads: Reads[OrganisationDetails] = Json.reads[OrganisationDetails]
 }
 
-case class RegistrationDetails(organisationDetails: Option[OrganisationDetails] = None) {
+case class RegistrationDetails(
+  organisationDetails: Option[OrganisationDetails] = None,
+  isaProducts: Option[IsaProducts] = None
+) {
   def correspondenceAddress: Option[CorrespondenceAddress] = organisationDetails.flatMap(_.correspondenceAddress)
   def orgTelephoneNumber: Option[String]                   = organisationDetails.flatMap(_.orgTelephoneNumber)
+
+  def isaProductSelections: Option[Seq[IsaProduct]] = isaProducts.flatMap(_.isaProducts)
+
+  def innovativeFinancialProductSelections: Option[Seq[InnovativeFinancialProduct]] =
+    isaProducts.flatMap(_.innovativeFinancialProducts)
 }
 
 object RegistrationDetails {
