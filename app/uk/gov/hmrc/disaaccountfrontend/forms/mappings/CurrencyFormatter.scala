@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,10 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.models
+package uk.gov.hmrc.disaaccountfrontend.forms.mappings
 
-import play.api.libs.json.{Json, OFormat}
-
-case class SessionUpdates(
-  correspondenceAddress: Option[CorrespondenceAddress] = None,
-  organisationTelephoneNumber: Option[String] = None
-)
-
-object SessionUpdates {
-  implicit val format: OFormat[SessionUpdates] = Json.format[SessionUpdates]
+trait CurrencyFormatter {
+  def currencyFormat(amt: BigDecimal): String = f"£$amt%,1.2f".replace(".00", "")
 }
+
+object CurrencyFormatter extends CurrencyFormatter

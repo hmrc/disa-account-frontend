@@ -14,15 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.models
+package uk.gov.hmrc.disaaccountfrontend.navigation
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.mvc.Call
+import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.OrganisationTelephoneNumberController
 
-case class SessionUpdates(
-  correspondenceAddress: Option[CorrespondenceAddress] = None,
-  organisationTelephoneNumber: Option[String] = None
-)
+import javax.inject.{Inject, Singleton}
 
-object SessionUpdates {
-  implicit val format: OFormat[SessionUpdates] = Json.format[SessionUpdates]
+@Singleton
+class Navigator @Inject() () {
+
+  def nextPage(page: Page): Call = page match {
+    case EnterYourOrganisationAddressPage => OrganisationTelephoneNumberController.onPageLoad()
+    // TODO: replace with the next page in the journey once it exists.
+    case OrganisationTelephoneNumberPage  => OrganisationTelephoneNumberController.onPageLoad()
+  }
 }

@@ -38,7 +38,14 @@ trait TestData {
     postCode = Some("AA1 1AA")
   )
 
+  val testOrgTelephoneNumber: String = "01642123456"
+
   val testRegistrationDetails: RegistrationDetails = RegistrationDetails(
-    organisationDetails = Some(OrganisationDetails(correspondenceAddress = Some(testCorrespondenceAddress)))
+    organisationDetails = Some(
+      OrganisationDetails(
+        correspondenceAddress = Some(testCorrespondenceAddress),
+        orgTelephoneNumber = Some(testOrgTelephoneNumber)
+      )
+    )
   )
 }

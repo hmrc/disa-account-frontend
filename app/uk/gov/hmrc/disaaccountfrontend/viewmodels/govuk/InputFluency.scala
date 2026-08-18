@@ -18,6 +18,8 @@ package uk.gov.hmrc.disaaccountfrontend.viewmodels.govuk
 
 import play.api.data.Field
 import play.api.i18n.Messages
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
 import uk.gov.hmrc.govukfrontend.views.viewmodels.input.Input
 import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
 import uk.gov.hmrc.disaaccountfrontend.viewmodels.{ErrorMessageAwareness, InputWidth}
@@ -41,9 +43,16 @@ trait InputFluency {
       )
   }
 
+  object HintViewModel {
+    def apply(text: String): Hint = Hint(content = Text(text))
+  }
+
   implicit class FluentInput(input: Input) {
 
     def withWidth(inputWidth: InputWidth): Input =
       input.copy(classes = s"${input.classes} $inputWidth")
+
+    def withHint(hint: Hint): Input =
+      input.copy(hint = Some(hint))
   }
 }
