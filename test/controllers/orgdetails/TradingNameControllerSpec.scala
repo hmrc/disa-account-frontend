@@ -67,7 +67,6 @@ class TradingNameControllerSpec extends BaseUnitSpec {
   "TradingNameController.onSubmit" should {
 
     "save the answer and redirect when the form is valid" in {
-      when(mockUserAnswersRepository.get(testSessionId)).thenReturn(Future.successful(None))
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
 
       val application = applicationBuilder().build()
@@ -86,15 +85,12 @@ class TradingNameControllerSpec extends BaseUnitSpec {
     }
 
     "preserve an existing cached correspondence address when saving the answer" in {
-      when(mockUserAnswersRepository.get(testSessionId))
-        .thenReturn(
-          Future.successful(
-            Some(UserAnswers(testSessionId, SessionUpdates(correspondenceAddress = Some(testCorrespondenceAddress))))
-          )
-        )
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
 
-      val application = applicationBuilder().build()
+      val application = applicationBuilder(
+        sessionAnswers =
+          Some(UserAnswers(testSessionId, SessionUpdates(correspondenceAddress = Some(testCorrespondenceAddress))))
+      ).build()
 
       running(application) {
         val request =

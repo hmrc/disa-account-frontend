@@ -52,19 +52,18 @@ class TradingNameController @Inject() (
     Ok(view(preparedForm))
   }
 
-  def onSubmit(): Action[AnyContent] = identify.async { implicit request =>
+  def onSubmit(): Action[AnyContent] = (identify andThen getData).async { implicit request =>
     form
       .bindFromRequest()
       .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
-        answer =>
-          userAnswersRepository.get(request.sessionId).flatMap { existing =>
-            val updates =
-              existing.map(_.updates).getOrElse(SessionUpdates()).copy(tradingName = Some(answer))
-            userAnswersRepository.set(UserAnswers(id = request.sessionId, updates = updates)).map { _ =>
-              Redirect(navigator.nextPage(TradingNamePage))
-            }
+        answer => {
+          val updates =
+            request.sessionAnswers.map(_.updates).getOrElse(SessionUpdates()).copy(tradingName = Some(answer))
+          userAnswersRepository.set(UserAnswers(id = request.sessionId, updates = updates)).map { _ =>
+            Redirect(navigator.nextPage(TradingNamePage))
           }
+        }
       )
   }
 }
