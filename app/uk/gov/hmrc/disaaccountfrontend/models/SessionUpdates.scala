@@ -22,6 +22,7 @@ import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.{InnovativeFinancialPr
 case class SessionUpdates(
   correspondenceAddress: Option[CorrespondenceAddress] = None,
   organisationTelephoneNumber: Option[String] = None,
+  tradingName: Option[String] = None,
   isaProducts: Option[Seq[IsaProduct]] = None,
   innovativeFinancialProducts: Option[Seq[InnovativeFinancialProduct]] = None
 )

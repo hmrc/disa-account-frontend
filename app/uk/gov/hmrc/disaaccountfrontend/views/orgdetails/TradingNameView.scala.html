@@ -1,5 +1,5 @@
 @*
- * Copyright 2026 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,10 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.OrganisationTelephoneNumberController
 @import uk.gov.hmrc.disaaccountfrontend.viewmodels.InputWidth._
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
+@import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.TradingNameController
+@import uk.gov.hmrc.disaaccountfrontend.views.html.Layout
 
 @this(
     layout: Layout,
@@ -27,9 +29,9 @@
 
 @(form: Form[_])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = Some(title(form, "organisationTelephoneNumber.title", Some("sectionTitle.orgDetails")))) {
+@layout(pageTitle = Some(title(form, "tradingName.title", Some("sectionTitle.orgDetails")))) {
 
-    @formHelper(action = OrganisationTelephoneNumberController.onSubmit()) {
+    @formHelper(action = TradingNameController.onSubmit()) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -37,11 +39,15 @@
 
         @govukInput(
             InputViewModel(
-                field = form("value"),
-                label = HmrcPageHeadingLabel.apply(Text(messages("organisationTelephoneNumber.heading")), HmrcSectionCaption(messages("sectionTitle.orgDetails")), "govuk-label--l")
+                  field = form("value"),
+                  label = HmrcPageHeadingLabel.apply(
+                    content = Text(messages("tradingName.heading")),
+                    caption = HmrcSectionCaption(messages("sectionTitle.orgDetails")),
+                    classes = "govuk-label--l govuk-!-margin-bottom-4",
+                    attributes = Map("for" -> "value")
+                  )
             )
             .withWidth(Full)
-            .withHint(HintViewModel(messages("organisationTelephoneNumber.hint")))
         )
 
         @govukButton(

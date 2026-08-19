@@ -22,7 +22,8 @@ import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.{InnovativeFinancialPr
 
 case class OrganisationDetails(
   correspondenceAddress: Option[CorrespondenceAddress] = None,
-  orgTelephoneNumber: Option[String] = None
+  orgTelephoneNumber: Option[String] = None,
+  tradingName: Option[String] = None
 )
 
 object OrganisationDetails {
@@ -35,6 +36,7 @@ case class RegistrationDetails(
 ) {
   def correspondenceAddress: Option[CorrespondenceAddress] = organisationDetails.flatMap(_.correspondenceAddress)
   def orgTelephoneNumber: Option[String]                   = organisationDetails.flatMap(_.orgTelephoneNumber)
+  def tradingName: Option[String]                          = organisationDetails.flatMap(_.tradingName)
 
   def isaProductSelections: Option[Seq[IsaProduct]] = isaProducts.flatMap(_.isaProducts)
 

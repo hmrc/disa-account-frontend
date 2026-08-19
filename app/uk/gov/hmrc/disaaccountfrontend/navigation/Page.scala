@@ -20,4 +20,5 @@ sealed trait Page
 
 case object EnterYourOrganisationAddressPage extends Page
 case object OrganisationTelephoneNumberPage extends Page
+case object TradingNamePage extends Page
 case object InnovativeFinancialProductsPage extends Page

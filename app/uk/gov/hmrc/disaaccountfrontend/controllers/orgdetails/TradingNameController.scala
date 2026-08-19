@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,36 +16,39 @@
 
 package uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails
 
+import play.api.Logging
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction}
-import uk.gov.hmrc.disaaccountfrontend.forms.TelephoneNumberFormProvider
+import uk.gov.hmrc.disaaccountfrontend.forms.TradingNameFormProvider
 import uk.gov.hmrc.disaaccountfrontend.models.{SessionUpdates, UserAnswers}
-import uk.gov.hmrc.disaaccountfrontend.navigation.{Navigator, OrganisationTelephoneNumberPage}
+import uk.gov.hmrc.disaaccountfrontend.navigation.{Navigator, TradingNamePage}
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
-import uk.gov.hmrc.disaaccountfrontend.views.html.orgdetails.OrganisationTelephoneNumberView
+import uk.gov.hmrc.disaaccountfrontend.views.html.orgdetails.TradingNameView
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class OrganisationTelephoneNumberController @Inject() (
+class TradingNameController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   userAnswersRepository: UserAnswersRepository,
   navigator: Navigator,
-  formProvider: TelephoneNumberFormProvider,
+  formProvider: TradingNameFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: OrganisationTelephoneNumberView
+  view: TradingNameView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
-  private val form = formProvider("organisationTelephoneNumber")
+  val form: Form[String] = formProvider()
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData) { implicit request =>
-    val preparedForm = request.effectiveAnswers.organisationTelephoneNumber.fold(form)(form.fill)
+    val preparedForm = request.effectiveAnswers.tradingName.fold(form)(form.fill)
     Ok(view(preparedForm))
   }
 
@@ -57,9 +60,9 @@ class OrganisationTelephoneNumberController @Inject() (
         answer =>
           userAnswersRepository.get(request.sessionId).flatMap { existing =>
             val updates =
-              existing.map(_.updates).getOrElse(SessionUpdates()).copy(organisationTelephoneNumber = Some(answer))
+              existing.map(_.updates).getOrElse(SessionUpdates()).copy(tradingName = Some(answer))
             userAnswersRepository.set(UserAnswers(id = request.sessionId, updates = updates)).map { _ =>
-              Redirect(navigator.nextPage(OrganisationTelephoneNumberPage))
+              Redirect(navigator.nextPage(TradingNamePage))
             }
           }
       )
