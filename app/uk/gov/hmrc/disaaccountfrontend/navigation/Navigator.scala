@@ -17,8 +17,11 @@
 package uk.gov.hmrc.disaaccountfrontend.navigation
 
 import play.api.mvc.Call
-import uk.gov.hmrc.disaaccountfrontend.controllers.routes.ChangeOfCircumstancesController
-import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes._
+import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, PeerToPeerPlatformController}
+import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.{
+  OrganisationTelephoneNumberController,
+  TradingNameController
+}
 import uk.gov.hmrc.disaaccountfrontend.models.SessionUpdates
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
 
@@ -33,6 +36,7 @@ class Navigator @Inject() () {
     case OrganisationTelephoneNumberPage  => OrganisationTelephoneNumberController.onPageLoad()
     case TradingNamePage                  => TradingNameController.onPageLoad()
     case InnovativeFinancialProductsPage  => innovativeFinancialProductsNextPage(answers)
+    case PeerToPeerPlatformPage           => peerToPeerPlatformNextPage(answers)
   }
 
   private def innovativeFinancialProductsNextPage(answers: SessionUpdates): Call =
@@ -44,6 +48,15 @@ class Navigator @Inject() () {
     }
 
   private def peerToPeerPlatformQuestionPage: Call =
-    // TODO: Replace this fallback with the peer-to-peer platform question when that page is implemented.
+    PeerToPeerPlatformController.onPageLoad()
+
+  private def peerToPeerPlatformNextPage(answers: SessionUpdates): Call =
+    answers.p2pPlatformNumber match {
+      case Some(_) => ChangeOfCircumstancesController.onPageLoad()
+      case None    => peerToPeerPlatformNumberQuestionPage
+    }
+
+  private def peerToPeerPlatformNumberQuestionPage: Call =
+    // TODO: Replace this fallback with the FCA/FRN question when that page is implemented.
     ChangeOfCircumstancesController.onPageLoad()
 }

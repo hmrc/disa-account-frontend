@@ -35,6 +35,10 @@ import scala.concurrent.Future
 
 class DataRetrievalActionSpec extends BaseUnitSpec {
 
+  private val updatedOrgTelephoneNumber = "07777777777"
+  private val updatedP2pPlatform        = "Updated platform"
+  private val updatedP2pPlatformNumber  = "7654321"
+
   val errorHandler: ErrorHandler = app.injector.instanceOf[ErrorHandler]
 
   class Harness(
@@ -70,7 +74,9 @@ class DataRetrievalActionSpec extends BaseUnitSpec {
             correspondenceAddress = Some(testCorrespondenceAddress),
             organisationTelephoneNumber = Some(testOrgTelephoneNumber),
             isaProducts = Some(testIsaProductSelections),
-            innovativeFinancialProducts = Some(testInnovativeFinancialProductSelections)
+            innovativeFinancialProducts = Some(testInnovativeFinancialProductSelections),
+            p2pPlatform = Some(testP2pPlatform),
+            p2pPlatformNumber = Some(testP2pPlatformNumber)
           )
         )
       )
@@ -79,9 +85,11 @@ class DataRetrievalActionSpec extends BaseUnitSpec {
     "prefer session answers field by field while falling back for unanswered fields" in {
       val request      = FakeRequest()
       val updates      = SessionUpdates(
-        organisationTelephoneNumber = Some("07777777777"),
+        organisationTelephoneNumber = Some(updatedOrgTelephoneNumber),
         isaProducts = Some(Seq(CashIsas)),
-        innovativeFinancialProducts = Some(Seq(LongTermAssetFunds))
+        innovativeFinancialProducts = Some(Seq(LongTermAssetFunds)),
+        p2pPlatform = Some(updatedP2pPlatform),
+        p2pPlatformNumber = Some(updatedP2pPlatformNumber)
       )
       val savedAnswers = UserAnswers(testSessionId, updates)
 
@@ -102,9 +110,11 @@ class DataRetrievalActionSpec extends BaseUnitSpec {
           sessionAnswers = Some(savedAnswers),
           effectiveAnswers = SessionUpdates(
             correspondenceAddress = Some(testCorrespondenceAddress),
-            organisationTelephoneNumber = Some("07777777777"),
+            organisationTelephoneNumber = Some(updatedOrgTelephoneNumber),
             isaProducts = Some(Seq(CashIsas)),
-            innovativeFinancialProducts = Some(Seq(LongTermAssetFunds))
+            innovativeFinancialProducts = Some(Seq(LongTermAssetFunds)),
+            p2pPlatform = Some(updatedP2pPlatform),
+            p2pPlatformNumber = Some(updatedP2pPlatformNumber)
           )
         )
       )

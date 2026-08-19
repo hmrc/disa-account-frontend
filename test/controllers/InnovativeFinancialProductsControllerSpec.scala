@@ -172,7 +172,7 @@ class InnovativeFinancialProductsControllerSpec extends BaseUnitSpec {
       }
     }
 
-    "use the temporary change-of-circumstances fallback when the platform-with-36H option is selected" in {
+    "redirect to the peer-to-peer platform page when the platform-with-36H option is selected" in {
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
       val application = applicationBuilder(
         effectiveAnswers = enrolledEffectiveAnswers
@@ -188,7 +188,7 @@ class InnovativeFinancialProductsControllerSpec extends BaseUnitSpec {
         val result = route(application, request).value
 
         status(result)               shouldBe SEE_OTHER
-        redirectLocation(result).value should endWith("/change-of-circumstances")
+        redirectLocation(result).value should endWith("/peer-to-peer-loans")
         verify(mockUserAnswersRepository).set(any())
       }
     }

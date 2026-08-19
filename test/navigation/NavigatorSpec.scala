@@ -16,11 +16,11 @@
 
 package navigation
 
-import uk.gov.hmrc.disaaccountfrontend.controllers.routes.ChangeOfCircumstancesController
+import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, PeerToPeerPlatformController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.OrganisationTelephoneNumberController
 import uk.gov.hmrc.disaaccountfrontend.models.SessionUpdates
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.{CrowdFundedDebentures, PeertopeerLoansUsingAPlatformWith36hPermissions}
-import uk.gov.hmrc.disaaccountfrontend.navigation.{EnterYourOrganisationAddressPage, InnovativeFinancialProductsPage, Navigator, OrganisationTelephoneNumberPage}
+import uk.gov.hmrc.disaaccountfrontend.navigation.{EnterYourOrganisationAddressPage, InnovativeFinancialProductsPage, Navigator, OrganisationTelephoneNumberPage, PeerToPeerPlatformPage}
 import utils.BaseUnitSpec
 
 class NavigatorSpec extends BaseUnitSpec {
@@ -37,19 +37,31 @@ class NavigatorSpec extends BaseUnitSpec {
       navigator.nextPage(OrganisationTelephoneNumberPage) shouldBe OrganisationTelephoneNumberController.onPageLoad()
     }
 
-    "temporarily go from InnovativeFinancialProductsPage to change of circumstances when the platform option is selected" in {
+    "go from InnovativeFinancialProductsPage to the peer-to-peer platform page when the platform option is selected" in {
       val answers = SessionUpdates(
         innovativeFinancialProducts = Some(Seq(PeertopeerLoansUsingAPlatformWith36hPermissions))
       )
 
       navigator.nextPage(InnovativeFinancialProductsPage, answers) shouldBe
-        ChangeOfCircumstancesController.onPageLoad()
+        PeerToPeerPlatformController.onPageLoad()
     }
 
     "go from InnovativeFinancialProductsPage to change of circumstances when the platform option is not selected" in {
       val answers = SessionUpdates(innovativeFinancialProducts = Some(Seq(CrowdFundedDebentures)))
 
       navigator.nextPage(InnovativeFinancialProductsPage, answers) shouldBe
+        ChangeOfCircumstancesController.onPageLoad()
+    }
+
+    "temporarily go from PeerToPeerPlatformPage to change of circumstances when the FCA/FRN page is not built" in {
+      navigator.nextPage(PeerToPeerPlatformPage, SessionUpdates()) shouldBe
+        ChangeOfCircumstancesController.onPageLoad()
+    }
+
+    "go from PeerToPeerPlatformPage to change of circumstances when an FCA/FRN is already present" in {
+      val answers = SessionUpdates(p2pPlatformNumber = Some(testP2pPlatformNumber))
+
+      navigator.nextPage(PeerToPeerPlatformPage, answers) shouldBe
         ChangeOfCircumstancesController.onPageLoad()
     }
   }

@@ -42,6 +42,8 @@ trait TestData {
   )
 
   val testOrgTelephoneNumber: String = "01642123456"
+  val testP2pPlatform: String        = "Platform r Us"
+  val testP2pPlatformNumber: String  = "1234567"
 
   val testRegistrationDetails: RegistrationDetails = RegistrationDetails(
     organisationDetails = Some(
@@ -62,7 +64,9 @@ trait TestData {
       isaProducts = Some(
         IsaProducts(
           isaProducts = Some(testIsaProductSelections),
-          innovativeFinancialProducts = Some(testInnovativeFinancialProductSelections)
+          innovativeFinancialProducts = Some(testInnovativeFinancialProductSelections),
+          p2pPlatform = Some(testP2pPlatform),
+          p2pPlatformNumber = Some(testP2pPlatformNumber)
         )
       )
     )

@@ -57,8 +57,23 @@ class SessionUpdatesSpec extends BaseUnitSpec {
       Json.toJson(sessionUpdates).validate[SessionUpdates] shouldBe JsSuccess(sessionUpdates)
     }
 
+    "round-trip through JSON when peer-to-peer platform answers are present" in {
+      val sessionUpdates = SessionUpdates(
+        p2pPlatform = Some(testP2pPlatform),
+        p2pPlatformNumber = Some(testP2pPlatformNumber)
+      )
+
+      Json.toJson(sessionUpdates).validate[SessionUpdates] shouldBe JsSuccess(sessionUpdates)
+    }
+
     "default organisationTelephoneNumber to None when absent from the JSON" in {
       Json.obj().validate[SessionUpdates] shouldBe JsSuccess(SessionUpdates(organisationTelephoneNumber = None))
+    }
+
+    "default peer-to-peer platform answers to None when absent from the JSON" in {
+      Json.obj().validate[SessionUpdates] shouldBe JsSuccess(
+        SessionUpdates(p2pPlatform = None, p2pPlatformNumber = None)
+      )
     }
   }
 }

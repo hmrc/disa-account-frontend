@@ -24,7 +24,9 @@ case class SessionUpdates(
   organisationTelephoneNumber: Option[String] = None,
   tradingName: Option[String] = None,
   isaProducts: Option[Seq[IsaProduct]] = None,
-  innovativeFinancialProducts: Option[Seq[InnovativeFinancialProduct]] = None
+  innovativeFinancialProducts: Option[Seq[InnovativeFinancialProduct]] = None,
+  p2pPlatform: Option[String] = None,
+  p2pPlatformNumber: Option[String] = None
 )
 
 object SessionUpdates {

@@ -80,7 +80,9 @@ class DataRetrievalActionImpl @Inject() (
       organisationTelephoneNumber = registrationDetails.flatMap(_.orgTelephoneNumber),
       tradingName = registrationDetails.flatMap(_.tradingName),
       isaProducts = registrationDetails.flatMap(_.isaProductSelections),
-      innovativeFinancialProducts = registrationDetails.flatMap(_.innovativeFinancialProductSelections)
+      innovativeFinancialProducts = registrationDetails.flatMap(_.innovativeFinancialProductSelections),
+      p2pPlatform = registrationDetails.flatMap(_.p2pPlatform),
+      p2pPlatformNumber = registrationDetails.flatMap(_.p2pPlatformNumber)
     )
 
     sessionAnswers.fold(registrationAnswers) { answers =>
@@ -93,7 +95,9 @@ class DataRetrievalActionImpl @Inject() (
           sessionUpdates.organisationTelephoneNumber.orElse(registrationAnswers.organisationTelephoneNumber),
         isaProducts = sessionUpdates.isaProducts.orElse(registrationAnswers.isaProducts),
         innovativeFinancialProducts =
-          sessionUpdates.innovativeFinancialProducts.orElse(registrationAnswers.innovativeFinancialProducts)
+          sessionUpdates.innovativeFinancialProducts.orElse(registrationAnswers.innovativeFinancialProducts),
+        p2pPlatform = sessionUpdates.p2pPlatform.orElse(registrationAnswers.p2pPlatform),
+        p2pPlatformNumber = sessionUpdates.p2pPlatformNumber.orElse(registrationAnswers.p2pPlatformNumber)
       )
     }
   }
