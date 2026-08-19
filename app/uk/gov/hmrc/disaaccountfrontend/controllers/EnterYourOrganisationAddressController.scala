@@ -20,6 +20,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction}
 import uk.gov.hmrc.disaaccountfrontend.forms.EnterYourOrganisationAddressFormProvider
+import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
 import uk.gov.hmrc.disaaccountfrontend.models.{SessionUpdates, UserAnswers}
 import uk.gov.hmrc.disaaccountfrontend.navigation.{EnterYourOrganisationAddressPage, Navigator}
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
@@ -56,7 +57,8 @@ class EnterYourOrganisationAddressController @Inject() (
         formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
         answer =>
           userAnswersRepository.get(request.sessionId).flatMap { existing =>
-            val updates = existing.map(_.updates).getOrElse(SessionUpdates()).copy(correspondenceAddress = Some(answer))
+            val updates =
+              existing.map(_.updates).getOrElse(SessionUpdates()).copy(correspondenceAddress = Assign(answer))
             userAnswersRepository.set(UserAnswers(id = request.sessionId, updates = updates)).map { _ =>
               Redirect(navigator.nextPage(EnterYourOrganisationAddressPage))
             }

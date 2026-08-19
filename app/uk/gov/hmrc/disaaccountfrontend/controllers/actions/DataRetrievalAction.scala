@@ -22,7 +22,7 @@ import uk.gov.hmrc.disaaccountfrontend.config.ErrorHandler
 import uk.gov.hmrc.disaaccountfrontend.connectors.RegistrationConnector
 import uk.gov.hmrc.disaaccountfrontend.models.registration.RegistrationDetails
 import uk.gov.hmrc.disaaccountfrontend.models.requests.{DataRequest, IdentifierRequest}
-import uk.gov.hmrc.disaaccountfrontend.models.{SessionUpdates, UserAnswers}
+import uk.gov.hmrc.disaaccountfrontend.models.{Answers, UserAnswers}
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
@@ -70,12 +70,11 @@ class DataRetrievalActionImpl @Inject() (
       }
   }
 
-  // A defined session value, including Some(Seq.empty), must take precedence over registration data.
   private def mergeAnswers(
     registrationDetails: Option[RegistrationDetails],
     sessionAnswers: Option[UserAnswers]
-  ): SessionUpdates = {
-    val registrationAnswers = SessionUpdates(
+  ): Answers = {
+    val registrationAnswers = Answers(
       correspondenceAddress = registrationDetails.flatMap(_.correspondenceAddress),
       organisationTelephoneNumber = registrationDetails.flatMap(_.orgTelephoneNumber),
       tradingName = registrationDetails.flatMap(_.tradingName),
@@ -85,20 +84,6 @@ class DataRetrievalActionImpl @Inject() (
       p2pPlatformNumber = registrationDetails.flatMap(_.p2pPlatformNumber)
     )
 
-    sessionAnswers.fold(registrationAnswers) { answers =>
-      val sessionUpdates = answers.updates
-
-      SessionUpdates(
-        correspondenceAddress = sessionUpdates.correspondenceAddress.orElse(registrationAnswers.correspondenceAddress),
-        tradingName = sessionUpdates.tradingName.orElse(registrationAnswers.tradingName),
-        organisationTelephoneNumber =
-          sessionUpdates.organisationTelephoneNumber.orElse(registrationAnswers.organisationTelephoneNumber),
-        isaProducts = sessionUpdates.isaProducts.orElse(registrationAnswers.isaProducts),
-        innovativeFinancialProducts =
-          sessionUpdates.innovativeFinancialProducts.orElse(registrationAnswers.innovativeFinancialProducts),
-        p2pPlatform = sessionUpdates.p2pPlatform.orElse(registrationAnswers.p2pPlatform),
-        p2pPlatformNumber = sessionUpdates.p2pPlatformNumber.orElse(registrationAnswers.p2pPlatformNumber)
-      )
-    }
+    sessionAnswers.fold(registrationAnswers)(_.updates.getEffectiveAnswers(registrationAnswers))
   }
 }

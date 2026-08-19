@@ -20,8 +20,11 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction}
 import uk.gov.hmrc.disaaccountfrontend.forms.InnovativeFinancialProductsFormProvider
+import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.{Assign, Clear}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct
+import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct.InnovativeFinanceIsas
+import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
 import uk.gov.hmrc.disaaccountfrontend.models.{SessionUpdates, UserAnswers}
 import uk.gov.hmrc.disaaccountfrontend.navigation.{InnovativeFinancialProductsPage, Navigator}
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
@@ -66,17 +69,36 @@ class InnovativeFinancialProductsController @Inject() (
         .fold(
           formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
           answer => {
-            val orderedAnswer = InnovativeFinancialProduct.values.filter(answer.contains)
-            val updates       = request.sessionAnswers
-              .map(_.updates)
-              .getOrElse(SessionUpdates())
-              .copy(innovativeFinancialProducts = Some(orderedAnswer))
+            val updates           = handleDependentAnswerClearing(answer, request)
+            val navigationAnswers = updates.getEffectiveAnswers(request.effectiveAnswers)
 
             userAnswersRepository
               .set(UserAnswers(id = request.sessionId, updates = updates))
-              .map(_ => Redirect(navigator.nextPage(InnovativeFinancialProductsPage, updates)))
+              .map(_ => Redirect(navigator.nextPage(InnovativeFinancialProductsPage, navigationAnswers)))
           }
         )
     }
   }
+
+  private def handleDependentAnswerClearing(
+    answer: Set[InnovativeFinancialProduct],
+    request: DataRequest[_]
+  ): SessionUpdates =
+    val existingUpdates           = request.sessionAnswers.fold(SessionUpdates())(_.updates)
+    val platformProductWasRemoved =
+      request.effectiveAnswers.innovativeFinancialProducts.exists(
+        _.contains(PeertopeerLoansUsingAPlatformWith36hPermissions)
+      ) && !answer.contains(PeertopeerLoansUsingAPlatformWith36hPermissions)
+    val hasPlatformAnswers        =
+      request.effectiveAnswers.p2pPlatform.isDefined || request.effectiveAnswers.p2pPlatformNumber.isDefined
+
+    if (platformProductWasRemoved && hasPlatformAnswers) {
+      existingUpdates.copy(
+        innovativeFinancialProducts = Assign(answer.toSeq),
+        p2pPlatform = Clear,
+        p2pPlatformNumber = Clear
+      )
+    } else {
+      existingUpdates.copy(innovativeFinancialProducts = Assign(answer.toSeq))
+    }
 }

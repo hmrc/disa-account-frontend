@@ -16,63 +16,61 @@
 
 package models
 
-import play.api.libs.json.{JsSuccess, Json}
-import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.CrowdFundedDebentures
-import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct.InnovativeFinanceIsas
-import uk.gov.hmrc.disaaccountfrontend.models.SessionUpdates
+import play.api.libs.json.{JsNull, JsSuccess, Json}
+import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.{Assign, Clear, Unchanged}
+import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates}
 import utils.BaseUnitSpec
 
 class SessionUpdatesSpec extends BaseUnitSpec {
 
+  private val updatedOrgTelephoneNumber = "07777777777"
+
   "SessionUpdates" should {
 
-    "round-trip through JSON when the correspondence address is present" in {
-      val sessionUpdates = SessionUpdates(correspondenceAddress = Some(testCorrespondenceAddress))
-
-      Json.toJson(sessionUpdates).validate[SessionUpdates] shouldBe JsSuccess(sessionUpdates)
-    }
-
-    "round-trip through JSON when there is nothing saved yet" in {
-      val sessionUpdates = SessionUpdates()
-
-      Json.toJson(sessionUpdates).validate[SessionUpdates] shouldBe JsSuccess(sessionUpdates)
-    }
-
-    "round-trip through JSON with ISA product updates" in {
+    "round-trip typed updates through JSON" in {
       val sessionUpdates = SessionUpdates(
-        isaProducts = Some(Seq(InnovativeFinanceIsas)),
-        innovativeFinancialProducts = Some(Seq(CrowdFundedDebentures))
+        correspondenceAddress = Assign(testCorrespondenceAddress),
+        isaProducts = Assign(Seq.empty),
+        p2pPlatform = Clear
       )
 
       Json.toJson(sessionUpdates).validate[SessionUpdates] shouldBe JsSuccess(sessionUpdates)
     }
 
-    "default correspondenceAddress to None when absent from the JSON" in {
-      Json.obj().validate[SessionUpdates] shouldBe JsSuccess(SessionUpdates(correspondenceAddress = None))
+    "default missing fields to unchanged" in {
+      Json.obj().validate[SessionUpdates] shouldBe JsSuccess(SessionUpdates())
     }
 
-    "round-trip through JSON when the organisation telephone number is present" in {
-      val sessionUpdates = SessionUpdates(organisationTelephoneNumber = Some("01642123456"))
-
-      Json.toJson(sessionUpdates).validate[SessionUpdates] shouldBe JsSuccess(sessionUpdates)
-    }
-
-    "round-trip through JSON when peer-to-peer platform answers are present" in {
-      val sessionUpdates = SessionUpdates(
-        p2pPlatform = Some(testP2pPlatform),
-        p2pPlatformNumber = Some(testP2pPlatformNumber)
+    "read legacy cached values as set and legacy nulls as unchanged" in {
+      val legacyJson = Json.obj(
+        "correspondenceAddress"       -> Json.toJson(testCorrespondenceAddress),
+        "organisationTelephoneNumber" -> JsNull,
+        "p2pPlatform"                 -> testP2pPlatform
       )
 
-      Json.toJson(sessionUpdates).validate[SessionUpdates] shouldBe JsSuccess(sessionUpdates)
+      legacyJson.validate[SessionUpdates] shouldBe JsSuccess(
+        SessionUpdates(
+          correspondenceAddress = Assign(testCorrespondenceAddress),
+          organisationTelephoneNumber = Unchanged,
+          p2pPlatform = Assign(testP2pPlatform)
+        )
+      )
     }
 
-    "default organisationTelephoneNumber to None when absent from the JSON" in {
-      Json.obj().validate[SessionUpdates] shouldBe JsSuccess(SessionUpdates(organisationTelephoneNumber = None))
-    }
+    "apply typed updates to an answer snapshot" in {
+      val answers = Answers(
+        correspondenceAddress = Some(testCorrespondenceAddress),
+        organisationTelephoneNumber = Some(testOrgTelephoneNumber),
+        p2pPlatform = Some(testP2pPlatform)
+      )
+      val updates = SessionUpdates(
+        organisationTelephoneNumber = Assign(updatedOrgTelephoneNumber),
+        p2pPlatform = Clear
+      )
 
-    "default peer-to-peer platform answers to None when absent from the JSON" in {
-      Json.obj().validate[SessionUpdates] shouldBe JsSuccess(
-        SessionUpdates(p2pPlatform = None, p2pPlatformNumber = None)
+      updates.getEffectiveAnswers(answers) shouldBe Answers(
+        correspondenceAddress = Some(testCorrespondenceAddress),
+        organisationTelephoneNumber = Some(updatedOrgTelephoneNumber)
       )
     }
   }

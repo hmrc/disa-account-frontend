@@ -21,7 +21,8 @@ import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import play.api.test.Helpers._
 import play.api.test._
-import uk.gov.hmrc.disaaccountfrontend.models.{SessionUpdates, UserAnswers}
+import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
+import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates, UserAnswers}
 import utils.BaseUnitSpec
 
 import scala.concurrent.Future
@@ -39,7 +40,7 @@ class OrganisationTelephoneNumberControllerSpec extends BaseUnitSpec {
 
     "return 200 OK prefilled from the effective answers supplied by the retrieval action" in {
       val application = applicationBuilder(
-        effectiveAnswers = SessionUpdates(organisationTelephoneNumber = Some("01642123456"))
+        effectiveAnswers = Answers(organisationTelephoneNumber = Some("01642123456"))
       ).build()
 
       running(application) {
@@ -87,7 +88,7 @@ class OrganisationTelephoneNumberControllerSpec extends BaseUnitSpec {
       when(mockUserAnswersRepository.get(testSessionId))
         .thenReturn(
           Future.successful(
-            Some(UserAnswers(testSessionId, SessionUpdates(correspondenceAddress = Some(testCorrespondenceAddress))))
+            Some(UserAnswers(testSessionId, SessionUpdates(correspondenceAddress = Assign(testCorrespondenceAddress))))
           )
         )
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
@@ -107,8 +108,8 @@ class OrganisationTelephoneNumberControllerSpec extends BaseUnitSpec {
         val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
         verify(mockUserAnswersRepository).set(captor.capture())
         captor.getValue.updates shouldBe SessionUpdates(
-          correspondenceAddress = Some(testCorrespondenceAddress),
-          organisationTelephoneNumber = Some("01642123456")
+          correspondenceAddress = Assign(testCorrespondenceAddress),
+          organisationTelephoneNumber = Assign("01642123456")
         )
       }
     }

@@ -35,7 +35,7 @@ import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.disaaccountfrontend.config.AppConfig
 import uk.gov.hmrc.disaaccountfrontend.connectors.RegistrationConnector
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{AuthenticatedIdentifierAction, DataRetrievalAction, IdentifierAction}
-import uk.gov.hmrc.disaaccountfrontend.models.{SessionUpdates, UserAnswers}
+import uk.gov.hmrc.disaaccountfrontend.models.{Answers, UserAnswers}
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
@@ -103,7 +103,7 @@ abstract class BaseUnitSpec
   // behaviour can be tested via route() without re-exercising real auth/data-retrieval logic
   // (that's covered by IdentifierActionSpec/DataRetrievalActionSpec instead).
   def applicationBuilder(
-    effectiveAnswers: SessionUpdates = SessionUpdates(),
+    effectiveAnswers: Answers = Answers(),
     sessionAnswers: Option[UserAnswers] = None,
     zReference: String = testZref,
     credentialId: String = testCredentialId,

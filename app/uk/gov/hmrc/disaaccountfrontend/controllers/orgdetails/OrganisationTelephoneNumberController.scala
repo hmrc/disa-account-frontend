@@ -20,6 +20,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction}
 import uk.gov.hmrc.disaaccountfrontend.forms.TelephoneNumberFormProvider
+import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
 import uk.gov.hmrc.disaaccountfrontend.models.{SessionUpdates, UserAnswers}
 import uk.gov.hmrc.disaaccountfrontend.navigation.{Navigator, OrganisationTelephoneNumberPage}
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
@@ -57,7 +58,7 @@ class OrganisationTelephoneNumberController @Inject() (
         answer =>
           userAnswersRepository.get(request.sessionId).flatMap { existing =>
             val updates =
-              existing.map(_.updates).getOrElse(SessionUpdates()).copy(organisationTelephoneNumber = Some(answer))
+              existing.map(_.updates).getOrElse(SessionUpdates()).copy(organisationTelephoneNumber = Assign(answer))
             userAnswersRepository.set(UserAnswers(id = request.sessionId, updates = updates)).map { _ =>
               Redirect(navigator.nextPage(OrganisationTelephoneNumberPage))
             }

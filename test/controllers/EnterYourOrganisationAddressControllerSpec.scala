@@ -20,7 +20,7 @@ import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import play.api.test.Helpers._
 import play.api.test._
-import uk.gov.hmrc.disaaccountfrontend.models.SessionUpdates
+import uk.gov.hmrc.disaaccountfrontend.models.Answers
 import utils.BaseUnitSpec
 
 import scala.concurrent.Future
@@ -42,7 +42,7 @@ class EnterYourOrganisationAddressControllerSpec extends BaseUnitSpec {
 
     "return 200 OK prefilled from the effective answers supplied by the retrieval action" in {
       val application = applicationBuilder(
-        effectiveAnswers = SessionUpdates(correspondenceAddress = Some(testCorrespondenceAddress))
+        effectiveAnswers = Answers(correspondenceAddress = Some(testCorrespondenceAddress))
       ).build()
 
       running(application) {

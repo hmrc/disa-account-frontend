@@ -23,6 +23,8 @@ import play.api.libs.json.Json
 import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
+import uk.gov.hmrc.disaaccountfrontend.models.CorrespondenceAddress
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
 import uk.gov.hmrc.disaaccountfrontend.utils.BaseIntegrationSpec
 import uk.gov.hmrc.disaaccountfrontend.utils.WiremockHelper.stubGet
@@ -147,12 +149,14 @@ class EnterYourOrganisationAddressControllerISpec extends BaseIntegrationSpec {
       status(result) shouldBe SEE_OTHER
 
       val stored = await(repo.get(testSessionId))
-      stored.flatMap(_.updates.correspondenceAddress) shouldBe Some(
-        uk.gov.hmrc.disaaccountfrontend.models.CorrespondenceAddress(
-          addressLine1 = Some("1 Test Street"),
-          addressLine2 = None,
-          addressLine3 = Some("Test Town"),
-          postCode = Some("AA1 1AA")
+      stored.map(_.updates.correspondenceAddress) shouldBe Some(
+        Assign(
+          CorrespondenceAddress(
+            addressLine1 = Some("1 Test Street"),
+            addressLine2 = None,
+            addressLine3 = Some("Test Town"),
+            postCode = Some("AA1 1AA")
+          )
         )
       )
     }

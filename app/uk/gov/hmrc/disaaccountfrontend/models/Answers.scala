@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.models.requests
+package uk.gov.hmrc.disaaccountfrontend.models
 
-import play.api.mvc.{Request, WrappedRequest}
-import uk.gov.hmrc.disaaccountfrontend.models.{Answers, UserAnswers}
+import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.{InnovativeFinancialProduct, IsaProduct}
 
-case class DataRequest[A](
-  request: Request[A],
-  zReference: String,
-  credentialId: String,
-  sessionId: String,
-  sessionAnswers: Option[UserAnswers],
-  effectiveAnswers: Answers
-) extends WrappedRequest[A](request)
+case class Answers(
+  correspondenceAddress: Option[CorrespondenceAddress] = None,
+  organisationTelephoneNumber: Option[String] = None,
+  tradingName: Option[String] = None,
+  isaProducts: Option[Seq[IsaProduct]] = None,
+  innovativeFinancialProducts: Option[Seq[InnovativeFinancialProduct]] = None,
+  p2pPlatform: Option[String] = None,
+  p2pPlatformNumber: Option[String] = None
+)

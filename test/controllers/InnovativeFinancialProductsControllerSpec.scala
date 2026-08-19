@@ -22,10 +22,11 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import play.api.test.Helpers.*
 import play.api.test.*
+import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.{Assign, Clear}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.*
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct.{CashIsas, InnovativeFinanceIsas}
-import uk.gov.hmrc.disaaccountfrontend.models.{SessionUpdates, UserAnswers}
+import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates, UserAnswers}
 import utils.BaseUnitSpec
 
 import scala.concurrent.Future
@@ -34,7 +35,7 @@ class InnovativeFinancialProductsControllerSpec extends BaseUnitSpec {
 
   val endpoint: String = "/obligations/account/isa/innovative-financial-products"
 
-  private val enrolledEffectiveAnswers = SessionUpdates(
+  private val enrolledEffectiveAnswers = Answers(
     isaProducts = Some(testIsaProductSelections),
     innovativeFinancialProducts = Some(testInnovativeFinancialProductSelections)
   )
@@ -63,10 +64,10 @@ class InnovativeFinancialProductsControllerSpec extends BaseUnitSpec {
     "render an empty page when Innovative Finance ISAs were newly added in the session" in {
       val answers     = UserAnswers(
         testSessionId,
-        SessionUpdates(isaProducts = Some(Seq(CashIsas, InnovativeFinanceIsas)))
+        SessionUpdates(isaProducts = Assign(Seq(CashIsas, InnovativeFinanceIsas)))
       )
       val application = applicationBuilder(
-        effectiveAnswers = answers.updates,
+        effectiveAnswers = Answers(isaProducts = Some(Seq(CashIsas, InnovativeFinanceIsas))),
         sessionAnswers = Some(answers)
       ).build()
 
@@ -85,12 +86,15 @@ class InnovativeFinancialProductsControllerSpec extends BaseUnitSpec {
       val answers     = UserAnswers(
         testSessionId,
         SessionUpdates(
-          isaProducts = Some(Seq(InnovativeFinanceIsas)),
-          innovativeFinancialProducts = Some(Seq(LongTermAssetFunds))
+          isaProducts = Assign(Seq(InnovativeFinanceIsas)),
+          innovativeFinancialProducts = Assign(Seq(LongTermAssetFunds))
         )
       )
       val application = applicationBuilder(
-        effectiveAnswers = answers.updates,
+        effectiveAnswers = Answers(
+          isaProducts = Some(Seq(InnovativeFinanceIsas)),
+          innovativeFinancialProducts = Some(Seq(LongTermAssetFunds))
+        ),
         sessionAnswers = Some(answers)
       ).build()
 
@@ -106,7 +110,7 @@ class InnovativeFinancialProductsControllerSpec extends BaseUnitSpec {
 
     "redirect when Innovative Finance ISAs are absent from both session and enrolment" in {
       val application = applicationBuilder(
-        effectiveAnswers = SessionUpdates(isaProducts = Some(Seq(CashIsas)))
+        effectiveAnswers = Answers(isaProducts = Some(Seq(CashIsas)))
       ).build()
 
       running(application) {
@@ -118,9 +122,9 @@ class InnovativeFinancialProductsControllerSpec extends BaseUnitSpec {
     }
 
     "redirect when the session deselects Innovative Finance ISAs from an existing enrolment" in {
-      val answers     = UserAnswers(testSessionId, SessionUpdates(isaProducts = Some(Seq(CashIsas))))
+      val answers     = UserAnswers(testSessionId, SessionUpdates(isaProducts = Assign(Seq(CashIsas))))
       val application = applicationBuilder(
-        effectiveAnswers = answers.updates,
+        effectiveAnswers = Answers(isaProducts = Some(Seq(CashIsas))),
         sessionAnswers = Some(answers)
       ).build()
 
@@ -135,16 +139,23 @@ class InnovativeFinancialProductsControllerSpec extends BaseUnitSpec {
 
   "InnovativeFinancialProductsController.onSubmit" should {
 
-    "save products in display order, preserve other session answers and redirect" in {
+    "save products in display order, preserve other updates and clear dependent platform answers" in {
       val existingUpdates = SessionUpdates(
-        correspondenceAddress = Some(testCorrespondenceAddress),
-        organisationTelephoneNumber = Some(testOrgTelephoneNumber),
-        isaProducts = Some(Seq(CashIsas, InnovativeFinanceIsas))
+        correspondenceAddress = Assign(testCorrespondenceAddress),
+        organisationTelephoneNumber = Assign(testOrgTelephoneNumber),
+        isaProducts = Assign(Seq(CashIsas, InnovativeFinanceIsas))
       )
       val existingAnswers = UserAnswers(testSessionId, existingUpdates)
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
       val application     = applicationBuilder(
-        effectiveAnswers = existingUpdates,
+        effectiveAnswers = Answers(
+          correspondenceAddress = Some(testCorrespondenceAddress),
+          organisationTelephoneNumber = Some(testOrgTelephoneNumber),
+          isaProducts = Some(Seq(CashIsas, InnovativeFinanceIsas)),
+          innovativeFinancialProducts = Some(Seq(PeertopeerLoansUsingAPlatformWith36hPermissions)),
+          p2pPlatform = Some(testP2pPlatform),
+          p2pPlatformNumber = Some(testP2pPlatformNumber)
+        ),
         sessionAnswers = Some(existingAnswers)
       ).build()
 
@@ -163,12 +174,14 @@ class InnovativeFinancialProductsControllerSpec extends BaseUnitSpec {
 
         val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
         verify(mockUserAnswersRepository).set(captor.capture())
-        captor.getValue.updates.correspondenceAddress       shouldBe Some(testCorrespondenceAddress)
-        captor.getValue.updates.organisationTelephoneNumber shouldBe Some(testOrgTelephoneNumber)
-        captor.getValue.updates.isaProducts                 shouldBe Some(Seq(CashIsas, InnovativeFinanceIsas))
-        captor.getValue.updates.innovativeFinancialProducts shouldBe Some(
+        captor.getValue.updates.correspondenceAddress       shouldBe Assign(testCorrespondenceAddress)
+        captor.getValue.updates.organisationTelephoneNumber shouldBe Assign(testOrgTelephoneNumber)
+        captor.getValue.updates.isaProducts                 shouldBe Assign(Seq(CashIsas, InnovativeFinanceIsas))
+        captor.getValue.updates.innovativeFinancialProducts shouldBe Assign(
           Seq(PeertopeerLoansAndHave36hPermissions, LongTermAssetFunds)
         )
+        captor.getValue.updates.p2pPlatform                 shouldBe Clear
+        captor.getValue.updates.p2pPlatformNumber           shouldBe Clear
       }
     }
 
@@ -215,9 +228,9 @@ class InnovativeFinancialProductsControllerSpec extends BaseUnitSpec {
     }
 
     "redirect without saving when the session has deselected Innovative Finance ISAs" in {
-      val answers     = UserAnswers(testSessionId, SessionUpdates(isaProducts = Some(Seq(CashIsas))))
+      val answers     = UserAnswers(testSessionId, SessionUpdates(isaProducts = Assign(Seq(CashIsas))))
       val application = applicationBuilder(
-        effectiveAnswers = answers.updates,
+        effectiveAnswers = Answers(isaProducts = Some(Seq(CashIsas))),
         sessionAnswers = Some(answers)
       ).build()
 

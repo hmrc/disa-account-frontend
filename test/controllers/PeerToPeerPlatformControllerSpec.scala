@@ -24,9 +24,10 @@ import play.api.Application
 import play.api.i18n.MessagesApi
 import play.api.test.Helpers.*
 import play.api.test.*
+import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct.CashIsas
-import uk.gov.hmrc.disaaccountfrontend.models.{SessionUpdates, UserAnswers}
+import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates, UserAnswers}
 import utils.BaseUnitSpec
 
 import scala.concurrent.Future
@@ -46,7 +47,7 @@ class PeerToPeerPlatformControllerSpec extends BaseUnitSpec {
   private val isaProductsSectionCaptionKey  = "sectionTitle.isaProducts"
   private val previousP2pPlatform           = "Old platform"
 
-  private val eligibleAnswers = SessionUpdates(
+  private val eligibleAnswers = Answers(
     isaProducts = Some(Seq(CashIsas)),
     innovativeFinancialProducts = Some(Seq(PeertopeerLoansUsingAPlatformWith36hPermissions))
   )
@@ -108,9 +109,9 @@ class PeerToPeerPlatformControllerSpec extends BaseUnitSpec {
       val existingAnswers = UserAnswers(
         testSessionId,
         SessionUpdates(
-          correspondenceAddress = Some(testCorrespondenceAddress),
-          organisationTelephoneNumber = Some(testOrgTelephoneNumber),
-          p2pPlatform = Some(previousP2pPlatform)
+          correspondenceAddress = Assign(testCorrespondenceAddress),
+          organisationTelephoneNumber = Assign(testOrgTelephoneNumber),
+          p2pPlatform = Assign(previousP2pPlatform)
         )
       )
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
@@ -135,9 +136,9 @@ class PeerToPeerPlatformControllerSpec extends BaseUnitSpec {
         verify(mockUserAnswersRepository).set(captor.capture())
         captor.getValue.id      shouldBe testSessionId
         captor.getValue.updates shouldBe SessionUpdates(
-          correspondenceAddress = Some(testCorrespondenceAddress),
-          organisationTelephoneNumber = Some(testOrgTelephoneNumber),
-          p2pPlatform = Some(testP2pPlatform)
+          correspondenceAddress = Assign(testCorrespondenceAddress),
+          organisationTelephoneNumber = Assign(testOrgTelephoneNumber),
+          p2pPlatform = Assign(testP2pPlatform)
         )
       }
     }

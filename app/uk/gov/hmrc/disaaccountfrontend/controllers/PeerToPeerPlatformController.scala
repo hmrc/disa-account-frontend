@@ -20,6 +20,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction}
 import uk.gov.hmrc.disaaccountfrontend.forms.PeerToPeerPlatformFormProvider
+import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
 import uk.gov.hmrc.disaaccountfrontend.models.{SessionUpdates, UserAnswers}
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
@@ -70,8 +71,8 @@ class PeerToPeerPlatformController @Inject() (
           formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
           answer => {
             val existingUpdates   = request.sessionAnswers.map(_.updates).getOrElse(SessionUpdates())
-            val updates           = existingUpdates.copy(p2pPlatform = Some(answer))
-            val navigationAnswers = request.effectiveAnswers.copy(p2pPlatform = Some(answer))
+            val updates           = existingUpdates.copy(p2pPlatform = Assign(answer))
+            val navigationAnswers = updates.getEffectiveAnswers(request.effectiveAnswers)
 
             userAnswersRepository
               .set(UserAnswers(id = request.sessionId, updates = updates))

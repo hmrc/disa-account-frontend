@@ -22,7 +22,7 @@ import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.{
   OrganisationTelephoneNumberController,
   TradingNameController
 }
-import uk.gov.hmrc.disaaccountfrontend.models.SessionUpdates
+import uk.gov.hmrc.disaaccountfrontend.models.Answers
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
 
 import javax.inject.{Inject, Singleton}
@@ -30,7 +30,7 @@ import javax.inject.{Inject, Singleton}
 @Singleton
 class Navigator @Inject() () {
 
-  def nextPage(page: Page, answers: SessionUpdates = SessionUpdates()): Call = page match {
+  def nextPage(page: Page, answers: Answers = Answers()): Call = page match {
     case EnterYourOrganisationAddressPage => OrganisationTelephoneNumberController.onPageLoad()
     // TODO: replace with the next page in the journey once it exists.
     case OrganisationTelephoneNumberPage  => OrganisationTelephoneNumberController.onPageLoad()
@@ -39,7 +39,7 @@ class Navigator @Inject() () {
     case PeerToPeerPlatformPage           => peerToPeerPlatformNextPage(answers)
   }
 
-  private def innovativeFinancialProductsNextPage(answers: SessionUpdates): Call =
+  private def innovativeFinancialProductsNextPage(answers: Answers): Call =
     answers.innovativeFinancialProducts match {
       case Some(products) if products.contains(PeertopeerLoansUsingAPlatformWith36hPermissions) =>
         peerToPeerPlatformQuestionPage
@@ -50,7 +50,7 @@ class Navigator @Inject() () {
   private def peerToPeerPlatformQuestionPage: Call =
     PeerToPeerPlatformController.onPageLoad()
 
-  private def peerToPeerPlatformNextPage(answers: SessionUpdates): Call =
+  private def peerToPeerPlatformNextPage(answers: Answers): Call =
     answers.p2pPlatformNumber match {
       case Some(_) => ChangeOfCircumstancesController.onPageLoad()
       case None    => peerToPeerPlatformNumberQuestionPage
