@@ -101,10 +101,10 @@ class InnovativeFinancialProductsControllerISpec extends BaseIntegrationSpec {
       val result = route(app, authenticatedGet()).get
       val html   = contentAsString(result)
 
-      status(result) shouldBe OK
+      status(result)                                                                    shouldBe OK
       checkboxIsChecked(html, PeertopeerLoansUsingAPlatformWith36hPermissions.toString) shouldBe true
-      checkboxIsChecked(html, CrowdFundedDebentures.toString) shouldBe true
-      checkboxIsChecked(html, LongTermAssetFunds.toString) shouldBe false
+      checkboxIsChecked(html, CrowdFundedDebentures.toString)                           shouldBe true
+      checkboxIsChecked(html, LongTermAssetFunds.toString)                              shouldBe false
     }
 
     "allow access when Innovative Finance ISAs were added in the session" in {
@@ -131,7 +131,7 @@ class InnovativeFinancialProductsControllerISpec extends BaseIntegrationSpec {
 
       val result = route(app, authenticatedGet()).get
 
-      status(result) shouldBe SEE_OTHER
+      status(result)             shouldBe SEE_OTHER
       redirectLocation(result).get should endWith("/change-of-circumstances")
     }
 
@@ -140,7 +140,7 @@ class InnovativeFinancialProductsControllerISpec extends BaseIntegrationSpec {
 
       val result = route(app, FakeRequest(GET, endpoint)).get
 
-      status(result) shouldBe SEE_OTHER
+      status(result)             shouldBe SEE_OTHER
       redirectLocation(result).get should include("auth-login-stub")
     }
   }
@@ -159,8 +159,8 @@ class InnovativeFinancialProductsControllerISpec extends BaseIntegrationSpec {
         )
       ).get
 
-      status(postResult) shouldBe SEE_OTHER
-      redirectLocation(postResult).get should endWith("/change-of-circumstances")
+      status(postResult)                                                            shouldBe SEE_OTHER
+      redirectLocation(postResult).get                                                should endWith("/change-of-circumstances")
       await(repo.get(testSessionId)).flatMap(_.updates.innovativeFinancialProducts) shouldBe Some(
         Seq(CrowdFundedDebentures, LongTermAssetFunds)
       )
@@ -168,9 +168,9 @@ class InnovativeFinancialProductsControllerISpec extends BaseIntegrationSpec {
       val getResult = route(app, authenticatedGet()).get
       val html      = contentAsString(getResult)
 
-      status(getResult) shouldBe OK
-      checkboxIsChecked(html, CrowdFundedDebentures.toString) shouldBe true
-      checkboxIsChecked(html, LongTermAssetFunds.toString) shouldBe true
+      status(getResult)                                                                 shouldBe OK
+      checkboxIsChecked(html, CrowdFundedDebentures.toString)                           shouldBe true
+      checkboxIsChecked(html, LongTermAssetFunds.toString)                              shouldBe true
       checkboxIsChecked(html, PeertopeerLoansUsingAPlatformWith36hPermissions.toString) shouldBe false
     }
 
@@ -180,8 +180,8 @@ class InnovativeFinancialProductsControllerISpec extends BaseIntegrationSpec {
 
       val result = route(app, authenticatedPost()).get
 
-      status(result) shouldBe BAD_REQUEST
-      contentAsString(result) should include(
+      status(result)                 shouldBe BAD_REQUEST
+      contentAsString(result)          should include(
         "Select which types of innovative finance products your organisation will offer"
       )
       await(repo.get(testSessionId)) shouldBe None
