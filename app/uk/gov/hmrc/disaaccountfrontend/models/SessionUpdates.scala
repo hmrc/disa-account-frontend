@@ -17,10 +17,13 @@
 package uk.gov.hmrc.disaaccountfrontend.models
 
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.{InnovativeFinancialProduct, IsaProduct}
 
 case class SessionUpdates(
   correspondenceAddress: Option[CorrespondenceAddress] = None,
-  organisationTelephoneNumber: Option[String] = None
+  organisationTelephoneNumber: Option[String] = None,
+  isaProducts: Option[Seq[IsaProduct]] = None,
+  innovativeFinancialProducts: Option[Seq[InnovativeFinancialProduct]] = None
 )
 
 object SessionUpdates {

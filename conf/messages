@@ -45,6 +45,15 @@ organisationTelephoneNumber.error.tooShort = The phone number you have entered i
 organisationTelephoneNumber.error.invalid = The phone number must not include letters a to z, hyphens or apostrophes and must be a a UK phone number, like 01642 123 456 or 07777 777 777
 organisationTelephoneNumber.change.hidden = organisation telephone number
 
+innovativeFinancialProducts.title = Which types of innovative finance products will your organisation offer?
+innovativeFinancialProducts.heading = Which types of innovative finance products will your organisation offer?
+innovativeFinancialProducts.hint = Select all that apply
+innovativeFinancialProducts.peerToPeerLoansAndHave36HPermissions = Peer-to-peer loans and have 36H permissions
+innovativeFinancialProducts.peerToPeerLoansUsingAPlatformWith36HPermissions = Peer-to-peer loans using a platform with 36H permissions
+innovativeFinancialProducts.crowdfundedDebentures = Crowdfunded debentures
+innovativeFinancialProducts.longTermAssetFunds = Long-Term Asset Funds (LTAFs) and other funds with extended redemption periods
+innovativeFinancialProducts.error.required = Select which types of innovative finance products your organisation will offer
+
 unauthorised.title = You cannot access this service
 unauthorised.heading = You cannot access this service
 unauthorised.body = You need to be signed in with an organisation that is enrolled to manage ISAs to use this service.

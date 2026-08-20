@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.models.requests
+package uk.gov.hmrc.disaaccountfrontend.viewmodels.govuk
 
-import play.api.mvc.{Request, WrappedRequest}
-import uk.gov.hmrc.disaaccountfrontend.models.{SessionUpdates, UserAnswers}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.{Fieldset, Legend}
 
-case class DataRequest[A](
-  request: Request[A],
-  zReference: String,
-  credentialId: String,
-  sessionId: String,
-  sessionAnswers: Option[UserAnswers],
-  effectiveAnswers: SessionUpdates
-) extends WrappedRequest[A](request)
+trait FieldsetFluency {
+
+  object FieldsetViewModel {
+    def apply(legend: Legend): Fieldset = Fieldset(legend = Some(legend))
+  }
+}

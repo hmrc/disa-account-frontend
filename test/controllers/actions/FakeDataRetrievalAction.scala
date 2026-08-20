@@ -18,17 +18,27 @@ package controllers.actions
 
 import play.api.mvc.Result
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.DataRetrievalAction
-import uk.gov.hmrc.disaaccountfrontend.models.registration.RegistrationDetails
+import uk.gov.hmrc.disaaccountfrontend.models.{SessionUpdates, UserAnswers}
 import uk.gov.hmrc.disaaccountfrontend.models.requests.{DataRequest, IdentifierRequest}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeDataRetrievalAction(registrationDetails: Option[RegistrationDetails]) extends DataRetrievalAction {
+class FakeDataRetrievalAction(
+  effectiveAnswers: SessionUpdates = SessionUpdates(),
+  sessionAnswers: Option[UserAnswers] = None
+) extends DataRetrievalAction {
 
   override protected def refine[A](request: IdentifierRequest[A]): Future[Either[Result, DataRequest[A]]] =
     Future.successful(
       Right(
-        DataRequest(request.request, request.zReference, request.credentialId, request.sessionId, registrationDetails)
+        DataRequest(
+          request.request,
+          request.zReference,
+          request.credentialId,
+          request.sessionId,
+          sessionAnswers,
+          effectiveAnswers
+        )
       )
     )
 

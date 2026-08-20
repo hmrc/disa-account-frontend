@@ -14,16 +14,8 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.models.requests
+package uk.gov.hmrc.disaaccountfrontend.models
 
-import play.api.mvc.{Request, WrappedRequest}
-import uk.gov.hmrc.disaaccountfrontend.models.{SessionUpdates, UserAnswers}
-
-case class DataRequest[A](
-  request: Request[A],
-  zReference: String,
-  credentialId: String,
-  sessionId: String,
-  sessionAnswers: Option[UserAnswers],
-  effectiveAnswers: SessionUpdates
-) extends WrappedRequest[A](request)
+class WithName(value: String) {
+  override val toString: String = value
+}

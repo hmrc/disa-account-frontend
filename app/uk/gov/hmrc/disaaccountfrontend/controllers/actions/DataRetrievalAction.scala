@@ -20,7 +20,10 @@ import play.api.Logging
 import play.api.mvc.{ActionRefiner, Result}
 import uk.gov.hmrc.disaaccountfrontend.config.ErrorHandler
 import uk.gov.hmrc.disaaccountfrontend.connectors.RegistrationConnector
+import uk.gov.hmrc.disaaccountfrontend.models.registration.RegistrationDetails
 import uk.gov.hmrc.disaaccountfrontend.models.requests.{DataRequest, IdentifierRequest}
+import uk.gov.hmrc.disaaccountfrontend.models.{SessionUpdates, UserAnswers}
+import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
@@ -32,6 +35,7 @@ trait DataRetrievalAction extends ActionRefiner[IdentifierRequest, DataRequest]
 
 class DataRetrievalActionImpl @Inject() (
   registrationConnector: RegistrationConnector,
+  userAnswersRepository: UserAnswersRepository,
   errorHandler: ErrorHandler
 )(implicit val executionContext: ExecutionContext)
     extends DataRetrievalAction
@@ -40,19 +44,55 @@ class DataRetrievalActionImpl @Inject() (
   override protected def refine[A](request: IdentifierRequest[A]): Future[Either[Result, DataRequest[A]]] = {
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    registrationConnector
-      .getRegistrationDetails(request.zReference)
-      .map { registrationDetails =>
+    val registrationDetails = registrationConnector.getRegistrationDetails(request.zReference)
+    val sessionAnswers      = userAnswersRepository.get(request.sessionId)
+
+    registrationDetails
+      .zip(sessionAnswers)
+      .map { case (registrationDetails, sessionAnswers) =>
         Right(
-          DataRequest(request.request, request.zReference, request.credentialId, request.sessionId, registrationDetails)
+          DataRequest(
+            request.request,
+            request.zReference,
+            request.credentialId,
+            request.sessionId,
+            sessionAnswers,
+            mergeAnswers(registrationDetails, sessionAnswers)
+          )
         )
       }
       .recoverWith { case NonFatal(e) =>
         logger.error(
-          s"[DataRetrievalActionImpl][refine] Failed to retrieve registration details for zref: [${request.zReference}]",
+          s"[DataRetrievalActionImpl][refine] Failed to retrieve answers for zref: [${request.zReference}]",
           e
         )
         errorHandler.internalServerError(request).map(Left.apply)
       }
+  }
+
+  // A defined session value, including Some(Seq.empty), must take precedence over registration data.
+  private def mergeAnswers(
+    registrationDetails: Option[RegistrationDetails],
+    sessionAnswers: Option[UserAnswers]
+  ): SessionUpdates = {
+    val registrationAnswers = SessionUpdates(
+      correspondenceAddress = registrationDetails.flatMap(_.correspondenceAddress),
+      organisationTelephoneNumber = registrationDetails.flatMap(_.orgTelephoneNumber),
+      isaProducts = registrationDetails.flatMap(_.isaProductSelections),
+      innovativeFinancialProducts = registrationDetails.flatMap(_.innovativeFinancialProductSelections)
+    )
+
+    sessionAnswers.fold(registrationAnswers) { answers =>
+      val sessionUpdates = answers.updates
+
+      SessionUpdates(
+        correspondenceAddress = sessionUpdates.correspondenceAddress.orElse(registrationAnswers.correspondenceAddress),
+        organisationTelephoneNumber =
+          sessionUpdates.organisationTelephoneNumber.orElse(registrationAnswers.organisationTelephoneNumber),
+        isaProducts = sessionUpdates.isaProducts.orElse(registrationAnswers.isaProducts),
+        innovativeFinancialProducts =
+          sessionUpdates.innovativeFinancialProducts.orElse(registrationAnswers.innovativeFinancialProducts)
+      )
+    }
   }
 }

@@ -17,6 +17,8 @@
 package models
 
 import play.api.libs.json.{JsSuccess, Json}
+import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.CrowdFundedDebentures
+import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct.InnovativeFinanceIsas
 import uk.gov.hmrc.disaaccountfrontend.models.SessionUpdates
 import utils.BaseUnitSpec
 
@@ -32,6 +34,15 @@ class SessionUpdatesSpec extends BaseUnitSpec {
 
     "round-trip through JSON when there is nothing saved yet" in {
       val sessionUpdates = SessionUpdates()
+
+      Json.toJson(sessionUpdates).validate[SessionUpdates] shouldBe JsSuccess(sessionUpdates)
+    }
+
+    "round-trip through JSON with ISA product updates" in {
+      val sessionUpdates = SessionUpdates(
+        isaProducts = Some(Seq(InnovativeFinanceIsas)),
+        innovativeFinancialProducts = Some(Seq(CrowdFundedDebentures))
+      )
 
       Json.toJson(sessionUpdates).validate[SessionUpdates] shouldBe JsSuccess(sessionUpdates)
     }

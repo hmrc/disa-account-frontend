@@ -44,13 +44,9 @@ class EnterYourOrganisationAddressController @Inject() (
 
   private val form = formProvider()
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData).async { implicit request =>
-    userAnswersRepository.get(request.sessionId).map { existing =>
-      val cachedAddress = existing.flatMap(_.updates.correspondenceAddress)
-      val address       = cachedAddress.orElse(request.registrationDetails.flatMap(_.correspondenceAddress))
-      val preparedForm  = address.fold(form)(form.fill)
-      Ok(view(preparedForm))
-    }
+  def onPageLoad(): Action[AnyContent] = (identify andThen getData) { implicit request =>
+    val preparedForm = request.effectiveAnswers.correspondenceAddress.fold(form)(form.fill)
+    Ok(view(preparedForm))
   }
 
   def onSubmit(): Action[AnyContent] = identify.async { implicit request =>

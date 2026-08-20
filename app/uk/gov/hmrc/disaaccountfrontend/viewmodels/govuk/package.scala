@@ -18,5 +18,12 @@ package uk.gov.hmrc.disaaccountfrontend.viewmodels
 
 package object govuk {
 
-  object all extends ImplicitConversions with ButtonFluency with ErrorSummaryFluency with InputFluency with LabelFluency
+  object all
+      extends ImplicitConversions
+      with ButtonFluency
+      with CheckboxFluency
+      with ErrorSummaryFluency
+      with FieldsetFluency
+      with InputFluency
+      with LabelFluency
 }

@@ -35,7 +35,7 @@ import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.disaaccountfrontend.config.AppConfig
 import uk.gov.hmrc.disaaccountfrontend.connectors.RegistrationConnector
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{AuthenticatedIdentifierAction, DataRetrievalAction, IdentifierAction}
-import uk.gov.hmrc.disaaccountfrontend.models.registration.RegistrationDetails
+import uk.gov.hmrc.disaaccountfrontend.models.{SessionUpdates, UserAnswers}
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
@@ -103,7 +103,8 @@ abstract class BaseUnitSpec
   // behaviour can be tested via route() without re-exercising real auth/data-retrieval logic
   // (that's covered by IdentifierActionSpec/DataRetrievalActionSpec instead).
   def applicationBuilder(
-    registrationDetails: Option[RegistrationDetails] = None,
+    effectiveAnswers: SessionUpdates = SessionUpdates(),
+    sessionAnswers: Option[UserAnswers] = None,
     zReference: String = testZref,
     credentialId: String = testCredentialId,
     sessionId: String = testSessionId
@@ -113,7 +114,7 @@ abstract class BaseUnitSpec
       .configure("play.filters.csrf.header.bypassHeaders.Csrf-Token" -> "nocheck")
       .overrides(
         bind[IdentifierAction].toInstance(new FakeIdentifierAction(bodyParsers, zReference, credentialId, sessionId)),
-        bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(registrationDetails)),
+        bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(effectiveAnswers, sessionAnswers)),
         bind[UserAnswersRepository].toInstance(mockUserAnswersRepository)
       )
   }
