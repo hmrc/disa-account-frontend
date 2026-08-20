@@ -14,10 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.forms.mappings
+package uk.gov.hmrc.disaaccountfrontend.forms
 
-trait CurrencyFormatter {
-  def currencyFormat(amt: BigDecimal): String = f"£$amt%,1.2f".replace(".00", "")
+import play.api.data.Form
+import uk.gov.hmrc.disaaccountfrontend.forms.mappings.Mappings
+
+import javax.inject.Inject
+
+class TradingNameFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[String] =
+    Form(
+      "value" -> text("tradingName.error.required")
+    )
 }
-
-object CurrencyFormatter extends CurrencyFormatter

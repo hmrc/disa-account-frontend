@@ -45,6 +45,12 @@ organisationTelephoneNumber.error.tooShort = The phone number you have entered i
 organisationTelephoneNumber.error.invalid = The phone number must not include letters a to z, hyphens or apostrophes and must be a a UK phone number, like 01642 123 456 or 07777 777 777
 organisationTelephoneNumber.change.hidden = organisation telephone number
 
+tradingName.title = What is your organisation’s trading name?
+tradingName.heading = What is your organisation’s trading name?
+tradingName.checkYourAnswersLabel = Trading name
+tradingName.error.required = You must tell us what your organisation’s trading name is
+tradingName.change.hidden = trading name
+
 innovativeFinancialProducts.title = Which types of innovative finance products will your organisation offer?
 innovativeFinancialProducts.heading = Which types of innovative finance products will your organisation offer?
 innovativeFinancialProducts.hint = Select all that apply

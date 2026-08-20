@@ -78,6 +78,7 @@ class DataRetrievalActionImpl @Inject() (
     val registrationAnswers = SessionUpdates(
       correspondenceAddress = registrationDetails.flatMap(_.correspondenceAddress),
       organisationTelephoneNumber = registrationDetails.flatMap(_.orgTelephoneNumber),
+      tradingName = registrationDetails.flatMap(_.tradingName),
       isaProducts = registrationDetails.flatMap(_.isaProductSelections),
       innovativeFinancialProducts = registrationDetails.flatMap(_.innovativeFinancialProductSelections)
     )
@@ -87,6 +88,7 @@ class DataRetrievalActionImpl @Inject() (
 
       SessionUpdates(
         correspondenceAddress = sessionUpdates.correspondenceAddress.orElse(registrationAnswers.correspondenceAddress),
+        tradingName = sessionUpdates.tradingName.orElse(registrationAnswers.tradingName),
         organisationTelephoneNumber =
           sessionUpdates.organisationTelephoneNumber.orElse(registrationAnswers.organisationTelephoneNumber),
         isaProducts = sessionUpdates.isaProducts.orElse(registrationAnswers.isaProducts),

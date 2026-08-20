@@ -18,7 +18,7 @@ package uk.gov.hmrc.disaaccountfrontend.navigation
 
 import play.api.mvc.Call
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes.ChangeOfCircumstancesController
-import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.OrganisationTelephoneNumberController
+import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes._
 import uk.gov.hmrc.disaaccountfrontend.models.SessionUpdates
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
 
@@ -31,6 +31,7 @@ class Navigator @Inject() () {
     case EnterYourOrganisationAddressPage => OrganisationTelephoneNumberController.onPageLoad()
     // TODO: replace with the next page in the journey once it exists.
     case OrganisationTelephoneNumberPage  => OrganisationTelephoneNumberController.onPageLoad()
+    case TradingNamePage                  => TradingNameController.onPageLoad()
     case InnovativeFinancialProductsPage  => innovativeFinancialProductsNextPage(answers)
   }
 

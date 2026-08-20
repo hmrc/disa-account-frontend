@@ -25,7 +25,7 @@
   hmrcTimeoutDialogHelper: HmrcTimeoutDialogHelper
 )
 
-@(pageTitle: Option[String] = None, timeout: Boolean = true, showSignOut: Boolean = true)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
+@(pageTitle: Option[String] = None, showBackLink: Boolean = true, timeout: Boolean = true, showSignOut: Boolean = true)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
 
 @head = {
   @if(timeout) {
@@ -46,6 +46,7 @@
   HmrcStandardPageParams(
     pageTitle = pageTitle,
     isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled,
+    backLink = if (showBackLink) Some(BackLink.mimicsBrowserBackButtonViaJavaScript) else None,
     templateOverrides = TemplateOverrides(additionalHeadBlock = Some(head)),
     serviceURLs = ServiceURLs(
       signOutUrl = if (showSignOut) Some(authRoutes.AuthController.signOut().url) else None

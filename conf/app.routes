@@ -9,6 +9,9 @@ POST       /enter-your-organisation-address    uk.gov.hmrc.disaaccountfrontend.c
 GET        /organisation-telephone-number      uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.OrganisationTelephoneNumberController.onPageLoad()
 POST       /organisation-telephone-number      uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.OrganisationTelephoneNumberController.onSubmit()
 
+GET        /trading-name                       uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.TradingNameController.onPageLoad()
+POST       /trading-name                       uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.TradingNameController.onSubmit()
+
 GET        /innovative-financial-products      uk.gov.hmrc.disaaccountfrontend.controllers.InnovativeFinancialProductsController.onPageLoad()
 POST       /innovative-financial-products      uk.gov.hmrc.disaaccountfrontend.controllers.InnovativeFinancialProductsController.onSubmit()
 
