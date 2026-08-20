@@ -18,9 +18,11 @@ package navigation
 
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, PeerToPeerPlatformController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.OrganisationTelephoneNumberController
-import uk.gov.hmrc.disaaccountfrontend.models.Answers
+import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.{CrowdFundedDebentures, PeertopeerLoansUsingAPlatformWith36hPermissions}
-import uk.gov.hmrc.disaaccountfrontend.navigation.{EnterYourOrganisationAddressPage, InnovativeFinancialProductsPage, Navigator, OrganisationTelephoneNumberPage, PeerToPeerPlatformPage}
+import uk.gov.hmrc.disaaccountfrontend.models.pages.{EnterYourOrganisationAddressPage, InnovativeFinancialProductsPage, OrganisationTelephoneNumberPage, PageWithAnswers, PeerToPeerPlatformPage}
+import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
+import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator
 import utils.BaseUnitSpec
 
 class NavigatorSpec extends BaseUnitSpec {
@@ -63,6 +65,17 @@ class NavigatorSpec extends BaseUnitSpec {
 
       navigator.nextPage(PeerToPeerPlatformPage, answers) shouldBe
         ChangeOfCircumstancesController.onPageLoad()
+    }
+
+    "fail fast when navigation has not been defined for a page" in {
+      val unsupportedPage = new PageWithAnswers[String] {
+        def saveAnswerAndHandleDependents(request: DataRequest[_], newAnswer: String): SessionUpdates =
+          SessionUpdates()
+      }
+
+      val exception = intercept[IllegalArgumentException](navigator.nextPage(unsupportedPage))
+
+      exception.getMessage should include("No navigation defined for page")
     }
   }
 }

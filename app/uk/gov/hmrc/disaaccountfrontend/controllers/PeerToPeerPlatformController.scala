@@ -18,13 +18,11 @@ package uk.gov.hmrc.disaaccountfrontend.controllers
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction}
+import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction, PageGuardAction}
 import uk.gov.hmrc.disaaccountfrontend.forms.PeerToPeerPlatformFormProvider
-import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
-import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
-import uk.gov.hmrc.disaaccountfrontend.models.{SessionUpdates, UserAnswers}
-import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
-import uk.gov.hmrc.disaaccountfrontend.navigation.{Navigator, PeerToPeerPlatformPage}
+import uk.gov.hmrc.disaaccountfrontend.models.UserAnswers
+import uk.gov.hmrc.disaaccountfrontend.models.pages.PeerToPeerPlatformPage
+import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
 import uk.gov.hmrc.disaaccountfrontend.views.html.PeerToPeerPlatformView
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -36,49 +34,37 @@ class PeerToPeerPlatformController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  guardPage: PageGuardAction,
   userAnswersRepository: UserAnswersRepository,
   navigator: Navigator,
   formProvider: PeerToPeerPlatformFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: PeerToPeerPlatformView
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+    extends PageController(PeerToPeerPlatformPage, navigator)
+    with FrontendBaseController
     with I18nSupport {
 
-  private val form = formProvider()
+  private val form       = formProvider()
+  private val pageAction = identify andThen getData andThen guardPage(page)
 
-  private def canAccess(request: DataRequest[_]): Boolean =
-    request.effectiveAnswers.innovativeFinancialProducts.exists(
-      _.contains(PeertopeerLoansUsingAPlatformWith36hPermissions)
-    )
-
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData) { implicit request =>
-    if (canAccess(request)) {
-      val preparedForm = request.effectiveAnswers.p2pPlatform.fold(form)(form.fill)
-      Ok(view(preparedForm))
-    } else {
-      Redirect(routes.ChangeOfCircumstancesController.onPageLoad())
-    }
+  def onPageLoad(): Action[AnyContent] = pageAction { implicit request =>
+    val preparedForm = request.effectiveAnswers.p2pPlatform.fold(form)(form.fill)
+    Ok(view(preparedForm))
   }
 
-  def onSubmit(): Action[AnyContent] = (identify andThen getData).async { implicit request =>
-    if (!canAccess(request)) {
-      Future.successful(Redirect(routes.ChangeOfCircumstancesController.onPageLoad()))
-    } else {
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
-          answer => {
-            val existingUpdates   = request.sessionAnswers.map(_.updates).getOrElse(SessionUpdates())
-            val updates           = existingUpdates.copy(p2pPlatform = Assign(answer))
-            val navigationAnswers = updates.getEffectiveAnswers(request.effectiveAnswers)
+  def onSubmit(): Action[AnyContent] = pageAction.async { implicit request =>
+    form
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
+        answer => {
+          val sessionUpdates = getSessionUpdates(answer)
 
-            userAnswersRepository
-              .set(UserAnswers(id = request.sessionId, updates = updates))
-              .map(_ => Redirect(navigator.nextPage(PeerToPeerPlatformPage, navigationAnswers)))
-          }
-        )
-    }
+          userAnswersRepository
+            .set(UserAnswers(id = request.sessionId, updates = sessionUpdates))
+            .map(_ => Redirect(nextPage(sessionUpdates)))
+        }
+      )
   }
 }

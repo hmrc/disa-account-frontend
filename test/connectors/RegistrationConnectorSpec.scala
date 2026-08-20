@@ -30,10 +30,9 @@ class RegistrationConnectorSpec extends BaseUnitSpec {
     val connector: RegistrationConnector =
       new RegistrationConnector(mockHttpClient, mockAppConfig, retryConfig, actorSystem)
 
-    val testUrl: String = "http://localhost:12105"
-    when(mockAppConfig.disaAccountBaseUrl).thenReturn(testUrl)
+    when(mockAppConfig.disaAccountBaseUrl).thenReturn(disaAccountBaseUrl)
 
-    when(mockHttpClient.get(url"$testUrl/disa-account/registration/$testZref"))
+    when(mockHttpClient.get(url"${disaAccountRegistrationEndpoint(testZref)}"))
       .thenReturn(mockRequestBuilder)
   }
 

@@ -21,9 +21,8 @@ import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, when}
 import play.api.Application
-import play.api.i18n.MessagesApi
-import play.api.test.Helpers.*
 import play.api.test.*
+import play.api.test.Helpers.*
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct.CashIsas
@@ -34,18 +33,16 @@ import scala.concurrent.Future
 
 class PeerToPeerPlatformControllerSpec extends BaseUnitSpec {
 
-  private val endpoint                      = "/obligations/account/isa/peer-to-peer-loans"
-  private val changeOfCircumstancesEndpoint = "/obligations/account/isa/change-of-circumstances"
-  private val platformFieldName             = "value"
-  private val csrfHeaderName                = "Csrf-Token"
-  private val csrfHeaderValue               = "nocheck"
-  private val titleMessageKey               = "peerToPeerPlatform.title"
-  private val headingMessageKey             = "peerToPeerPlatform.heading"
-  private val hintMessageKey                = "peerToPeerPlatform.details.summary"
-  private val moreInfoMessageKey            = "peerToPeerPlatform.details.content.link"
-  private val requiredErrorMessageKey       = "peerToPeerPlatform.error.required"
-  private val isaProductsSectionCaptionKey  = "sectionTitle.isaProducts"
-  private val previousP2pPlatform           = "Old platform"
+  private val platformFieldName            = "value"
+  private val csrfHeaderName               = "Csrf-Token"
+  private val csrfHeaderValue              = "nocheck"
+  private val titleMessageKey              = "peerToPeerPlatform.title"
+  private val headingMessageKey            = "peerToPeerPlatform.heading"
+  private val hintMessageKey               = "peerToPeerPlatform.details.summary"
+  private val moreInfoMessageKey           = "peerToPeerPlatform.details.content.link"
+  private val requiredErrorMessageKey      = "peerToPeerPlatform.error.required"
+  private val isaProductsSectionCaptionKey = "sectionTitle.isaProducts"
+  private val previousP2pPlatform          = "Old platform"
 
   private val eligibleAnswers = Answers(
     isaProducts = Some(Seq(CashIsas)),
@@ -55,21 +52,21 @@ class PeerToPeerPlatformControllerSpec extends BaseUnitSpec {
   "PeerToPeerPlatformController.onPageLoad" should {
 
     "render the page and pre-populate a saved platform name" in {
-      val application = applicationBuilder(
+      implicit val application: Application = applicationBuilder(
         effectiveAnswers = eligibleAnswers.copy(p2pPlatform = Some(testP2pPlatform))
       ).build()
 
       running(application) {
-        val result = route(application, FakeRequest(GET, endpoint)).value
+        val result = route(application, FakeRequest(GET, peerToPeerPlatformEndpoint)).value
         val doc    = Jsoup.parse(contentAsString(result))
 
         status(result)                                        shouldBe OK
-        doc.title()                                             should include(message(application, titleMessageKey))
+        doc.title()                                             should include(messages(titleMessageKey))
         doc.select(s"input#$platformFieldName").attr("value") shouldBe testP2pPlatform
-        doc.select("h1").text()                                 should include(message(application, headingMessageKey))
-        doc.text()                                              should include(message(application, hintMessageKey))
-        doc.text()                                              should include(message(application, moreInfoMessageKey))
-        doc.text()                                              should not include message(application, isaProductsSectionCaptionKey)
+        doc.select("h1").text()                                 should include(messages(headingMessageKey))
+        doc.text()                                              should include(messages(hintMessageKey))
+        doc.text()                                              should include(messages(moreInfoMessageKey))
+        doc.text()                                              should not include messages(isaProductsSectionCaptionKey)
       }
     }
 
@@ -77,7 +74,7 @@ class PeerToPeerPlatformControllerSpec extends BaseUnitSpec {
       val application = applicationBuilder().build()
 
       running(application) {
-        val result = route(application, FakeRequest(GET, endpoint)).value
+        val result = route(application, FakeRequest(GET, peerToPeerPlatformEndpoint)).value
 
         status(result)               shouldBe SEE_OTHER
         redirectLocation(result).value should endWith(changeOfCircumstancesEndpoint)
@@ -88,18 +85,18 @@ class PeerToPeerPlatformControllerSpec extends BaseUnitSpec {
   "PeerToPeerPlatformController.onSubmit" should {
 
     "return the exact required error and not save when the platform name is blank" in {
-      val application = applicationBuilder(effectiveAnswers = eligibleAnswers).build()
+      implicit val application: Application = applicationBuilder(effectiveAnswers = eligibleAnswers).build()
 
       running(application) {
         val result = route(
           application,
-          FakeRequest(POST, endpoint).withHeaders(csrfHeaderName -> csrfHeaderValue)
+          FakeRequest(POST, peerToPeerPlatformEndpoint).withHeaders(csrfHeaderName -> csrfHeaderValue)
         ).value
         val doc    = Jsoup.parse(contentAsString(result))
 
         status(result)                          shouldBe BAD_REQUEST
         doc.select(".govuk-error-message").text() should include(
-          message(application, requiredErrorMessageKey)
+          messages(requiredErrorMessageKey)
         )
         verify(mockUserAnswersRepository, never).set(any())
       }
@@ -124,7 +121,7 @@ class PeerToPeerPlatformControllerSpec extends BaseUnitSpec {
       running(application) {
         val result = route(
           application,
-          FakeRequest(POST, endpoint)
+          FakeRequest(POST, peerToPeerPlatformEndpoint)
             .withHeaders(csrfHeaderName -> csrfHeaderValue)
             .withFormUrlEncodedBody(platformFieldName -> testP2pPlatform)
         ).value
@@ -149,7 +146,7 @@ class PeerToPeerPlatformControllerSpec extends BaseUnitSpec {
       running(application) {
         val result = route(
           application,
-          FakeRequest(POST, endpoint)
+          FakeRequest(POST, peerToPeerPlatformEndpoint)
             .withHeaders(csrfHeaderName -> csrfHeaderValue)
             .withFormUrlEncodedBody(platformFieldName -> testP2pPlatform)
         ).value
@@ -160,7 +157,4 @@ class PeerToPeerPlatformControllerSpec extends BaseUnitSpec {
       }
     }
   }
-
-  private def message(application: Application, key: String): String =
-    application.injector.instanceOf[MessagesApi].preferred(FakeRequest())(key)
 }

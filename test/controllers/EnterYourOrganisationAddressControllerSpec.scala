@@ -16,21 +16,18 @@
 
 package controllers
 
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import play.api.test.Helpers._
 import play.api.test._
-import uk.gov.hmrc.disaaccountfrontend.models.Answers
+import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
+import uk.gov.hmrc.disaaccountfrontend.models.{Answers, CorrespondenceAddress, SessionUpdates, UserAnswers}
 import utils.BaseUnitSpec
 
 import scala.concurrent.Future
 
 class EnterYourOrganisationAddressControllerSpec extends BaseUnitSpec {
-
-  // prod.routes mounts app.routes under this prefix, which the per-controller reverse router
-  // (uk.gov.hmrc.disaaccountfrontend.controllers.routes) doesn't know about, so it's hardcoded here.
-  val onPageLoadUrl: String = "/obligations/account/isa/enter-your-organisation-address"
-  val onSubmitUrl: String   = "/obligations/account/isa/enter-your-organisation-address"
 
   val validFormData: Map[String, String] = Map(
     "addressLine1" -> "1 Test Street",
@@ -46,7 +43,7 @@ class EnterYourOrganisationAddressControllerSpec extends BaseUnitSpec {
       ).build()
 
       running(application) {
-        val result = route(application, FakeRequest(GET, onPageLoadUrl)).value
+        val result = route(application, FakeRequest(GET, enterYourOrganisationAddressEndpoint)).value
 
         status(result)        shouldBe OK
         contentAsString(result) should include("1 Test Street")
@@ -57,7 +54,7 @@ class EnterYourOrganisationAddressControllerSpec extends BaseUnitSpec {
       val application = applicationBuilder().build()
 
       running(application) {
-        val result = route(application, FakeRequest(GET, onPageLoadUrl)).value
+        val result = route(application, FakeRequest(GET, enterYourOrganisationAddressEndpoint)).value
 
         status(result)        shouldBe OK
         contentAsString(result) should not include "1 Test Street"
@@ -67,22 +64,42 @@ class EnterYourOrganisationAddressControllerSpec extends BaseUnitSpec {
 
   "EnterYourOrganisationAddressController.onSubmit" should {
 
-    "save the answer and redirect when the form is valid" in {
-      when(mockUserAnswersRepository.get(testSessionId)).thenReturn(Future.successful(None))
+    "save the answer, preserve existing session changes and redirect when the form is valid" in {
+      val existingAnswers = UserAnswers(
+        testSessionId,
+        SessionUpdates(organisationTelephoneNumber = Assign(testOrgTelephoneNumber))
+      )
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
 
-      val application = applicationBuilder().build()
+      val application = applicationBuilder(
+        effectiveAnswers = Answers(organisationTelephoneNumber = Some(testOrgTelephoneNumber)),
+        sessionAnswers = Some(existingAnswers)
+      ).build()
 
       running(application) {
         val request =
-          FakeRequest(POST, onSubmitUrl)
+          FakeRequest(POST, enterYourOrganisationAddressEndpoint)
             .withFormUrlEncodedBody(validFormData.toSeq: _*)
             .withHeaders("Csrf-Token" -> "nocheck")
 
         val result = route(application, request).value
 
-        status(result) shouldBe SEE_OTHER
-        verify(mockUserAnswersRepository).set(any())
+        status(result)               shouldBe SEE_OTHER
+        redirectLocation(result).value should endWith(organisationTelephoneNumberEndpoint)
+
+        val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+        verify(mockUserAnswersRepository).set(captor.capture())
+        captor.getValue.id      shouldBe testSessionId
+        captor.getValue.updates shouldBe SessionUpdates(
+          correspondenceAddress = Assign(
+            CorrespondenceAddress(
+              addressLine1 = Some("1 Test Street"),
+              addressLine3 = Some("Test Town"),
+              postCode = Some("AA1 1AA")
+            )
+          ),
+          organisationTelephoneNumber = Assign(testOrgTelephoneNumber)
+        )
       }
     }
 
@@ -91,7 +108,7 @@ class EnterYourOrganisationAddressControllerSpec extends BaseUnitSpec {
 
       running(application) {
         val request =
-          FakeRequest(POST, onSubmitUrl)
+          FakeRequest(POST, enterYourOrganisationAddressEndpoint)
             .withFormUrlEncodedBody(validFormData.updated("addressLine1", "").toSeq: _*)
             .withHeaders("Csrf-Token" -> "nocheck")
 

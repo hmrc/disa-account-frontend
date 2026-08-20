@@ -33,8 +33,6 @@ import scala.concurrent.Future
 
 class InnovativeFinancialProductsControllerSpec extends BaseUnitSpec {
 
-  val endpoint: String = "/obligations/account/isa/innovative-financial-products"
-
   private val enrolledEffectiveAnswers = Answers(
     isaProducts = Some(testIsaProductSelections),
     innovativeFinancialProducts = Some(testInnovativeFinancialProductSelections)
@@ -51,7 +49,7 @@ class InnovativeFinancialProductsControllerSpec extends BaseUnitSpec {
       ).build()
 
       running(application) {
-        val result = route(application, FakeRequest(GET, endpoint)).value
+        val result = route(application, FakeRequest(GET, innovativeFinancialProductsEndpoint)).value
         val html   = contentAsString(result)
 
         status(result)                                                         shouldBe OK
@@ -72,7 +70,7 @@ class InnovativeFinancialProductsControllerSpec extends BaseUnitSpec {
       ).build()
 
       running(application) {
-        val result = route(application, FakeRequest(GET, endpoint)).value
+        val result = route(application, FakeRequest(GET, innovativeFinancialProductsEndpoint)).value
         val html   = contentAsString(result)
 
         status(result) shouldBe OK
@@ -99,7 +97,7 @@ class InnovativeFinancialProductsControllerSpec extends BaseUnitSpec {
       ).build()
 
       running(application) {
-        val result = route(application, FakeRequest(GET, endpoint)).value
+        val result = route(application, FakeRequest(GET, innovativeFinancialProductsEndpoint)).value
         val html   = contentAsString(result)
 
         status(result)                                          shouldBe OK
@@ -114,10 +112,10 @@ class InnovativeFinancialProductsControllerSpec extends BaseUnitSpec {
       ).build()
 
       running(application) {
-        val result = route(application, FakeRequest(GET, endpoint)).value
+        val result = route(application, FakeRequest(GET, innovativeFinancialProductsEndpoint)).value
 
         status(result)               shouldBe SEE_OTHER
-        redirectLocation(result).value should endWith("/change-of-circumstances")
+        redirectLocation(result).value should endWith(changeOfCircumstancesEndpoint)
       }
     }
 
@@ -129,10 +127,10 @@ class InnovativeFinancialProductsControllerSpec extends BaseUnitSpec {
       ).build()
 
       running(application) {
-        val result = route(application, FakeRequest(GET, endpoint)).value
+        val result = route(application, FakeRequest(GET, innovativeFinancialProductsEndpoint)).value
 
         status(result)               shouldBe SEE_OTHER
-        redirectLocation(result).value should endWith("/change-of-circumstances")
+        redirectLocation(result).value should endWith(changeOfCircumstancesEndpoint)
       }
     }
   }
@@ -160,7 +158,7 @@ class InnovativeFinancialProductsControllerSpec extends BaseUnitSpec {
       ).build()
 
       running(application) {
-        val request = FakeRequest(POST, endpoint)
+        val request = FakeRequest(POST, innovativeFinancialProductsEndpoint)
           .withFormUrlEncodedBody(
             "value[3]" -> LongTermAssetFunds.toString,
             "value[0]" -> PeertopeerLoansAndHave36hPermissions.toString
@@ -170,7 +168,7 @@ class InnovativeFinancialProductsControllerSpec extends BaseUnitSpec {
         val result = route(application, request).value
 
         status(result)               shouldBe SEE_OTHER
-        redirectLocation(result).value should endWith("/change-of-circumstances")
+        redirectLocation(result).value should endWith(changeOfCircumstancesEndpoint)
 
         val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
         verify(mockUserAnswersRepository).set(captor.capture())
@@ -192,7 +190,7 @@ class InnovativeFinancialProductsControllerSpec extends BaseUnitSpec {
       ).build()
 
       running(application) {
-        val request = FakeRequest(POST, endpoint)
+        val request = FakeRequest(POST, innovativeFinancialProductsEndpoint)
           .withFormUrlEncodedBody(
             "value[1]" -> PeertopeerLoansUsingAPlatformWith36hPermissions.toString
           )
@@ -201,7 +199,7 @@ class InnovativeFinancialProductsControllerSpec extends BaseUnitSpec {
         val result = route(application, request).value
 
         status(result)               shouldBe SEE_OTHER
-        redirectLocation(result).value should endWith("/peer-to-peer-loans")
+        redirectLocation(result).value should endWith(peerToPeerPlatformEndpoint)
         verify(mockUserAnswersRepository).set(any())
       }
     }
@@ -212,7 +210,7 @@ class InnovativeFinancialProductsControllerSpec extends BaseUnitSpec {
       ).build()
 
       running(application) {
-        val request = FakeRequest(POST, endpoint).withHeaders("Csrf-Token" -> "nocheck")
+        val request = FakeRequest(POST, innovativeFinancialProductsEndpoint).withHeaders("Csrf-Token" -> "nocheck")
         val result  = route(application, request).value
         val html    = contentAsString(result)
         val doc     = Jsoup.parse(html)
@@ -235,13 +233,13 @@ class InnovativeFinancialProductsControllerSpec extends BaseUnitSpec {
       ).build()
 
       running(application) {
-        val request = FakeRequest(POST, endpoint)
+        val request = FakeRequest(POST, innovativeFinancialProductsEndpoint)
           .withFormUrlEncodedBody("value[0]" -> CrowdFundedDebentures.toString)
           .withHeaders("Csrf-Token" -> "nocheck")
         val result  = route(application, request).value
 
         status(result)               shouldBe SEE_OTHER
-        redirectLocation(result).value should endWith("/change-of-circumstances")
+        redirectLocation(result).value should endWith(changeOfCircumstancesEndpoint)
         verify(mockUserAnswersRepository, never).set(any())
       }
     }

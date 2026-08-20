@@ -29,7 +29,7 @@ case class SessionUpdates(
   p2pPlatform: AnswerUpdate[String] = Unchanged,
   p2pPlatformNumber: AnswerUpdate[String] = Unchanged
 ) {
-  def getEffectiveAnswers(answers: Answers): Answers =
+  def getUpdatedEffectiveAnswers(answers: Answers): Answers =
     Answers(
       correspondenceAddress = correspondenceAddress.getEffectiveAnswer(answers.correspondenceAddress),
       organisationTelephoneNumber = organisationTelephoneNumber.getEffectiveAnswer(answers.organisationTelephoneNumber),

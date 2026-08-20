@@ -20,17 +20,18 @@ import com.typesafe.config.Config
 import controllers.actions.{FakeDataRetrievalAction, FakeIdentifierAction}
 import org.apache.pekko.actor.ActorSystem
 import org.mockito.Mockito
-import org.scalatest._
+import org.scalatest.{BeforeAndAfterEach, EitherValues, OptionValues}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
+import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.test.DefaultAwaitTimeout
 import play.api.test.Helpers.stubControllerComponents
+import play.api.test.{DefaultAwaitTimeout, FakeRequest}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.disaaccountfrontend.config.AppConfig
 import uk.gov.hmrc.disaaccountfrontend.connectors.RegistrationConnector
@@ -39,7 +40,6 @@ import uk.gov.hmrc.disaaccountfrontend.models.{Answers, UserAnswers}
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
-import utils.TestData
 
 import scala.concurrent.ExecutionContext
 
@@ -54,6 +54,7 @@ abstract class BaseUnitSpec
     with DefaultAwaitTimeout
     with GuiceOneAppPerSuite
     with TestData
+    with TestEndpoints
     with AuthTestSupport {
 
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
@@ -82,10 +83,10 @@ abstract class BaseUnitSpec
     // Sane defaults for anything that constructs an AuthenticatedIdentifierAction directly from mockAppConfig.
     Mockito.when(mockAppConfig.manageIsaEnrolmentKey).thenReturn("HMRC-DISA-ORG")
     Mockito.when(mockAppConfig.zrefIdentifierKey).thenReturn("ZREF")
-    Mockito.when(mockAppConfig.loginUrl).thenReturn("http://localhost:9949/auth-login-stub/gg-sign-in")
+    Mockito.when(mockAppConfig.loginUrl).thenReturn(authLoginStubSignInEndpoint)
     Mockito
       .when(mockAppConfig.loginContinueUrl)
-      .thenReturn("http://localhost:12107/disa-account-frontend/enter-your-organisation-address")
+      .thenReturn(loginContinueEndpoint)
   }
 
   override def fakeApplication(): Application = GuiceApplicationBuilder()
@@ -118,4 +119,9 @@ abstract class BaseUnitSpec
         bind[UserAnswersRepository].toInstance(mockUserAnswersRepository)
       )
   }
+
+  implicit def messages(implicit app: Application): Messages =
+    app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
+
+  def messages(key: String)(implicit app: Application): String = messages(app).messages(key)
 }

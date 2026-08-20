@@ -84,6 +84,6 @@ class DataRetrievalActionImpl @Inject() (
       p2pPlatformNumber = registrationDetails.flatMap(_.p2pPlatformNumber)
     )
 
-    sessionAnswers.fold(registrationAnswers)(_.updates.getEffectiveAnswers(registrationAnswers))
+    sessionAnswers.fold(registrationAnswers)(_.updates.getUpdatedEffectiveAnswers(registrationAnswers))
   }
 }

@@ -29,11 +29,6 @@ import scala.concurrent.Future
 
 class OrganisationTelephoneNumberControllerSpec extends BaseUnitSpec {
 
-  // prod.routes mounts app.routes under this prefix, which the per-controller reverse router
-  // (uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes) doesn't know about, so it's hardcoded here.
-  val onPageLoadUrl: String = "/obligations/account/isa/organisation-telephone-number"
-  val onSubmitUrl: String   = "/obligations/account/isa/organisation-telephone-number"
-
   val validFormData: Map[String, String] = Map("value" -> "01642123456")
 
   "OrganisationTelephoneNumberController.onPageLoad" should {
@@ -44,7 +39,7 @@ class OrganisationTelephoneNumberControllerSpec extends BaseUnitSpec {
       ).build()
 
       running(application) {
-        val result = route(application, FakeRequest(GET, onPageLoadUrl)).value
+        val result = route(application, FakeRequest(GET, organisationTelephoneNumberEndpoint)).value
 
         status(result)        shouldBe OK
         contentAsString(result) should include("01642123456")
@@ -55,7 +50,7 @@ class OrganisationTelephoneNumberControllerSpec extends BaseUnitSpec {
       val application = applicationBuilder().build()
 
       running(application) {
-        val result = route(application, FakeRequest(GET, onPageLoadUrl)).value
+        val result = route(application, FakeRequest(GET, organisationTelephoneNumberEndpoint)).value
 
         status(result)        shouldBe OK
         contentAsString(result) should not include "01642123456"
@@ -66,14 +61,13 @@ class OrganisationTelephoneNumberControllerSpec extends BaseUnitSpec {
   "OrganisationTelephoneNumberController.onSubmit" should {
 
     "save the answer and redirect when the form is valid" in {
-      when(mockUserAnswersRepository.get(testSessionId)).thenReturn(Future.successful(None))
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
 
       val application = applicationBuilder().build()
 
       running(application) {
         val request =
-          FakeRequest(POST, onSubmitUrl)
+          FakeRequest(POST, organisationTelephoneNumberEndpoint)
             .withFormUrlEncodedBody(validFormData.toSeq: _*)
             .withHeaders("Csrf-Token" -> "nocheck")
 
@@ -85,19 +79,20 @@ class OrganisationTelephoneNumberControllerSpec extends BaseUnitSpec {
     }
 
     "preserve an existing cached correspondence address when saving the answer" in {
-      when(mockUserAnswersRepository.get(testSessionId))
-        .thenReturn(
-          Future.successful(
-            Some(UserAnswers(testSessionId, SessionUpdates(correspondenceAddress = Assign(testCorrespondenceAddress))))
-          )
-        )
+      val existingAnswers = UserAnswers(
+        testSessionId,
+        SessionUpdates(correspondenceAddress = Assign(testCorrespondenceAddress))
+      )
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
 
-      val application = applicationBuilder().build()
+      val application = applicationBuilder(
+        effectiveAnswers = Answers(correspondenceAddress = Some(testCorrespondenceAddress)),
+        sessionAnswers = Some(existingAnswers)
+      ).build()
 
       running(application) {
         val request =
-          FakeRequest(POST, onSubmitUrl)
+          FakeRequest(POST, organisationTelephoneNumberEndpoint)
             .withFormUrlEncodedBody(validFormData.toSeq: _*)
             .withHeaders("Csrf-Token" -> "nocheck")
 
@@ -119,7 +114,7 @@ class OrganisationTelephoneNumberControllerSpec extends BaseUnitSpec {
 
       running(application) {
         val request =
-          FakeRequest(POST, onSubmitUrl)
+          FakeRequest(POST, organisationTelephoneNumberEndpoint)
             .withFormUrlEncodedBody("value" -> "")
             .withHeaders("Csrf-Token" -> "nocheck")
 

@@ -20,10 +20,12 @@ import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.disaaccountfrontend.controllers.PageController
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction}
 import uk.gov.hmrc.disaaccountfrontend.forms.TradingNameFormProvider
-import uk.gov.hmrc.disaaccountfrontend.models.{SessionUpdates, UserAnswers}
-import uk.gov.hmrc.disaaccountfrontend.navigation.{Navigator, TradingNamePage}
+import uk.gov.hmrc.disaaccountfrontend.models.UserAnswers
+import uk.gov.hmrc.disaaccountfrontend.models.pages.TradingNamePage
+import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
 import uk.gov.hmrc.disaaccountfrontend.views.html.orgdetails.TradingNameView
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -41,7 +43,8 @@ class TradingNameController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: TradingNameView
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+    extends PageController(TradingNamePage, navigator)
+    with FrontendBaseController
     with I18nSupport
     with Logging {
 
@@ -58,11 +61,11 @@ class TradingNameController @Inject() (
       .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
         answer => {
-          val updates =
-            request.sessionAnswers.map(_.updates).getOrElse(SessionUpdates()).copy(tradingName = Some(answer))
-          userAnswersRepository.set(UserAnswers(id = request.sessionId, updates = updates)).map { _ =>
-            Redirect(navigator.nextPage(TradingNamePage))
-          }
+          val sessionUpdates = getSessionUpdates(answer)
+
+          userAnswersRepository
+            .set(UserAnswers(id = request.sessionId, updates = sessionUpdates))
+            .map(_ => Redirect(nextPage(sessionUpdates)))
         }
       )
   }

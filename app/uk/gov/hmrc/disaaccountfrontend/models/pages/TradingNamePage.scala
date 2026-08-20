@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.navigation
+package uk.gov.hmrc.disaaccountfrontend.models.pages
 
-sealed trait Page
+import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
+import uk.gov.hmrc.disaaccountfrontend.models.SessionUpdates
+import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
 
-case object EnterYourOrganisationAddressPage extends Page
-case object OrganisationTelephoneNumberPage extends Page
-case object TradingNamePage extends Page
-case object InnovativeFinancialProductsPage extends Page
-case object PeerToPeerPlatformPage extends Page
+case object TradingNamePage extends PageWithAnswers[String] {
+
+  def saveAnswerAndHandleDependents(request: DataRequest[_], newAnswer: String): SessionUpdates = {
+    val existingUpdates = request.sessionAnswers.fold(SessionUpdates())(_.updates)
+    existingUpdates.copy(tradingName = Assign(newAnswer))
+  }
+}

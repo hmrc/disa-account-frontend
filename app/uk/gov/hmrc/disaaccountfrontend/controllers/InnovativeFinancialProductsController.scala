@@ -18,15 +18,11 @@ package uk.gov.hmrc.disaaccountfrontend.controllers
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction}
+import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction, PageGuardAction}
 import uk.gov.hmrc.disaaccountfrontend.forms.InnovativeFinancialProductsFormProvider
-import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.{Assign, Clear}
-import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct
-import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
-import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct.InnovativeFinanceIsas
-import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
-import uk.gov.hmrc.disaaccountfrontend.models.{SessionUpdates, UserAnswers}
-import uk.gov.hmrc.disaaccountfrontend.navigation.{InnovativeFinancialProductsPage, Navigator}
+import uk.gov.hmrc.disaaccountfrontend.models.UserAnswers
+import uk.gov.hmrc.disaaccountfrontend.models.pages.InnovativeFinancialProductsPage
+import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
 import uk.gov.hmrc.disaaccountfrontend.views.html.InnovativeFinancialProductsView
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -38,67 +34,39 @@ class InnovativeFinancialProductsController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  guardPage: PageGuardAction,
   userAnswersRepository: UserAnswersRepository,
   navigator: Navigator,
   formProvider: InnovativeFinancialProductsFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: InnovativeFinancialProductsView
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+    extends PageController(InnovativeFinancialProductsPage, navigator)
+    with FrontendBaseController
     with I18nSupport {
 
-  private val form = formProvider()
+  private val form       = formProvider()
+  private val pageAction = identify andThen getData andThen guardPage(page)
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData) { implicit request =>
-    if (request.effectiveAnswers.isaProducts.exists(_.contains(InnovativeFinanceIsas))) {
-      val preparedForm = request.effectiveAnswers.innovativeFinancialProducts
-        .fold(form)(answer => form.fill(answer.toSet))
+  def onPageLoad(): Action[AnyContent] = pageAction { implicit request =>
+    val preparedForm = request.effectiveAnswers.innovativeFinancialProducts
+      .fold(form)(answer => form.fill(answer.toSet))
 
-      Ok(view(preparedForm))
-    } else {
-      Redirect(routes.ChangeOfCircumstancesController.onPageLoad())
-    }
+    Ok(view(preparedForm))
   }
 
-  def onSubmit(): Action[AnyContent] = (identify andThen getData).async { implicit request =>
-    if (!request.effectiveAnswers.isaProducts.exists(_.contains(InnovativeFinanceIsas))) {
-      Future.successful(Redirect(routes.ChangeOfCircumstancesController.onPageLoad()))
-    } else {
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
-          answer => {
-            val updates           = handleDependentAnswerClearing(answer, request)
-            val navigationAnswers = updates.getEffectiveAnswers(request.effectiveAnswers)
+  def onSubmit(): Action[AnyContent] = pageAction.async { implicit request =>
+    form
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
+        answer => {
+          val sessionUpdates = getSessionUpdates(answer)
 
-            userAnswersRepository
-              .set(UserAnswers(id = request.sessionId, updates = updates))
-              .map(_ => Redirect(navigator.nextPage(InnovativeFinancialProductsPage, navigationAnswers)))
-          }
-        )
-    }
-  }
-
-  private def handleDependentAnswerClearing(
-    answer: Set[InnovativeFinancialProduct],
-    request: DataRequest[_]
-  ): SessionUpdates =
-    val existingUpdates           = request.sessionAnswers.fold(SessionUpdates())(_.updates)
-    val platformProductWasRemoved =
-      request.effectiveAnswers.innovativeFinancialProducts.exists(
-        _.contains(PeertopeerLoansUsingAPlatformWith36hPermissions)
-      ) && !answer.contains(PeertopeerLoansUsingAPlatformWith36hPermissions)
-    val hasPlatformAnswers        =
-      request.effectiveAnswers.p2pPlatform.isDefined || request.effectiveAnswers.p2pPlatformNumber.isDefined
-
-    if (platformProductWasRemoved && hasPlatformAnswers) {
-      existingUpdates.copy(
-        innovativeFinancialProducts = Assign(answer.toSeq),
-        p2pPlatform = Clear,
-        p2pPlatformNumber = Clear
+          userAnswersRepository
+            .set(UserAnswers(id = request.sessionId, updates = sessionUpdates))
+            .map(_ => Redirect(nextPage(sessionUpdates)))
+        }
       )
-    } else {
-      existingUpdates.copy(innovativeFinancialProducts = Assign(answer.toSeq))
-    }
+  }
 }

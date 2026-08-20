@@ -68,7 +68,7 @@ class SessionUpdatesSpec extends BaseUnitSpec {
         p2pPlatform = Clear
       )
 
-      updates.getEffectiveAnswers(answers) shouldBe Answers(
+      updates.getUpdatedEffectiveAnswers(answers) shouldBe Answers(
         correspondenceAddress = Some(testCorrespondenceAddress),
         organisationTelephoneNumber = Some(updatedOrgTelephoneNumber)
       )
