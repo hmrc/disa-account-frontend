@@ -18,6 +18,7 @@ package models
 
 import play.api.libs.json.{JsNull, JsSuccess, Json}
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.{Assign, Clear, Unchanged}
+import uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority.FinancialOrganisation.{Bank, BuildingSociety}
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates}
 import utils.BaseUnitSpec
 
@@ -31,6 +32,7 @@ class SessionUpdatesSpec extends BaseUnitSpec {
       val sessionUpdates = SessionUpdates(
         correspondenceAddress = Assign(testCorrespondenceAddress),
         isaProducts = Assign(Seq.empty),
+        financialOrganisation = Assign(Seq(Bank)),
         p2pPlatform = Clear
       )
 
@@ -61,16 +63,19 @@ class SessionUpdatesSpec extends BaseUnitSpec {
       val answers = Answers(
         correspondenceAddress = Some(testCorrespondenceAddress),
         organisationTelephoneNumber = Some(testOrgTelephoneNumber),
+        financialOrganisation = Some(Seq(BuildingSociety)),
         p2pPlatform = Some(testP2pPlatform)
       )
       val updates = SessionUpdates(
         organisationTelephoneNumber = Assign(updatedOrgTelephoneNumber),
+        financialOrganisation = Assign(Seq(Bank)),
         p2pPlatform = Clear
       )
 
       updates.getUpdatedEffectiveAnswers(answers) shouldBe Answers(
         correspondenceAddress = Some(testCorrespondenceAddress),
-        organisationTelephoneNumber = Some(updatedOrgTelephoneNumber)
+        organisationTelephoneNumber = Some(updatedOrgTelephoneNumber),
+        financialOrganisation = Some(Seq(Bank))
       )
     }
   }

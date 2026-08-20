@@ -28,6 +28,7 @@ trait TestEndpoints {
   val innovativeFinancialProductsEndpoint: String  =
     s"$accountFrontendRoutePrefix/innovative-financial-products"
   val peerToPeerPlatformEndpoint: String           = s"$accountFrontendRoutePrefix/peer-to-peer-loans"
+  val financialOrganisationEndpoint: String        = s"$accountFrontendRoutePrefix/financial-organisation"
   val changeOfCircumstancesEndpoint: String        = s"$accountFrontendRoutePrefix/change-of-circumstances"
   val keepAliveEndpoint: String                    = s"$accountFrontendRoutePrefix/refresh-session"
   val signOutEndpoint: String                      = s"$accountFrontendRoutePrefix/sign-out"

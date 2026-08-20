@@ -14,18 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.models
+package uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority
 
-import uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority.FinancialOrganisation
-import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.{InnovativeFinancialProduct, IsaProduct}
+import play.api.libs.json.{Json, Reads}
 
-case class Answers(
-  correspondenceAddress: Option[CorrespondenceAddress] = None,
-  organisationTelephoneNumber: Option[String] = None,
-  tradingName: Option[String] = None,
-  isaProducts: Option[Seq[IsaProduct]] = None,
-  innovativeFinancialProducts: Option[Seq[InnovativeFinancialProduct]] = None,
-  p2pPlatform: Option[String] = None,
-  p2pPlatformNumber: Option[String] = None,
+case class CertificatesOfAuthority(
   financialOrganisation: Option[Seq[FinancialOrganisation]] = None
 )
+
+object CertificatesOfAuthority {
+  implicit val reads: Reads[CertificatesOfAuthority] = Json.reads[CertificatesOfAuthority]
+}
