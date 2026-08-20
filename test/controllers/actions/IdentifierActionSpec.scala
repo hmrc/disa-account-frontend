@@ -84,7 +84,7 @@ class IdentifierActionSpec extends BaseUnitSpec {
       )
 
       status(result)             shouldBe SEE_OTHER
-      redirectLocation(result).get should startWith("http://localhost:9949/auth-login-stub/gg-sign-in")
+      redirectLocation(result).get should startWith(authLoginStubSignInEndpoint)
     }
 
     "redirect to sign-in when there is no active session" in {
@@ -94,7 +94,7 @@ class IdentifierActionSpec extends BaseUnitSpec {
       )
 
       status(result)             shouldBe SEE_OTHER
-      redirectLocation(result).get should startWith("http://localhost:9949/auth-login-stub/gg-sign-in")
+      redirectLocation(result).get should startWith(authLoginStubSignInEndpoint)
     }
   }
 }

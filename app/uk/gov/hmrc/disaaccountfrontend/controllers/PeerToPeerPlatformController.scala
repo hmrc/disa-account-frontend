@@ -19,29 +19,29 @@ package uk.gov.hmrc.disaaccountfrontend.controllers
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction, PageGuardAction}
-import uk.gov.hmrc.disaaccountfrontend.forms.InnovativeFinancialProductsFormProvider
+import uk.gov.hmrc.disaaccountfrontend.forms.PeerToPeerPlatformFormProvider
 import uk.gov.hmrc.disaaccountfrontend.models.UserAnswers
-import uk.gov.hmrc.disaaccountfrontend.models.pages.InnovativeFinancialProductsPage
+import uk.gov.hmrc.disaaccountfrontend.models.pages.PeerToPeerPlatformPage
 import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
-import uk.gov.hmrc.disaaccountfrontend.views.html.InnovativeFinancialProductsView
+import uk.gov.hmrc.disaaccountfrontend.views.html.PeerToPeerPlatformView
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class InnovativeFinancialProductsController @Inject() (
+class PeerToPeerPlatformController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   guardPage: PageGuardAction,
   userAnswersRepository: UserAnswersRepository,
   navigator: Navigator,
-  formProvider: InnovativeFinancialProductsFormProvider,
+  formProvider: PeerToPeerPlatformFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: InnovativeFinancialProductsView
+  view: PeerToPeerPlatformView
 )(implicit ec: ExecutionContext)
-    extends PageController(InnovativeFinancialProductsPage, navigator)
+    extends PageController(PeerToPeerPlatformPage, navigator)
     with FrontendBaseController
     with I18nSupport {
 
@@ -49,9 +49,7 @@ class InnovativeFinancialProductsController @Inject() (
   private val pageAction = identify andThen getData andThen guardPage(page)
 
   def onPageLoad(): Action[AnyContent] = pageAction { implicit request =>
-    val preparedForm = request.effectiveAnswers.innovativeFinancialProducts
-      .fold(form)(answer => form.fill(answer.toSet))
-
+    val preparedForm = request.effectiveAnswers.p2pPlatform.fold(form)(form.fill)
     Ok(view(preparedForm))
   }
 

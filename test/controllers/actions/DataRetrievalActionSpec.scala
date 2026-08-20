@@ -24,16 +24,17 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.disaaccountfrontend.config.ErrorHandler
 import uk.gov.hmrc.disaaccountfrontend.connectors.RegistrationConnector
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.DataRetrievalActionImpl
-import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.LongTermAssetFunds
-import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct.CashIsas
+import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.{Assign, Clear}
 import uk.gov.hmrc.disaaccountfrontend.models.requests.{DataRequest, IdentifierRequest}
-import uk.gov.hmrc.disaaccountfrontend.models.{SessionUpdates, UserAnswers}
+import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates, UserAnswers}
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
 import utils.BaseUnitSpec
 
 import scala.concurrent.Future
 
 class DataRetrievalActionSpec extends BaseUnitSpec {
+
+  private val updatedOrgTelephoneNumber = "07777777777"
 
   val errorHandler: ErrorHandler = app.injector.instanceOf[ErrorHandler]
 
@@ -66,22 +67,25 @@ class DataRetrievalActionSpec extends BaseUnitSpec {
           testCredentialId,
           testSessionId,
           sessionAnswers = None,
-          effectiveAnswers = SessionUpdates(
+          effectiveAnswers = Answers(
             correspondenceAddress = Some(testCorrespondenceAddress),
             organisationTelephoneNumber = Some(testOrgTelephoneNumber),
             isaProducts = Some(testIsaProductSelections),
-            innovativeFinancialProducts = Some(testInnovativeFinancialProductSelections)
+            innovativeFinancialProducts = Some(testInnovativeFinancialProductSelections),
+            p2pPlatform = Some(testP2pPlatform),
+            p2pPlatformNumber = Some(testP2pPlatformNumber)
           )
         )
       )
     }
 
-    "prefer session answers field by field while falling back for unanswered fields" in {
+    "apply unchanged, set and clear session updates to registration answers" in {
       val request      = FakeRequest()
       val updates      = SessionUpdates(
-        organisationTelephoneNumber = Some("07777777777"),
-        isaProducts = Some(Seq(CashIsas)),
-        innovativeFinancialProducts = Some(Seq(LongTermAssetFunds))
+        organisationTelephoneNumber = Assign(updatedOrgTelephoneNumber),
+        isaProducts = Assign(Seq.empty),
+        p2pPlatform = Clear,
+        p2pPlatformNumber = Clear
       )
       val savedAnswers = UserAnswers(testSessionId, updates)
 
@@ -100,36 +104,14 @@ class DataRetrievalActionSpec extends BaseUnitSpec {
           testCredentialId,
           testSessionId,
           sessionAnswers = Some(savedAnswers),
-          effectiveAnswers = SessionUpdates(
+          effectiveAnswers = Answers(
             correspondenceAddress = Some(testCorrespondenceAddress),
-            organisationTelephoneNumber = Some("07777777777"),
-            isaProducts = Some(Seq(CashIsas)),
-            innovativeFinancialProducts = Some(Seq(LongTermAssetFunds))
+            organisationTelephoneNumber = Some(updatedOrgTelephoneNumber),
+            isaProducts = Some(Seq.empty),
+            innovativeFinancialProducts = Some(testInnovativeFinancialProductSelections)
           )
         )
       )
-    }
-
-    "retain explicitly empty session selections instead of restoring registration answers" in {
-      val request      = FakeRequest()
-      val savedAnswers = UserAnswers(
-        testSessionId,
-        SessionUpdates(
-          isaProducts = Some(Seq.empty),
-          innovativeFinancialProducts = Some(Seq.empty)
-        )
-      )
-
-      when(mockRegistrationConnector.getRegistrationDetails(eqTo(testZref))(any()))
-        .thenReturn(Future.successful(Some(testRegistrationDetailsWithInnovativeFinanceIsa)))
-      when(mockUserAnswersRepository.get(testSessionId)).thenReturn(Future.successful(Some(savedAnswers)))
-
-      val result = action
-        .callRefine(IdentifierRequest(request, testZref, testCredentialId, testSessionId))
-        .futureValue
-
-      result.value.effectiveAnswers.isaProducts                 shouldBe Some(Seq.empty)
-      result.value.effectiveAnswers.innovativeFinancialProducts shouldBe Some(Seq.empty)
     }
 
     "use empty effective answers when neither source has answers" in {
@@ -143,7 +125,7 @@ class DataRetrievalActionSpec extends BaseUnitSpec {
         .futureValue
 
       result shouldBe Right(
-        DataRequest(request, testZref, testCredentialId, testSessionId, None, SessionUpdates())
+        DataRequest(request, testZref, testCredentialId, testSessionId, None, Answers())
       )
     }
 

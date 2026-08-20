@@ -22,6 +22,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
 import uk.gov.hmrc.disaaccountfrontend.utils.BaseIntegrationSpec
 import uk.gov.hmrc.disaaccountfrontend.utils.WiremockHelper.stubGet
@@ -29,6 +30,8 @@ import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.mongo.MongoComponent
 
 class OrganisationTelephoneNumberControllerISpec extends BaseIntegrationSpec {
+
+  private val updatedTelephoneNumber = "07777777777"
 
   private val databaseName: String                    = "disa-account-frontend-controller-test"
   private lazy val mongoUri: String                   = s"mongodb://127.0.0.1:27017/$databaseName"
@@ -90,13 +93,13 @@ class OrganisationTelephoneNumberControllerISpec extends BaseIntegrationSpec {
       stubGet(registrationUrl, OK, registrationResponseBody)
 
       status(
-        route(app, authenticatedPost(Map("value" -> Seq("07777777777")))).get
+        route(app, authenticatedPost(Map("value" -> Seq(updatedTelephoneNumber)))).get
       ) shouldBe SEE_OTHER
 
       val result = route(app, authenticatedGet()).get
 
       status(result)        shouldBe OK
-      contentAsString(result) should include("07777777777")
+      contentAsString(result) should include(updatedTelephoneNumber)
       contentAsString(result) should not include testOrgTelephoneNumber
     }
 
@@ -129,7 +132,7 @@ class OrganisationTelephoneNumberControllerISpec extends BaseIntegrationSpec {
       status(result) shouldBe SEE_OTHER
 
       val stored = await(repo.get(testSessionId))
-      stored.flatMap(_.updates.organisationTelephoneNumber) shouldBe Some("01642123456")
+      stored.map(_.updates.organisationTelephoneNumber) shouldBe Some(Assign(testOrgTelephoneNumber))
     }
 
     "return 400 BadRequest with the inline error when the value is missing" in {

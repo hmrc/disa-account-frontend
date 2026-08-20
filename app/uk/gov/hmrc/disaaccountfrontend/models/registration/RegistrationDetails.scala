@@ -42,6 +42,10 @@ case class RegistrationDetails(
 
   def innovativeFinancialProductSelections: Option[Seq[InnovativeFinancialProduct]] =
     isaProducts.flatMap(_.innovativeFinancialProducts)
+
+  def p2pPlatform: Option[String] = isaProducts.flatMap(_.p2pPlatform)
+
+  def p2pPlatformNumber: Option[String] = isaProducts.flatMap(_.p2pPlatformNumber)
 }
 
 object RegistrationDetails {

@@ -22,16 +22,13 @@ import utils.BaseUnitSpec
 
 class SignedOutControllerSpec extends BaseUnitSpec {
 
-  // prod.routes mounts app.routes under this prefix, which the per-controller reverse router doesn't know about.
-  val signedOutUrl: String = "/obligations/account/isa/signed-out"
-
   "SignedOutController.onPageLoad" should {
 
     "return 200 OK and render the signed-out view" in {
       val application = applicationBuilder().build()
 
       running(application) {
-        val result = route(application, FakeRequest(GET, signedOutUrl)).value
+        val result = route(application, FakeRequest(GET, signedOutEndpoint)).value
 
         status(result)        shouldBe OK
         contentAsString(result) should include("For your security, we signed you out")

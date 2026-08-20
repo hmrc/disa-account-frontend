@@ -21,17 +21,13 @@ import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import play.api.test.Helpers._
 import play.api.test._
-import uk.gov.hmrc.disaaccountfrontend.models.{SessionUpdates, UserAnswers}
+import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
+import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates, UserAnswers}
 import utils.BaseUnitSpec
 
 import scala.concurrent.Future
 
 class TradingNameControllerSpec extends BaseUnitSpec {
-
-  // prod.routes mounts app.routes under this prefix, which the per-controller reverse router
-  // (uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes) doesn't know about, so it's hardcoded here.
-  val onPageLoadUrl: String = "/obligations/account/isa/trading-name"
-  val onSubmitUrl: String   = "/obligations/account/isa/trading-name"
 
   val testTradingName: String = "Acme Savings Ltd"
 
@@ -41,11 +37,11 @@ class TradingNameControllerSpec extends BaseUnitSpec {
 
     "return 200 OK prefilled from the effective answers supplied by the retrieval action" in {
       val application = applicationBuilder(
-        effectiveAnswers = SessionUpdates(tradingName = Some(testTradingName))
+        effectiveAnswers = Answers(tradingName = Some(testTradingName))
       ).build()
 
       running(application) {
-        val result = route(application, FakeRequest(GET, onPageLoadUrl)).value
+        val result = route(application, FakeRequest(GET, tradingNameEndpoint)).value
 
         status(result)        shouldBe OK
         contentAsString(result) should include(testTradingName)
@@ -56,7 +52,7 @@ class TradingNameControllerSpec extends BaseUnitSpec {
       val application = applicationBuilder().build()
 
       running(application) {
-        val result = route(application, FakeRequest(GET, onPageLoadUrl)).value
+        val result = route(application, FakeRequest(GET, tradingNameEndpoint)).value
 
         status(result)        shouldBe OK
         contentAsString(result) should not include testTradingName
@@ -73,7 +69,7 @@ class TradingNameControllerSpec extends BaseUnitSpec {
 
       running(application) {
         val request =
-          FakeRequest(POST, onSubmitUrl)
+          FakeRequest(POST, tradingNameEndpoint)
             .withFormUrlEncodedBody(validFormData.toSeq: _*)
             .withHeaders("Csrf-Token" -> "nocheck")
 
@@ -89,12 +85,12 @@ class TradingNameControllerSpec extends BaseUnitSpec {
 
       val application = applicationBuilder(
         sessionAnswers =
-          Some(UserAnswers(testSessionId, SessionUpdates(correspondenceAddress = Some(testCorrespondenceAddress))))
+          Some(UserAnswers(testSessionId, SessionUpdates(correspondenceAddress = Assign(testCorrespondenceAddress))))
       ).build()
 
       running(application) {
         val request =
-          FakeRequest(POST, onSubmitUrl)
+          FakeRequest(POST, tradingNameEndpoint)
             .withFormUrlEncodedBody(validFormData.toSeq: _*)
             .withHeaders("Csrf-Token" -> "nocheck")
 
@@ -105,8 +101,8 @@ class TradingNameControllerSpec extends BaseUnitSpec {
         val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
         verify(mockUserAnswersRepository).set(captor.capture())
         captor.getValue.updates shouldBe SessionUpdates(
-          correspondenceAddress = Some(testCorrespondenceAddress),
-          tradingName = Some(testTradingName)
+          correspondenceAddress = Assign(testCorrespondenceAddress),
+          tradingName = Assign(testTradingName)
         )
       }
     }
@@ -116,7 +112,7 @@ class TradingNameControllerSpec extends BaseUnitSpec {
 
       running(application) {
         val request =
-          FakeRequest(POST, onSubmitUrl)
+          FakeRequest(POST, tradingNameEndpoint)
             .withFormUrlEncodedBody("value" -> "")
             .withHeaders("Csrf-Token" -> "nocheck")
 

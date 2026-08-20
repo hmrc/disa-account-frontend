@@ -16,11 +16,13 @@
 
 package navigation
 
-import uk.gov.hmrc.disaaccountfrontend.controllers.routes.ChangeOfCircumstancesController
+import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, PeerToPeerPlatformController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.OrganisationTelephoneNumberController
-import uk.gov.hmrc.disaaccountfrontend.models.SessionUpdates
+import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.{CrowdFundedDebentures, PeertopeerLoansUsingAPlatformWith36hPermissions}
-import uk.gov.hmrc.disaaccountfrontend.navigation.{EnterYourOrganisationAddressPage, InnovativeFinancialProductsPage, Navigator, OrganisationTelephoneNumberPage}
+import uk.gov.hmrc.disaaccountfrontend.models.pages.{EnterYourOrganisationAddressPage, InnovativeFinancialProductsPage, OrganisationTelephoneNumberPage, PageWithAnswers, PeerToPeerPlatformPage}
+import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
+import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator
 import utils.BaseUnitSpec
 
 class NavigatorSpec extends BaseUnitSpec {
@@ -37,20 +39,43 @@ class NavigatorSpec extends BaseUnitSpec {
       navigator.nextPage(OrganisationTelephoneNumberPage) shouldBe OrganisationTelephoneNumberController.onPageLoad()
     }
 
-    "temporarily go from InnovativeFinancialProductsPage to change of circumstances when the platform option is selected" in {
-      val answers = SessionUpdates(
+    "go from InnovativeFinancialProductsPage to the peer-to-peer platform page when the platform option is selected" in {
+      val answers = Answers(
         innovativeFinancialProducts = Some(Seq(PeertopeerLoansUsingAPlatformWith36hPermissions))
       )
+
+      navigator.nextPage(InnovativeFinancialProductsPage, answers) shouldBe
+        PeerToPeerPlatformController.onPageLoad()
+    }
+
+    "go from InnovativeFinancialProductsPage to change of circumstances when the platform option is not selected" in {
+      val answers = Answers(innovativeFinancialProducts = Some(Seq(CrowdFundedDebentures)))
 
       navigator.nextPage(InnovativeFinancialProductsPage, answers) shouldBe
         ChangeOfCircumstancesController.onPageLoad()
     }
 
-    "go from InnovativeFinancialProductsPage to change of circumstances when the platform option is not selected" in {
-      val answers = SessionUpdates(innovativeFinancialProducts = Some(Seq(CrowdFundedDebentures)))
-
-      navigator.nextPage(InnovativeFinancialProductsPage, answers) shouldBe
+    "temporarily go from PeerToPeerPlatformPage to change of circumstances when the FCA/FRN page is not built" in {
+      navigator.nextPage(PeerToPeerPlatformPage, Answers()) shouldBe
         ChangeOfCircumstancesController.onPageLoad()
+    }
+
+    "go from PeerToPeerPlatformPage to change of circumstances when an FCA/FRN is already present" in {
+      val answers = Answers(p2pPlatformNumber = Some(testP2pPlatformNumber))
+
+      navigator.nextPage(PeerToPeerPlatformPage, answers) shouldBe
+        ChangeOfCircumstancesController.onPageLoad()
+    }
+
+    "fail fast when navigation has not been defined for a page" in {
+      val unsupportedPage = new PageWithAnswers[String] {
+        def saveAnswerAndHandleDependents(request: DataRequest[_], newAnswer: String): SessionUpdates =
+          SessionUpdates()
+      }
+
+      val exception = intercept[IllegalArgumentException](navigator.nextPage(unsupportedPage))
+
+      exception.getMessage should include("No navigation defined for page")
     }
   }
 }

@@ -35,8 +35,9 @@ class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig
   val timeout: Int   = config.get[Int]("timeout-dialog.timeout")
   val countdown: Int = config.get[Int]("timeout-dialog.countdown")
 
-  val manageIsaEnrolmentKey: String = config.get[String]("enrolments.manageIsa")
-  val zrefIdentifierKey: String     = config.get[String]("enrolments.zrefIdentifierKey")
+  val manageIsaEnrolmentKey: String  = config.get[String]("enrolments.manageIsa")
+  val zrefIdentifierKey: String      = config.get[String]("enrolments.zrefIdentifierKey")
+  val p2pLoansInformationUrl: String = config.get[String]("urls.external.p2pLoansInformation")
 
   val cacheTtl: Long = config.get[Long]("cache.ttlInSeconds")
 }

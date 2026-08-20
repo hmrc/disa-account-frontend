@@ -14,11 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.navigation
+package uk.gov.hmrc.disaaccountfrontend.forms
 
-sealed trait Page
+import play.api.data.Form
+import uk.gov.hmrc.disaaccountfrontend.forms.mappings.Mappings
 
-case object EnterYourOrganisationAddressPage extends Page
-case object OrganisationTelephoneNumberPage extends Page
-case object TradingNamePage extends Page
-case object InnovativeFinancialProductsPage extends Page
+import javax.inject.Inject
+
+class PeerToPeerPlatformFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[String] =
+    Form(
+      "value" -> text("peerToPeerPlatform.error.required")
+    )
+}

@@ -14,24 +14,16 @@
  * limitations under the License.
  */
 
-package controllers
+package uk.gov.hmrc.disaaccountfrontend.models
 
-import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import utils.BaseUnitSpec
+import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.{InnovativeFinancialProduct, IsaProduct}
 
-class KeepAliveControllerSpec extends BaseUnitSpec {
-
-  "KeepAliveController.keepAlive" should {
-
-    "return 200 OK" in {
-      val application = applicationBuilder().build()
-
-      running(application) {
-        val result = route(application, FakeRequest(GET, keepAliveEndpoint)).value
-
-        status(result) shouldBe OK
-      }
-    }
-  }
-}
+case class Answers(
+  correspondenceAddress: Option[CorrespondenceAddress] = None,
+  organisationTelephoneNumber: Option[String] = None,
+  tradingName: Option[String] = None,
+  isaProducts: Option[Seq[IsaProduct]] = None,
+  innovativeFinancialProducts: Option[Seq[InnovativeFinancialProduct]] = None,
+  p2pPlatform: Option[String] = None,
+  p2pPlatformNumber: Option[String] = None
+)

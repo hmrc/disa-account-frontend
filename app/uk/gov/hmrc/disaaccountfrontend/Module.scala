@@ -17,8 +17,8 @@
 package uk.gov.hmrc.disaaccountfrontend
 
 import play.api.{Configuration, Environment}
-import play.api.inject.{Binding, Module => AppModule}
-import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{AuthenticatedIdentifierAction, DataRetrievalAction, DataRetrievalActionImpl, IdentifierAction}
+import play.api.inject.{Binding, Module as AppModule}
+import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{AuthenticatedIdentifierAction, DataRetrievalAction, DataRetrievalActionImpl, IdentifierAction, PageGuardAction, PageGuardActionImpl}
 
 import java.time.Clock
 
@@ -31,5 +31,6 @@ class Module extends AppModule {
     bind[Clock].toInstance(Clock.systemDefaultZone) :: // inject if current time needs to be controlled in unit tests
       bind[IdentifierAction].to[AuthenticatedIdentifierAction] ::
       bind[DataRetrievalAction].to[DataRetrievalActionImpl] ::
+      bind[PageGuardAction].to[PageGuardActionImpl] ::
       Nil
 }

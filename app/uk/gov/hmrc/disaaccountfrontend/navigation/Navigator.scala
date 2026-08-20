@@ -17,25 +17,29 @@
 package uk.gov.hmrc.disaaccountfrontend.navigation
 
 import play.api.mvc.Call
-import uk.gov.hmrc.disaaccountfrontend.controllers.routes.ChangeOfCircumstancesController
-import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes._
-import uk.gov.hmrc.disaaccountfrontend.models.SessionUpdates
+import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, PeerToPeerPlatformController}
+import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.{OrganisationTelephoneNumberController, TradingNameController}
+import uk.gov.hmrc.disaaccountfrontend.models.Answers
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
+import uk.gov.hmrc.disaaccountfrontend.models.pages.{EnterYourOrganisationAddressPage, InnovativeFinancialProductsPage, OrganisationTelephoneNumberPage, Page, PeerToPeerPlatformPage, TradingNamePage}
 
 import javax.inject.{Inject, Singleton}
 
 @Singleton
 class Navigator @Inject() () {
 
-  def nextPage(page: Page, answers: SessionUpdates = SessionUpdates()): Call = page match {
+  def nextPage(page: Page, answers: Answers = Answers()): Call = page match {
     case EnterYourOrganisationAddressPage => OrganisationTelephoneNumberController.onPageLoad()
     // TODO: replace with the next page in the journey once it exists.
     case OrganisationTelephoneNumberPage  => OrganisationTelephoneNumberController.onPageLoad()
     case TradingNamePage                  => TradingNameController.onPageLoad()
     case InnovativeFinancialProductsPage  => innovativeFinancialProductsNextPage(answers)
+    case PeerToPeerPlatformPage           => peerToPeerPlatformNextPage(answers)
+    case unsupportedPage                  =>
+      throw new IllegalArgumentException(s"No navigation defined for page: $unsupportedPage")
   }
 
-  private def innovativeFinancialProductsNextPage(answers: SessionUpdates): Call =
+  private def innovativeFinancialProductsNextPage(answers: Answers): Call =
     answers.innovativeFinancialProducts match {
       case Some(products) if products.contains(PeertopeerLoansUsingAPlatformWith36hPermissions) =>
         peerToPeerPlatformQuestionPage
@@ -44,6 +48,15 @@ class Navigator @Inject() () {
     }
 
   private def peerToPeerPlatformQuestionPage: Call =
-    // TODO: Replace this fallback with the peer-to-peer platform question when that page is implemented.
+    PeerToPeerPlatformController.onPageLoad()
+
+  private def peerToPeerPlatformNextPage(answers: Answers): Call =
+    answers.p2pPlatformNumber match {
+      case Some(_) => ChangeOfCircumstancesController.onPageLoad()
+      case None    => peerToPeerPlatformNumberQuestionPage
+    }
+
+  private def peerToPeerPlatformNumberQuestionPage: Call =
+    // TODO: Replace this fallback with the FCA/FRN question when that page is implemented.
     ChangeOfCircumstancesController.onPageLoad()
 }

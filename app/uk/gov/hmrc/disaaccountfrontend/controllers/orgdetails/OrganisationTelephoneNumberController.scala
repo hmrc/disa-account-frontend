@@ -18,10 +18,12 @@ package uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.disaaccountfrontend.controllers.PageController
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction}
 import uk.gov.hmrc.disaaccountfrontend.forms.TelephoneNumberFormProvider
-import uk.gov.hmrc.disaaccountfrontend.models.{SessionUpdates, UserAnswers}
-import uk.gov.hmrc.disaaccountfrontend.navigation.{Navigator, OrganisationTelephoneNumberPage}
+import uk.gov.hmrc.disaaccountfrontend.models.UserAnswers
+import uk.gov.hmrc.disaaccountfrontend.models.pages.OrganisationTelephoneNumberPage
+import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
 import uk.gov.hmrc.disaaccountfrontend.views.html.orgdetails.OrganisationTelephoneNumberView
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -39,7 +41,8 @@ class OrganisationTelephoneNumberController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: OrganisationTelephoneNumberView
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+    extends PageController(OrganisationTelephoneNumberPage, navigator)
+    with FrontendBaseController
     with I18nSupport {
 
   private val form = formProvider("organisationTelephoneNumber")
@@ -49,19 +52,18 @@ class OrganisationTelephoneNumberController @Inject() (
     Ok(view(preparedForm))
   }
 
-  def onSubmit(): Action[AnyContent] = identify.async { implicit request =>
+  def onSubmit(): Action[AnyContent] = (identify andThen getData).async { implicit request =>
     form
       .bindFromRequest()
       .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
-        answer =>
-          userAnswersRepository.get(request.sessionId).flatMap { existing =>
-            val updates =
-              existing.map(_.updates).getOrElse(SessionUpdates()).copy(organisationTelephoneNumber = Some(answer))
-            userAnswersRepository.set(UserAnswers(id = request.sessionId, updates = updates)).map { _ =>
-              Redirect(navigator.nextPage(OrganisationTelephoneNumberPage))
-            }
-          }
+        answer => {
+          val sessionUpdates = getSessionUpdates(answer)
+
+          userAnswersRepository
+            .set(UserAnswers(id = request.sessionId, updates = sessionUpdates))
+            .map(_ => Redirect(nextPage(sessionUpdates)))
+        }
       )
   }
 }

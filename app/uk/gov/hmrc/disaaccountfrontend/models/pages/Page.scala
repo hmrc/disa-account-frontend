@@ -14,24 +14,17 @@
  * limitations under the License.
  */
 
-package controllers
+package uk.gov.hmrc.disaaccountfrontend.models.pages
 
-import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import utils.BaseUnitSpec
+import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
+import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates}
 
-class KeepAliveControllerSpec extends BaseUnitSpec {
+sealed trait Page
 
-  "KeepAliveController.keepAlive" should {
+trait GuardedPage extends Page {
+  def canBeAccessedWith(answers: Answers): Boolean
+}
 
-    "return 200 OK" in {
-      val application = applicationBuilder().build()
-
-      running(application) {
-        val result = route(application, FakeRequest(GET, keepAliveEndpoint)).value
-
-        status(result) shouldBe OK
-      }
-    }
-  }
+trait PageWithAnswers[A] extends Page {
+  def saveAnswerAndHandleDependents(request: DataRequest[_], newAnswer: A): SessionUpdates
 }

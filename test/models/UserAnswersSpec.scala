@@ -17,6 +17,7 @@
 package models
 
 import play.api.libs.json.{JsSuccess, Json}
+import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
 import uk.gov.hmrc.disaaccountfrontend.models.{SessionUpdates, UserAnswers}
 import utils.BaseUnitSpec
 
@@ -30,7 +31,7 @@ class UserAnswersSpec extends BaseUnitSpec {
     "round-trip through JSON" in {
       val userAnswers = UserAnswers(
         id = testSessionId,
-        updates = SessionUpdates(correspondenceAddress = Some(testCorrespondenceAddress)),
+        updates = SessionUpdates(correspondenceAddress = Assign(testCorrespondenceAddress)),
         lastUpdated = Instant.now().truncatedTo(ChronoUnit.MILLIS)
       )
 

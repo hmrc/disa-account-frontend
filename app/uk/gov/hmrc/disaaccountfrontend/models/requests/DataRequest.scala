@@ -17,7 +17,7 @@
 package uk.gov.hmrc.disaaccountfrontend.models.requests
 
 import play.api.mvc.{Request, WrappedRequest}
-import uk.gov.hmrc.disaaccountfrontend.models.{SessionUpdates, UserAnswers}
+import uk.gov.hmrc.disaaccountfrontend.models.{Answers, UserAnswers}
 
 case class DataRequest[A](
   request: Request[A],
@@ -25,5 +25,5 @@ case class DataRequest[A](
   credentialId: String,
   sessionId: String,
   sessionAnswers: Option[UserAnswers],
-  effectiveAnswers: SessionUpdates
+  effectiveAnswers: Answers
 ) extends WrappedRequest[A](request)

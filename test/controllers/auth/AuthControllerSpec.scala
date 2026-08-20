@@ -22,12 +22,11 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import utils.BaseUnitSpec
 
+import java.net.{URI, URLDecoder}
+import java.nio.charset.StandardCharsets
 import scala.concurrent.Future
 
 class AuthControllerSpec extends BaseUnitSpec {
-
-  // prod.routes mounts app.routes under this prefix, which the per-controller reverse router doesn't know about.
-  val signOutUrl: String = "/obligations/account/isa/sign-out"
 
   "AuthController.signOut" should {
 
@@ -37,11 +36,14 @@ class AuthControllerSpec extends BaseUnitSpec {
       val application = applicationBuilder().build()
 
       running(application) {
-        val result = route(application, FakeRequest(GET, signOutUrl)).value
+        val result = route(application, FakeRequest(GET, signOutEndpoint)).value
 
-        status(result)             shouldBe SEE_OTHER
-        redirectLocation(result).get should startWith("http://localhost:9553/bas-gateway/sign-out-without-state")
-        redirectLocation(result).get should include("signed-out")
+        val redirectUrl = redirectLocation(result).value
+
+        status(result)                                                                 shouldBe SEE_OTHER
+        redirectUrl                                                                      should startWith(basGatewaySignOutEndpoint)
+        URLDecoder.decode(URI.create(redirectUrl).getRawQuery, StandardCharsets.UTF_8) shouldBe
+          s"continue=$signedOutEndpoint"
         verify(mockUserAnswersRepository).clear(testSessionId)
       }
     }
@@ -53,10 +55,10 @@ class AuthControllerSpec extends BaseUnitSpec {
       val application = applicationBuilder().build()
 
       running(application) {
-        val result = route(application, FakeRequest(GET, signOutUrl)).value
+        val result = route(application, FakeRequest(GET, signOutEndpoint)).value
 
         status(result)             shouldBe SEE_OTHER
-        redirectLocation(result).get should startWith("http://localhost:9553/bas-gateway/sign-out-without-state")
+        redirectLocation(result).get should startWith(basGatewaySignOutEndpoint)
       }
     }
   }

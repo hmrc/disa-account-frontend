@@ -17,15 +17,29 @@
 package uk.gov.hmrc.disaaccountfrontend.models
 
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Unchanged
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.{InnovativeFinancialProduct, IsaProduct}
 
 case class SessionUpdates(
-  correspondenceAddress: Option[CorrespondenceAddress] = None,
-  organisationTelephoneNumber: Option[String] = None,
-  tradingName: Option[String] = None,
-  isaProducts: Option[Seq[IsaProduct]] = None,
-  innovativeFinancialProducts: Option[Seq[InnovativeFinancialProduct]] = None
-)
+  correspondenceAddress: AnswerUpdate[CorrespondenceAddress] = Unchanged,
+  organisationTelephoneNumber: AnswerUpdate[String] = Unchanged,
+  tradingName: AnswerUpdate[String] = Unchanged,
+  isaProducts: AnswerUpdate[Seq[IsaProduct]] = Unchanged,
+  innovativeFinancialProducts: AnswerUpdate[Seq[InnovativeFinancialProduct]] = Unchanged,
+  p2pPlatform: AnswerUpdate[String] = Unchanged,
+  p2pPlatformNumber: AnswerUpdate[String] = Unchanged
+) {
+  def getUpdatedEffectiveAnswers(answers: Answers): Answers =
+    Answers(
+      correspondenceAddress = correspondenceAddress.getEffectiveAnswer(answers.correspondenceAddress),
+      organisationTelephoneNumber = organisationTelephoneNumber.getEffectiveAnswer(answers.organisationTelephoneNumber),
+      tradingName = tradingName.getEffectiveAnswer(answers.tradingName),
+      isaProducts = isaProducts.getEffectiveAnswer(answers.isaProducts),
+      innovativeFinancialProducts = innovativeFinancialProducts.getEffectiveAnswer(answers.innovativeFinancialProducts),
+      p2pPlatform = p2pPlatform.getEffectiveAnswer(answers.p2pPlatform),
+      p2pPlatformNumber = p2pPlatformNumber.getEffectiveAnswer(answers.p2pPlatformNumber)
+    )
+}
 
 object SessionUpdates {
   implicit val format: OFormat[SessionUpdates] = Json.format[SessionUpdates]

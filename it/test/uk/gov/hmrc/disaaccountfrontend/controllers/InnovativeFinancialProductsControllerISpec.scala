@@ -23,6 +23,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.{CrowdFundedDebentures, LongTermAssetFunds, PeertopeerLoansUsingAPlatformWith36hPermissions}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct.{CashIsas, InnovativeFinanceIsas}
 import uk.gov.hmrc.disaaccountfrontend.models.{SessionUpdates, UserAnswers}
@@ -114,7 +115,7 @@ class InnovativeFinancialProductsControllerISpec extends BaseIntegrationSpec {
         repo.set(
           UserAnswers(
             testSessionId,
-            SessionUpdates(isaProducts = Some(Seq(CashIsas, InnovativeFinanceIsas)))
+            SessionUpdates(isaProducts = Assign(Seq(CashIsas, InnovativeFinanceIsas)))
           )
         )
       )
@@ -127,7 +128,7 @@ class InnovativeFinancialProductsControllerISpec extends BaseIntegrationSpec {
     "redirect when the session explicitly clears the enrolled Innovative Finance ISA selection" in {
       stubAuth(testZref, testCredentialId)
       stubGet(registrationUrl, OK, enrolledRegistrationResponse)
-      await(repo.set(UserAnswers(testSessionId, SessionUpdates(isaProducts = Some(Seq.empty)))))
+      await(repo.set(UserAnswers(testSessionId, SessionUpdates(isaProducts = Assign(Seq.empty)))))
 
       val result = route(app, authenticatedGet()).get
 
@@ -159,10 +160,10 @@ class InnovativeFinancialProductsControllerISpec extends BaseIntegrationSpec {
         )
       ).get
 
-      status(postResult)                                                            shouldBe SEE_OTHER
-      redirectLocation(postResult).get                                                should endWith("/change-of-circumstances")
-      await(repo.get(testSessionId)).flatMap(_.updates.innovativeFinancialProducts) shouldBe Some(
-        Seq(CrowdFundedDebentures, LongTermAssetFunds)
+      status(postResult)                                                        shouldBe SEE_OTHER
+      redirectLocation(postResult).get                                            should endWith("/change-of-circumstances")
+      await(repo.get(testSessionId)).map(_.updates.innovativeFinancialProducts) shouldBe Some(
+        Assign(Seq(CrowdFundedDebentures, LongTermAssetFunds))
       )
 
       val getResult = route(app, authenticatedGet()).get
