@@ -10,7 +10,14 @@ error.prefix = Error
 error.title.prefix = Error:
 error.summary.title = There is a problem
 
+## Section Titles
 sectionTitle.orgDetails = Organisation details
+sectionTitle.organisationEmail = Organisation email
+sectionTitle.signatories = Signatories
+sectionTitle.liaisonOfficers = Liaison officers
+sectionTitle.isaProducts = ISA products
+sectionTitle.certificatesOfAuthority = Certificates of authority
+sectionTitle.thirdParty = Third-party organisations
 
 enterYourOrganisationAddress.title = Enter your organisation’s address
 enterYourOrganisationAddress.heading = Enter your organisation’s address
@@ -27,6 +34,16 @@ enterYourOrganisationAddress.error.postcode.required = Enter your postcode in th
 enterYourOrganisationAddress.error.postcode.invalid = Enter a postcode, like AA1 1AA
 enterYourOrganisationAddress.error.postcode.tooShort = Post code is too short. Enter a postcode, like AA1 1AA
 enterYourOrganisationAddress.error.postcode.tooLong = Post code is too long. Enter a postcode, like AA1 1AA
+
+organisationTelephoneNumber.title = What is the telephone number of your organisation?
+organisationTelephoneNumber.heading = What is the telephone number of your organisation?
+organisationTelephoneNumber.hint = This number will only be used by HMRC to speak to ISA managers or liaison officers during the audit process
+organisationTelephoneNumber.checkYourAnswersLabel = Organisation telephone number
+organisationTelephoneNumber.error.required = Enter the phone number of your organisation. Use a UK phone number, like 01642 123 456 or 07777 777 777
+organisationTelephoneNumber.error.tooLong = The phone number you have entered is too long. For example, a UK phone number, like 01642 123 456 or 07777 777 777
+organisationTelephoneNumber.error.tooShort = The phone number you have entered is too short. Enter a UK phone number, like 01642 123 456 or 07777 777 777
+organisationTelephoneNumber.error.invalid = The phone number must not include letters a to z, hyphens or apostrophes and must be a a UK phone number, like 01642 123 456 or 07777 777 777
+organisationTelephoneNumber.change.hidden = organisation telephone number
 
 unauthorised.title = You cannot access this service
 unauthorised.heading = You cannot access this service

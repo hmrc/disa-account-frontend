@@ -14,41 +14,41 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.controllers
+package uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction}
-import uk.gov.hmrc.disaaccountfrontend.forms.EnterYourOrganisationAddressFormProvider
+import uk.gov.hmrc.disaaccountfrontend.forms.TelephoneNumberFormProvider
 import uk.gov.hmrc.disaaccountfrontend.models.{SessionUpdates, UserAnswers}
-import uk.gov.hmrc.disaaccountfrontend.navigation.{EnterYourOrganisationAddressPage, Navigator}
+import uk.gov.hmrc.disaaccountfrontend.navigation.{Navigator, OrganisationTelephoneNumberPage}
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
-import uk.gov.hmrc.disaaccountfrontend.views.html.EnterYourOrganisationAddressView
+import uk.gov.hmrc.disaaccountfrontend.views.html.OrganisationTelephoneNumberView
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class EnterYourOrganisationAddressController @Inject() (
+class OrganisationTelephoneNumberController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   userAnswersRepository: UserAnswersRepository,
   navigator: Navigator,
-  formProvider: EnterYourOrganisationAddressFormProvider,
+  formProvider: TelephoneNumberFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: EnterYourOrganisationAddressView
+  view: OrganisationTelephoneNumberView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
-  private val form = formProvider()
+  private val form = formProvider("organisationTelephoneNumber")
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData).async { implicit request =>
     userAnswersRepository.get(request.sessionId).map { existing =>
-      val cachedAddress = existing.flatMap(_.updates.correspondenceAddress)
-      val address       = cachedAddress.orElse(request.registrationDetails.flatMap(_.correspondenceAddress))
-      val preparedForm  = address.fold(form)(form.fill)
+      val cachedTelephoneNumber = existing.flatMap(_.updates.organisationTelephoneNumber)
+      val telephoneNumber       = cachedTelephoneNumber.orElse(request.registrationDetails.flatMap(_.orgTelephoneNumber))
+      val preparedForm          = telephoneNumber.fold(form)(form.fill)
       Ok(view(preparedForm))
     }
   }
@@ -60,9 +60,10 @@ class EnterYourOrganisationAddressController @Inject() (
         formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
         answer =>
           userAnswersRepository.get(request.sessionId).flatMap { existing =>
-            val updates = existing.map(_.updates).getOrElse(SessionUpdates()).copy(correspondenceAddress = Some(answer))
+            val updates =
+              existing.map(_.updates).getOrElse(SessionUpdates()).copy(organisationTelephoneNumber = Some(answer))
             userAnswersRepository.set(UserAnswers(id = request.sessionId, updates = updates)).map { _ =>
-              Redirect(navigator.nextPage(EnterYourOrganisationAddressPage))
+              Redirect(navigator.nextPage(OrganisationTelephoneNumberPage))
             }
           }
       )

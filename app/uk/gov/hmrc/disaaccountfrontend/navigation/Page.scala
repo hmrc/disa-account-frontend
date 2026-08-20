@@ -14,15 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.models
+package uk.gov.hmrc.disaaccountfrontend.navigation
 
-import play.api.libs.json.{Json, OFormat}
+sealed trait Page
 
-case class SessionUpdates(
-  correspondenceAddress: Option[CorrespondenceAddress] = None,
-  organisationTelephoneNumber: Option[String] = None
-)
-
-object SessionUpdates {
-  implicit val format: OFormat[SessionUpdates] = Json.format[SessionUpdates]
-}
+case object EnterYourOrganisationAddressPage extends Page
+case object OrganisationTelephoneNumberPage extends Page

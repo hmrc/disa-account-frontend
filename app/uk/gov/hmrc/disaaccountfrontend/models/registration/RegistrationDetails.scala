@@ -19,7 +19,10 @@ package uk.gov.hmrc.disaaccountfrontend.models.registration
 import play.api.libs.json.{Json, Reads}
 import uk.gov.hmrc.disaaccountfrontend.models.CorrespondenceAddress
 
-case class OrganisationDetails(correspondenceAddress: Option[CorrespondenceAddress] = None)
+case class OrganisationDetails(
+  correspondenceAddress: Option[CorrespondenceAddress] = None,
+  orgTelephoneNumber: Option[String] = None
+)
 
 object OrganisationDetails {
   implicit val reads: Reads[OrganisationDetails] = Json.reads[OrganisationDetails]
@@ -27,6 +30,7 @@ object OrganisationDetails {
 
 case class RegistrationDetails(organisationDetails: Option[OrganisationDetails] = None) {
   def correspondenceAddress: Option[CorrespondenceAddress] = organisationDetails.flatMap(_.correspondenceAddress)
+  def orgTelephoneNumber: Option[String]                   = organisationDetails.flatMap(_.orgTelephoneNumber)
 }
 
 object RegistrationDetails {

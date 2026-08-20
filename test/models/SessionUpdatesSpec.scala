@@ -39,5 +39,15 @@ class SessionUpdatesSpec extends BaseUnitSpec {
     "default correspondenceAddress to None when absent from the JSON" in {
       Json.obj().validate[SessionUpdates] shouldBe JsSuccess(SessionUpdates(correspondenceAddress = None))
     }
+
+    "round-trip through JSON when the organisation telephone number is present" in {
+      val sessionUpdates = SessionUpdates(organisationTelephoneNumber = Some("01642123456"))
+
+      Json.toJson(sessionUpdates).validate[SessionUpdates] shouldBe JsSuccess(sessionUpdates)
+    }
+
+    "default organisationTelephoneNumber to None when absent from the JSON" in {
+      Json.obj().validate[SessionUpdates] shouldBe JsSuccess(SessionUpdates(organisationTelephoneNumber = None))
+    }
   }
 }
