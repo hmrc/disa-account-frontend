@@ -73,7 +73,8 @@ class DataRetrievalActionSpec extends BaseUnitSpec {
             isaProducts = Some(testIsaProductSelections),
             innovativeFinancialProducts = Some(testInnovativeFinancialProductSelections),
             p2pPlatform = Some(testP2pPlatform),
-            p2pPlatformNumber = Some(testP2pPlatformNumber)
+            p2pPlatformNumber = Some(testP2pPlatformNumber),
+            organisationEmailAddress = Some(testOrganisationEmailAddress)
           )
         )
       )
@@ -108,7 +109,8 @@ class DataRetrievalActionSpec extends BaseUnitSpec {
             correspondenceAddress = Some(testCorrespondenceAddress),
             organisationTelephoneNumber = Some(updatedOrgTelephoneNumber),
             isaProducts = Some(Seq.empty),
-            innovativeFinancialProducts = Some(testInnovativeFinancialProductSelections)
+            innovativeFinancialProducts = Some(testInnovativeFinancialProductSelections),
+            organisationEmailAddress = Some(testOrganisationEmailAddress)
           )
         )
       )

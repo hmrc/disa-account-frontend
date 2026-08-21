@@ -28,6 +28,8 @@ class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig
 
   lazy val disaAccountBaseUrl: String = servicesConfig.baseUrl(serviceName = "disa-account")
 
+  lazy val emailVerificationBaseUrl: String = servicesConfig.baseUrl(serviceName = "email-verification")
+
   val loginUrl: String         = config.get[String]("urls.login")
   val loginContinueUrl: String = config.get[String]("urls.loginContinue")
   val signOutUrl: String       = config.get[String]("urls.signOut")

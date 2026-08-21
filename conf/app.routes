@@ -22,6 +22,15 @@ GET        /unauthorised                       uk.gov.hmrc.disaaccountfrontend.c
 
 GET        /change-of-circumstances            uk.gov.hmrc.disaaccountfrontend.controllers.ChangeOfCircumstancesController.onPageLoad()
 
+## Organisation Email
+
+GET        /organisation-email-address         uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.OrganisationEmailAddressController.onPageLoad()
+POST       /organisation-email-address         uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.OrganisationEmailAddressController.onSubmit()
+
+GET        /email-verification-code            uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.EmailVerificationCodeController.onPageLoad()
+POST       /email-verification-code            uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.EmailVerificationCodeController.onSubmit()
+POST       /request-new-code                   uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.EmailVerificationCodeController.requestNewCode()
+
 GET        /refresh-session                    uk.gov.hmrc.disaaccountfrontend.controllers.KeepAliveController.keepAlive()
 
 GET        /sign-out                           uk.gov.hmrc.disaaccountfrontend.controllers.auth.AuthController.signOut()

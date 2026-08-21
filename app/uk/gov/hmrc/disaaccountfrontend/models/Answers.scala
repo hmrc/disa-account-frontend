@@ -25,5 +25,7 @@ case class Answers(
   isaProducts: Option[Seq[IsaProduct]] = None,
   innovativeFinancialProducts: Option[Seq[InnovativeFinancialProduct]] = None,
   p2pPlatform: Option[String] = None,
-  p2pPlatformNumber: Option[String] = None
+  p2pPlatformNumber: Option[String] = None,
+  organisationEmailAddress: Option[String] = None,
+  organisationEmailVerified: Option[Boolean] = None
 )
