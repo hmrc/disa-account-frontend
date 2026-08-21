@@ -25,6 +25,7 @@ import uk.gov.hmrc.disaaccountfrontend.config.ErrorHandler
 import uk.gov.hmrc.disaaccountfrontend.connectors.RegistrationConnector
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.DataRetrievalActionImpl
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.{Assign, Clear}
+import uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority.FinancialOrganisation.Bank
 import uk.gov.hmrc.disaaccountfrontend.models.requests.{DataRequest, IdentifierRequest}
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates, UserAnswers}
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
@@ -53,7 +54,7 @@ class DataRetrievalActionSpec extends BaseUnitSpec {
     "convert registration details into effective answers when there are no session answers" in {
       val request = FakeRequest()
       when(mockRegistrationConnector.getRegistrationDetails(eqTo(testZref))(any()))
-        .thenReturn(Future.successful(Some(testRegistrationDetailsWithInnovativeFinanceIsa)))
+        .thenReturn(Future.successful(Some(testRegistrationDetailsWithFinancialOrganisation)))
       when(mockUserAnswersRepository.get(testSessionId)).thenReturn(Future.successful(None))
 
       val result = action
@@ -74,7 +75,8 @@ class DataRetrievalActionSpec extends BaseUnitSpec {
             innovativeFinancialProducts = Some(testInnovativeFinancialProductSelections),
             p2pPlatform = Some(testP2pPlatform),
             p2pPlatformNumber = Some(testP2pPlatformNumber),
-            organisationEmailAddress = Some(testOrganisationEmailAddress)
+            organisationEmailAddress = Some(testOrganisationEmailAddress),
+            financialOrganisation = Some(testFinancialOrganisationSelections)
           )
         )
       )
@@ -86,12 +88,13 @@ class DataRetrievalActionSpec extends BaseUnitSpec {
         organisationTelephoneNumber = Assign(updatedOrgTelephoneNumber),
         isaProducts = Assign(Seq.empty),
         p2pPlatform = Clear,
-        p2pPlatformNumber = Clear
+        p2pPlatformNumber = Clear,
+        financialOrganisation = Assign(Seq(Bank))
       )
       val savedAnswers = UserAnswers(testSessionId, updates)
 
       when(mockRegistrationConnector.getRegistrationDetails(eqTo(testZref))(any()))
-        .thenReturn(Future.successful(Some(testRegistrationDetailsWithInnovativeFinanceIsa)))
+        .thenReturn(Future.successful(Some(testRegistrationDetailsWithFinancialOrganisation)))
       when(mockUserAnswersRepository.get(testSessionId)).thenReturn(Future.successful(Some(savedAnswers)))
 
       val result = action
@@ -110,7 +113,8 @@ class DataRetrievalActionSpec extends BaseUnitSpec {
             organisationTelephoneNumber = Some(updatedOrgTelephoneNumber),
             isaProducts = Some(Seq.empty),
             innovativeFinancialProducts = Some(testInnovativeFinancialProductSelections),
-            organisationEmailAddress = Some(testOrganisationEmailAddress)
+            organisationEmailAddress = Some(testOrganisationEmailAddress),
+            financialOrganisation = Some(Seq(Bank))
           )
         )
       )

@@ -19,6 +19,8 @@ package utils
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments}
 import uk.gov.hmrc.disaaccountfrontend.models.CorrespondenceAddress
+import uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority.FinancialOrganisation.{BuildingSociety, InsuranceCompany}
+import uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority.{CertificatesOfAuthority, FinancialOrganisation}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.{CrowdFundedDebentures, PeertopeerLoansAndHave36hPermissions}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct.{CashIsas, InnovativeFinanceIsas}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
@@ -72,6 +74,16 @@ trait TestData {
           p2pPlatform = Some(testP2pPlatform),
           p2pPlatformNumber = Some(testP2pPlatformNumber)
         )
+      )
+    )
+
+  val testFinancialOrganisationSelections: Seq[FinancialOrganisation] =
+    Seq(BuildingSociety, InsuranceCompany)
+
+  val testRegistrationDetailsWithFinancialOrganisation: RegistrationDetails =
+    testRegistrationDetailsWithInnovativeFinanceIsa.copy(
+      certificatesOfAuthority = Some(
+        CertificatesOfAuthority(financialOrganisation = Some(testFinancialOrganisationSelections))
       )
     )
 }

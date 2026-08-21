@@ -18,7 +18,7 @@ package utils
 
 trait TestEndpoints {
 
-  private val accountFrontendRoutePrefix = "/obligations/account/isa"
+  val accountFrontendRoutePrefix: String = "/obligations/account/isa"
 
   val enterYourOrganisationAddressEndpoint: String =
     s"$accountFrontendRoutePrefix/enter-your-organisation-address"
@@ -31,6 +31,7 @@ trait TestEndpoints {
   val organisationEmailAddressEndpoint: String     = s"$accountFrontendRoutePrefix/organisation-email-address"
   val emailVerificationCodeEndpoint: String        = s"$accountFrontendRoutePrefix/email-verification-code"
   val requestNewCodeEndpoint: String               = s"$accountFrontendRoutePrefix/request-new-code"
+  val financialOrganisationEndpoint: String        = s"$accountFrontendRoutePrefix/financial-organisation"
   val changeOfCircumstancesEndpoint: String        = s"$accountFrontendRoutePrefix/change-of-circumstances"
   val keepAliveEndpoint: String                    = s"$accountFrontendRoutePrefix/refresh-session"
   val signOutEndpoint: String                      = s"$accountFrontendRoutePrefix/sign-out"

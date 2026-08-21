@@ -82,7 +82,8 @@ class DataRetrievalActionImpl @Inject() (
       innovativeFinancialProducts = registrationDetails.flatMap(_.innovativeFinancialProductSelections),
       p2pPlatform = registrationDetails.flatMap(_.p2pPlatform),
       p2pPlatformNumber = registrationDetails.flatMap(_.p2pPlatformNumber),
-      organisationEmailAddress = registrationDetails.flatMap(_.organisationEmailAddress)
+      organisationEmailAddress = registrationDetails.flatMap(_.organisationEmailAddress),
+      financialOrganisation = registrationDetails.flatMap(_.financialOrganisation)
     )
 
     sessionAnswers.fold(registrationAnswers)(_.updates.getUpdatedEffectiveAnswers(registrationAnswers))
