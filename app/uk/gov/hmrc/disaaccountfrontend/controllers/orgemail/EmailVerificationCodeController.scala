@@ -74,7 +74,8 @@ class EmailVerificationCodeController @Inject() (
       .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, email))),
         code =>
-          emailVerificationConnector.verifyCode(email, code)
+          emailVerificationConnector
+            .verifyCode(email, code)
             .flatMap {
               case VerifyEmailCodeResult.Verified    =>
                 val sessionUpdates = getSessionUpdates(true)
@@ -82,7 +83,8 @@ class EmailVerificationCodeController @Inject() (
                   .set(UserAnswers(id = request.sessionId, updates = sessionUpdates))
                   .map(_ => Redirect(nextPage(sessionUpdates)))
               case VerifyEmailCodeResult.InvalidCode =>
-                Future.successful(BadRequest(view(form.withError("value", "emailVerificationCode.error.invalid"), email)))
+                Future
+                  .successful(BadRequest(view(form.withError("value", "emailVerificationCode.error.invalid"), email)))
             }
             .recoverWith { case NonFatal(e) =>
               logger.error(

@@ -42,7 +42,7 @@ class EmailVerificationCodeControllerSpec extends BaseUnitSpec {
         val html   = contentAsString(result)
 
         status(result) shouldBe OK
-        html            should include(testOrganisationEmailAddress)
+        html             should include(testOrganisationEmailAddress)
       }
     }
 
@@ -96,7 +96,7 @@ class EmailVerificationCodeControllerSpec extends BaseUnitSpec {
 
         val result = route(application, request).value
 
-        status(result)          shouldBe BAD_REQUEST
+        status(result)        shouldBe BAD_REQUEST
         contentAsString(result) should include(messages("emailVerificationCode.error.invalid")(application))
       }
     }

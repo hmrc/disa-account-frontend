@@ -26,7 +26,7 @@ class OrganisationEmailAddressFormProviderSpec extends BaseUnitSpec {
 
   "OrganisationEmailAddressFormProvider" should {
 
-    "bind valid email addresses" in {
+    "bind valid email addresses" in
       Seq(
         "test@example.com",
         "user.name+tag@domain.co.uk",
@@ -39,7 +39,6 @@ class OrganisationEmailAddressFormProviderSpec extends BaseUnitSpec {
         result.errors shouldBe empty
         result.value  shouldBe Some(email)
       }
-    }
 
     "trim surrounding whitespace from a valid email address" in {
       val result = form.bind(Map("value" -> "  test@example.com  "))

@@ -17,7 +17,7 @@
 package uk.gov.hmrc.disaaccountfrontend.connectors
 
 import play.api.Logging
-import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, OK}
+import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK}
 import play.api.libs.json.Json
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.disaaccountfrontend.config.AppConfig
@@ -44,12 +44,21 @@ class EmailVerificationConnector @Inject() (
       .execute[HttpResponse]
       .map { response =>
         response.status match {
-          case OK    => ()
-          case other =>
-            val msg =
-              s"Email verification call [POST /v2/send-code] failed with upstream status [$other] and body [${response.body}]"
+          case OK =>
+            ()
+
+          case status =>
+            val msg = upstreamErrorMessage(
+              endpoint = "POST /v2/send-code",
+              status = response.status,
+              body = response.body
+            )
             logger.error(msg)
-            throw UpstreamErrorResponse(message = msg, statusCode = other, reportAs = INTERNAL_SERVER_ERROR)
+            throw UpstreamErrorResponse(
+              message = msg,
+              statusCode = response.status,
+              reportAs = INTERNAL_SERVER_ERROR
+            )
         }
       }
   }
@@ -63,14 +72,35 @@ class EmailVerificationConnector @Inject() (
       .execute[HttpResponse]
       .map { response =>
         response.status match {
-          case OK           => VerifyEmailCodeResult.Verified
-          case BAD_REQUEST  => VerifyEmailCodeResult.InvalidCode
-          case other        =>
-            val msg =
-              s"Email verification call [POST /v2/verify-code] failed with upstream status [$other] and body [${response.body}]"
+          case OK =>
+            VerifyEmailCodeResult.Verified
+
+          case status if status >= 400 && status < 500 =>
+            logger.warn(
+              upstreamErrorMessage(
+                endpoint = "POST /v2/verify-code",
+                status = response.status,
+                body = response.body
+              )
+            )
+            VerifyEmailCodeResult.InvalidCode
+
+          case _ =>
+            val msg = upstreamErrorMessage(
+              endpoint = "POST /v2/verify-code",
+              status = response.status,
+              body = response.body
+            )
             logger.error(msg)
-            throw UpstreamErrorResponse(message = msg, statusCode = other, reportAs = INTERNAL_SERVER_ERROR)
+            throw UpstreamErrorResponse(
+              message = msg,
+              statusCode = response.status,
+              reportAs = INTERNAL_SERVER_ERROR
+            )
         }
       }
   }
+
+  private def upstreamErrorMessage(endpoint: String, status: Int, body: String): String =
+    s"Email verification call [$endpoint] failed with upstream status [$status] and body [$body]"
 }

@@ -63,10 +63,10 @@ class EmailVerificationConnectorSpec extends BaseUnitSpec {
 
       val thrown = connector.sendCode(testOrganisationEmailAddress).failed.futureValue
 
-      thrown                                              shouldBe a[UpstreamErrorResponse]
+      thrown                                                shouldBe a[UpstreamErrorResponse]
       thrown.asInstanceOf[UpstreamErrorResponse].statusCode shouldBe BAD_REQUEST
       thrown.asInstanceOf[UpstreamErrorResponse].reportAs   shouldBe INTERNAL_SERVER_ERROR
-      thrown.getMessage                                     should include(upstreamBody)
+      thrown.getMessage                                       should include(upstreamBody)
     }
 
     "fail with an UpstreamErrorResponse when the backend returns a 5xx status" in new TestSetup {
@@ -114,7 +114,7 @@ class EmailVerificationConnectorSpec extends BaseUnitSpec {
 
       val thrown = connector.verifyCode(testOrganisationEmailAddress, "ABCDEF").failed.futureValue
 
-      thrown                                              shouldBe a[UpstreamErrorResponse]
+      thrown                                                shouldBe a[UpstreamErrorResponse]
       thrown.asInstanceOf[UpstreamErrorResponse].statusCode shouldBe SERVICE_UNAVAILABLE
       thrown.asInstanceOf[UpstreamErrorResponse].reportAs   shouldBe INTERNAL_SERVER_ERROR
     }

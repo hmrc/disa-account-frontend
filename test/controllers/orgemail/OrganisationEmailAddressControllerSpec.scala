@@ -41,7 +41,7 @@ class OrganisationEmailAddressControllerSpec extends BaseUnitSpec {
       running(application) {
         val result = route(application, FakeRequest(GET, organisationEmailAddressEndpoint)).value
 
-        status(result)          shouldBe OK
+        status(result)        shouldBe OK
         contentAsString(result) should include(testOrganisationEmailAddress)
       }
     }
@@ -52,7 +52,7 @@ class OrganisationEmailAddressControllerSpec extends BaseUnitSpec {
       running(application) {
         val result = route(application, FakeRequest(GET, organisationEmailAddressEndpoint)).value
 
-        status(result)          shouldBe OK
+        status(result)        shouldBe OK
         contentAsString(result) should not include testOrganisationEmailAddress
       }
     }
