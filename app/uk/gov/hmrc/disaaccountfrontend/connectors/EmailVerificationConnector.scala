@@ -17,12 +17,12 @@
 package uk.gov.hmrc.disaaccountfrontend.connectors
 
 import play.api.Logging
-import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK}
+import play.api.http.Status._
 import play.api.libs.json.Json
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.disaaccountfrontend.config.AppConfig
 import uk.gov.hmrc.disaaccountfrontend.models.emailverification.{SendEmailVerificationCodeRequest, VerifyEmailCodeRequest, VerifyEmailCodeResult}
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps, UpstreamErrorResponse}
 
@@ -75,7 +75,7 @@ class EmailVerificationConnector @Inject() (
           case OK =>
             VerifyEmailCodeResult.Verified
 
-          case status if status >= 400 && status < 500 =>
+          case status if status >= BAD_REQUEST && status < INTERNAL_SERVER_ERROR =>
             logger.warn(
               upstreamErrorMessage(
                 endpoint = "POST /v2/verify-code",

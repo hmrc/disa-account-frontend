@@ -18,6 +18,7 @@ package uk.gov.hmrc.disaaccountfrontend.connectors
 
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
+import play.api.http.Status.{INTERNAL_SERVER_ERROR, NOT_FOUND}
 import uk.gov.hmrc.disaaccountfrontend.models.registration.RegistrationDetails
 import uk.gov.hmrc.http.{StringContextOps, UpstreamErrorResponse}
 import utils.BaseUnitSpec
@@ -48,7 +49,7 @@ class RegistrationConnectorSpec extends BaseUnitSpec {
     }
 
     "return None when the backend returns a 404" in new TestSetup {
-      val notFound: UpstreamErrorResponse = UpstreamErrorResponse("Not found", 404, 404, Map.empty)
+      val notFound: UpstreamErrorResponse = UpstreamErrorResponse("Not found", NOT_FOUND, NOT_FOUND, Map.empty)
 
       when(mockRequestBuilder.execute[Either[UpstreamErrorResponse, RegistrationDetails]](any(), any()))
         .thenReturn(Future.successful(Left(notFound)))
@@ -59,7 +60,8 @@ class RegistrationConnectorSpec extends BaseUnitSpec {
     }
 
     "propagate the failure when the backend returns an unexpected error, so the journey is not entered" in new TestSetup {
-      val serverError: UpstreamErrorResponse = UpstreamErrorResponse("Boom", 500, 500, Map.empty)
+      val serverError: UpstreamErrorResponse =
+        UpstreamErrorResponse("Boom", INTERNAL_SERVER_ERROR, INTERNAL_SERVER_ERROR, Map.empty)
 
       when(mockRequestBuilder.execute[Either[UpstreamErrorResponse, RegistrationDetails]](any(), any()))
         .thenReturn(Future.successful(Left(serverError)))
