@@ -21,7 +21,7 @@ import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstances
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.{OrganisationTelephoneNumberController, TradingNameController}
 import uk.gov.hmrc.disaaccountfrontend.models.Answers
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
-import uk.gov.hmrc.disaaccountfrontend.models.pages.{EnterYourOrganisationAddressPage, InnovativeFinancialProductsPage, OrganisationTelephoneNumberPage, Page, PeerToPeerPlatformPage, TradingNamePage}
+import uk.gov.hmrc.disaaccountfrontend.models.pages.{EnterYourOrganisationAddressPage, FinancialOrganisationPage, InnovativeFinancialProductsPage, OrganisationTelephoneNumberPage, Page, PeerToPeerPlatformPage, TradingNamePage}
 
 import javax.inject.{Inject, Singleton}
 
@@ -35,6 +35,7 @@ class Navigator @Inject() () {
     case TradingNamePage                  => TradingNameController.onPageLoad()
     case InnovativeFinancialProductsPage  => innovativeFinancialProductsNextPage(answers)
     case PeerToPeerPlatformPage           => peerToPeerPlatformNextPage(answers)
+    case FinancialOrganisationPage        => ChangeOfCircumstancesController.onPageLoad()
     case unsupportedPage                  =>
       throw new IllegalArgumentException(s"No navigation defined for page: $unsupportedPage")
   }

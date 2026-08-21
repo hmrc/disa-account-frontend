@@ -14,18 +14,20 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.models
+package uk.gov.hmrc.disaaccountfrontend.forms
 
+import play.api.data.Form
+import play.api.data.Forms.set
+import uk.gov.hmrc.disaaccountfrontend.forms.mappings.Mappings
 import uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority.FinancialOrganisation
-import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.{InnovativeFinancialProduct, IsaProduct}
 
-case class Answers(
-  correspondenceAddress: Option[CorrespondenceAddress] = None,
-  organisationTelephoneNumber: Option[String] = None,
-  tradingName: Option[String] = None,
-  isaProducts: Option[Seq[IsaProduct]] = None,
-  innovativeFinancialProducts: Option[Seq[InnovativeFinancialProduct]] = None,
-  p2pPlatform: Option[String] = None,
-  p2pPlatformNumber: Option[String] = None,
-  financialOrganisation: Option[Seq[FinancialOrganisation]] = None
-)
+import javax.inject.Inject
+
+class FinancialOrganisationFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[Set[FinancialOrganisation]] =
+    Form(
+      "value" -> set(enumerable[FinancialOrganisation]("financialOrganisation.error.required"))
+        .verifying(nonEmptySet("financialOrganisation.error.required"))
+    )
+}

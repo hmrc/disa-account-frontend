@@ -45,15 +45,21 @@ class PageGuardActionSpec extends BaseUnitSpec {
     }
 
     "redirect to change of circumstances by default when the page cannot be accessed" in {
-      val result = action(InnovativeFinancialProductsPage).invokeBlock(
-        dataRequest(Answers(isaProducts = Some(Seq(CashIsas)))),
-        _ => Future.successful(Ok)
-      )
+      val originalRoutePrefix = _root_.app.RoutesPrefix.prefix
 
-      status(result)         shouldBe SEE_OTHER
-      redirectLocation(result) should contain(
-        uk.gov.hmrc.disaaccountfrontend.controllers.routes.ChangeOfCircumstancesController.onPageLoad().url
-      )
+      try {
+        _root_.app.RoutesPrefix.setPrefix("/")
+        val guardedAction = action(InnovativeFinancialProductsPage)
+        _root_.app.RoutesPrefix.setPrefix(accountFrontendRoutePrefix)
+
+        val result = guardedAction.invokeBlock(
+          dataRequest(Answers(isaProducts = Some(Seq(CashIsas)))),
+          _ => Future.successful(Ok)
+        )
+
+        status(result)         shouldBe SEE_OTHER
+        redirectLocation(result) should contain(changeOfCircumstancesEndpoint)
+      } finally _root_.app.RoutesPrefix.setPrefix(originalRoutePrefix)
     }
 
     "use a caller-supplied redirect when the page cannot be accessed" in {

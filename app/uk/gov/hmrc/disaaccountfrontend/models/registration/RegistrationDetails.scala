@@ -18,6 +18,7 @@ package uk.gov.hmrc.disaaccountfrontend.models.registration
 
 import play.api.libs.json.{Json, Reads}
 import uk.gov.hmrc.disaaccountfrontend.models.CorrespondenceAddress
+import uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority.{CertificatesOfAuthority, FinancialOrganisation}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
 
 case class OrganisationDetails(
@@ -32,7 +33,8 @@ object OrganisationDetails {
 
 case class RegistrationDetails(
   organisationDetails: Option[OrganisationDetails] = None,
-  isaProducts: Option[IsaProducts] = None
+  isaProducts: Option[IsaProducts] = None,
+  certificatesOfAuthority: Option[CertificatesOfAuthority] = None
 ) {
   def correspondenceAddress: Option[CorrespondenceAddress] = organisationDetails.flatMap(_.correspondenceAddress)
   def orgTelephoneNumber: Option[String]                   = organisationDetails.flatMap(_.orgTelephoneNumber)
@@ -46,6 +48,9 @@ case class RegistrationDetails(
   def p2pPlatform: Option[String] = isaProducts.flatMap(_.p2pPlatform)
 
   def p2pPlatformNumber: Option[String] = isaProducts.flatMap(_.p2pPlatformNumber)
+
+  def financialOrganisation: Option[Seq[FinancialOrganisation]] =
+    certificatesOfAuthority.flatMap(_.financialOrganisation)
 }
 
 object RegistrationDetails {
