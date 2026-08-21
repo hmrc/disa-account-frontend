@@ -69,6 +69,15 @@ peerToPeerPlatform.details.content.p2 = These parties are brought together by an
 peerToPeerPlatform.details.content.p3 = It then manages the payment of interest and repayment of the principal according to the terms agreed between the parties.
 peerToPeerPlatform.details.content.link = Find out more about peer-to-peer loans
 
+FCAArticlesOrganisation.title = FCA Articles that apply to your organisation
+FCAArticlesOrganisation.heading = Certificates of Authority
+FCAArticlesOrganisation.error.required = Enter which platform your organisation uses to offer FCA Articles-to-FCA Articles loans
+FCAArticlesOrganisation.details.summary = What is a FCA Articles-to-FCA Articles loan?
+FCAArticlesOrganisation.details.content.p1 = FCA Articles-to-FCA Articles loans are direct transactions between investors willing to lend money and borrowers seeking loans.
+FCAArticlesOrganisation.details.content.p2 = These parties are brought together by an electronic platform which introduces and arranges the loan documentation between the lender and the borrower.
+FCAArticlesOrganisation.details.content.p3 = It then manages the payment of interest and repayment of the principal according to the terms agreed between the parties.
+FCAArticlesOrganisation.details.content.link = Find out more about FCA Articles-to-FCA Articles loans
+
 unauthorised.title = You cannot access this service
 unauthorised.heading = You cannot access this service
 unauthorised.body = You need to be signed in with an organisation that is enrolled to manage ISAs to use this service.

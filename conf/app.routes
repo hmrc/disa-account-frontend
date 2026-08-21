@@ -15,8 +15,8 @@ POST       /trading-name                       uk.gov.hmrc.disaaccountfrontend.c
 GET        /innovative-financial-products      uk.gov.hmrc.disaaccountfrontend.controllers.InnovativeFinancialProductsController.onPageLoad()
 POST       /innovative-financial-products      uk.gov.hmrc.disaaccountfrontend.controllers.InnovativeFinancialProductsController.onSubmit()
 
-GET        /peer-to-peer-loans                  uk.gov.hmrc.disaaccountfrontend.controllers.PeerToPeerPlatformController.onPageLoad()
-POST       /peer-to-peer-loans                  uk.gov.hmrc.disaaccountfrontend.controllers.PeerToPeerPlatformController.onSubmit()
+GET        /peer-to-peer-loans                 uk.gov.hmrc.disaaccountfrontend.controllers.PeerToPeerPlatformController.onPageLoad()
+POST       /peer-to-peer-loans                 uk.gov.hmrc.disaaccountfrontend.controllers.PeerToPeerPlatformController.onSubmit()
 
 GET        /unauthorised                       uk.gov.hmrc.disaaccountfrontend.controllers.UnauthorisedController.onPageLoad()
 
@@ -26,3 +26,6 @@ GET        /refresh-session                    uk.gov.hmrc.disaaccountfrontend.c
 
 GET        /sign-out                           uk.gov.hmrc.disaaccountfrontend.controllers.auth.AuthController.signOut()
 GET        /signed-out                         uk.gov.hmrc.disaaccountfrontend.controllers.auth.SignedOutController.onPageLoad()
+
+GET        /fca-articles                       uk.gov.hmrc.disaaccountfrontend.controllers.FCAArticlesOrganisationController.onPageLoad()
+GET        /fca-articles                       uk.gov.hmrc.disaaccountfrontend.controllers.FCAArticlesOrganisationController.onSubmit()
