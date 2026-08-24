@@ -26,71 +26,45 @@ sealed trait FcaArticles
 
 object FcaArticles extends Enumerable.Implicits {
 
-  case object FcaArticle14
-    extends WithName("FcaArticle14")
-      with FcaArticles
+  case object FcaArticle14 extends WithName("article14") with FcaArticles
 
-  case object FcaArticle21
-    extends WithName("FcaArticle21")
-      with FcaArticles
+  case object FcaArticle21 extends WithName("article21") with FcaArticles
 
-  case object FcaArticle25
-    extends WithName("FcaArticle25")
-      with FcaArticles
+  case object FcaArticle25 extends WithName("article25") with FcaArticles
 
-  case object FcaArticle36H
-    extends WithName("FcaArticle36H")
-      with FcaArticles
+  case object FcaArticle36H extends WithName("article36H") with FcaArticles
 
-  case object FcaArticle37
-    extends WithName("FcaArticle37")
-      with FcaArticles
+  case object FcaArticle37 extends WithName("article37") with FcaArticles
 
-  case object FcaArticle39G
-    extends WithName("FcaArticle39G")
-      with FcaArticles
+  case object FcaArticle39G extends WithName("article39G") with FcaArticles
 
-  case object FcaArticle40
-    extends WithName("FcaArticle40")
-      with FcaArticles
+  case object FcaArticle40 extends WithName("article40") with FcaArticles
 
-  case object FcaArticle45
-    extends WithName("FcaArticle45")
-      with FcaArticles
+  case object FcaArticle45 extends WithName("article45") with FcaArticles
 
-  case object FcaArticle51ZA
-    extends WithName("FcaArticle51ZA")
-      with FcaArticles
+  case object FcaArticle51ZA extends WithName("article51ZA") with FcaArticles
 
-  case object FcaArticle51ZC
-    extends WithName("FcaArticle51ZC")
-      with FcaArticles
+  case object FcaArticle51ZC extends WithName("article51ZC") with FcaArticles
 
-  case object FcaArticle51ZE
-    extends WithName("FcaArticle51ZE")
-      with FcaArticles
+  case object FcaArticle51ZE extends WithName("article51ZE") with FcaArticles
 
-  case object FcaArticle53
-    extends WithName("FcaArticle53")
-      with FcaArticles
+  case object FcaArticle53 extends WithName("article53") with FcaArticles
 
-  case object FcaArticle64
-    extends WithName("FcaArticle64")
-      with FcaArticles
+  case object FcaArticle64 extends WithName("article64") with FcaArticles
 
   val values: Seq[FcaArticles] = Seq(
-    FcaArticle14, 
-    FcaArticle21, 
-    FcaArticle25, 
-    FcaArticle36H, 
-    FcaArticle37, 
-    FcaArticle39G, 
-    FcaArticle40, 
-    FcaArticle45, 
-    FcaArticle51ZA, 
-    FcaArticle51ZC, 
-    FcaArticle51ZE, 
-    FcaArticle53, 
+    FcaArticle14,
+    FcaArticle21,
+    FcaArticle25,
+    FcaArticle36H,
+    FcaArticle37,
+    FcaArticle39G,
+    FcaArticle40,
+    FcaArticle45,
+    FcaArticle51ZA,
+    FcaArticle51ZC,
+    FcaArticle51ZE,
+    FcaArticle53,
     FcaArticle64
   )
 

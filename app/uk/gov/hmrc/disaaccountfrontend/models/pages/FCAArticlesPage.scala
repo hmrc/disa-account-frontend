@@ -36,16 +36,15 @@ case object FCAArticlesPage extends GuardedPage with PageWithAnswers[Set[FcaArti
       request.effectiveAnswers.fcaArticles.exists(
         _.contains(FcaArticles.FcaArticle14)
       ) && !newAnswer.contains(FcaArticle14)
-      
+
     val hasPlatformAnswers =
       request.effectiveAnswers.fcaArticles.isDefined
 
     if (platformProductWasRemoved && hasPlatformAnswers) {
       existingUpdates.copy(fcaArticles = Assign(newAnswer.toSeq))
-      } 
-    else {
+    } else {
       existingUpdates.copy(fcaArticles = Assign(newAnswer.toSeq))
     }
-      
+
   }
 }

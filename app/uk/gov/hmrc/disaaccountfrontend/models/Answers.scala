@@ -28,5 +28,4 @@ case class Answers(
   p2pPlatform: Option[String] = None,
   p2pPlatformNumber: Option[String] = None,
   fcaArticles: Option[Seq[FcaArticles]] = None
-  
 )
