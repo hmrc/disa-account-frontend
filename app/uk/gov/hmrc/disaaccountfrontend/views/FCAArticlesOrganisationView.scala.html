@@ -14,65 +14,42 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.disaaccountfrontend.config.AppConfig
-@import uk.gov.hmrc.disaaccountfrontend.controllers.routes.FCAArticlesOrganisationController
-@import uk.gov.hmrc.disaaccountfrontend.viewmodels.InputWidth._
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcNewTabLinkHelper
-@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
+@import uk.gov.hmrc.disaaccountfrontend.models.articles.FcaArticles
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichCheckboxes
 
 @this(
 layout: Layout,
 formHelper: FormWithCSRF,
 govukErrorSummary: GovukErrorSummary,
-govukInput: GovukInput,
-govukButton: GovukButton,
-govukDetails: GovukDetails,
-govukLabel: GovukLabel,
-hmrcNewTabLinkHelper: HmrcNewTabLinkHelper,
-config: AppConfig
+govukCheckboxes: GovukCheckboxes,
+govukButton: GovukButton
 )
 
 @(form: Form[_])(implicit request: Request[_], messages: Messages)
 
-@link = @{ hmrcNewTabLinkHelper(NewTabLinkHelper(
-text = messages("FCAArticlesOrganisation.details.content.link"),
-href = Some(config.p2pLoansInformationUrl)
-)) }
-
-@layout(pageTitle = Some(title(form, "FCAArticlesOrganisation.title"))) {
+@layout(pageTitle = Some(title(form, "FCAArticlesOrganisation.title", Some("sectionTitle.isaProducts")))) {
 
 @formHelper(action = FCAArticlesOrganisationController.onSubmit(), Symbol("autoComplete") -> "off") {
 
 @if(form.errors.nonEmpty) {
-@govukErrorSummary(ErrorSummaryViewModel(form))
+@govukErrorSummary(
+ErrorSummaryViewModel(
+form,
+errorLinkOverrides = Map("value" -> "value_0", "value[0]" -> "value_0")
+)
+)
 }
 
-@govukLabel(
-Label(
-content = Text(messages("FCAArticlesOrganisation.heading")),
-isPageHeading = true,
-classes = "govuk-label--l govuk-!-margin-bottom-4",
-attributes = Map("for" -> "value")
+@govukCheckboxes(
+CheckboxesViewModel(
+form = form,
+name = "value",
+hint = Some(Hint(content = Text(messages("FCAArticlesOrganisation.hint")))),
+legend = HmrcPageHeadingLegend(
+Text(messages("FCAArticlesOrganisation.heading"))
+),
+items = FcaArticles.checkboxItems
 )
-)
-
-@govukDetails(Details(
-summary = Text(messages("FCAArticlesOrganisation.details.summary")),
-content = HtmlContent(
-HtmlFormat.raw(s"""
-<p class="govuk-body">${messages("FCAArticlesOrganisation.details.content.p1")}</p>
-<p class="govuk-body">${messages("FCAArticlesOrganisation.details.content.p2")}</p>
-<p class="govuk-body">${messages("FCAArticlesOrganisation.details.content.p3")}</p>
-$link
-""")
-)
-))
-
-@govukInput(
-InputViewModel(
-field = form("value"),
-label = Label()
-).withWidth(Full)
 )
 
 @govukButton(ButtonViewModel(messages("site.continue")))
