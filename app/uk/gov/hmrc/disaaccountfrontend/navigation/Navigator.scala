@@ -17,11 +17,11 @@
 package uk.gov.hmrc.disaaccountfrontend.navigation
 
 import play.api.mvc.Call
-import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, PeerToPeerPlatformController}
+import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, PeerToPeerPlatformController, FcaArticlesOrganisationController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.{OrganisationTelephoneNumberController, TradingNameController}
 import uk.gov.hmrc.disaaccountfrontend.models.Answers
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
-import uk.gov.hmrc.disaaccountfrontend.models.pages.{EnterYourOrganisationAddressPage, InnovativeFinancialProductsPage, OrganisationTelephoneNumberPage, Page, PeerToPeerPlatformPage, TradingNamePage}
+import uk.gov.hmrc.disaaccountfrontend.models.pages.{EnterYourOrganisationAddressPage, FcaArticlesPage, InnovativeFinancialProductsPage, OrganisationTelephoneNumberPage, Page, PeerToPeerPlatformPage, TradingNamePage}
 
 import javax.inject.{Inject, Singleton}
 
@@ -35,6 +35,8 @@ class Navigator @Inject() () {
     case TradingNamePage                  => TradingNameController.onPageLoad()
     case InnovativeFinancialProductsPage  => innovativeFinancialProductsNextPage(answers)
     case PeerToPeerPlatformPage           => peerToPeerPlatformNextPage(answers)
+    // TODO: replace with the next page in the journey once it exists.
+    case FcaArticlesPage                  => fcaArticlesNextPage(answers)
     case unsupportedPage                  =>
       throw new IllegalArgumentException(s"No navigation defined for page: $unsupportedPage")
   }
@@ -57,6 +59,15 @@ class Navigator @Inject() () {
     }
 
   private def peerToPeerPlatformNumberQuestionPage: Call =
-    // TODO: Replace this fallback with the FCA/FRN question when that page is implemented.
+    FcaArticlesOrganisationController.onPageLoad()
+
+  private def fcaArticlesNextPage(answers: Answers): Call =
+    answers.fcaArticles match {
+      case Some(_) => ChangeOfCircumstancesController.onPageLoad()
+      case None    => fcaArticlesQuestionPage
+    }
+
+  private def fcaArticlesQuestionPage: Call =
+    // TODO: Replace this fallback with the next question-page when that page is implemented.
     ChangeOfCircumstancesController.onPageLoad()
 }

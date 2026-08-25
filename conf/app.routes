@@ -27,5 +27,5 @@ GET        /refresh-session                    uk.gov.hmrc.disaaccountfrontend.c
 GET        /sign-out                           uk.gov.hmrc.disaaccountfrontend.controllers.auth.AuthController.signOut()
 GET        /signed-out                         uk.gov.hmrc.disaaccountfrontend.controllers.auth.SignedOutController.onPageLoad()
 
-GET        /fca-articles                       uk.gov.hmrc.disaaccountfrontend.controllers.FCAArticlesOrganisationController.onPageLoad()
-GET        /fca-articles                       uk.gov.hmrc.disaaccountfrontend.controllers.FCAArticlesOrganisationController.onSubmit()
+GET        /fca-articles                       uk.gov.hmrc.disaaccountfrontend.controllers.FcaArticlesOrganisationController.onPageLoad()
+GET        /fca-articles                       uk.gov.hmrc.disaaccountfrontend.controllers.FcaArticlesOrganisationController.onSubmit()

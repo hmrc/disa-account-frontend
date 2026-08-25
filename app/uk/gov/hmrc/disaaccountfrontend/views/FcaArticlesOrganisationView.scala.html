@@ -29,9 +29,9 @@ hmrcPageHeading: HmrcPageHeading
 
 @(form: Form[_])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = Some(title(form, "FCAArticlesOrganisation.title", Some("sectionTitle.isaProducts")))) {
+@layout(pageTitle = Some(title(form, "FcaArticlesOrganisation.title", Some("sectionTitle.isaProducts")))) {
 
-@formHelper(action = FCAArticlesOrganisationController.onSubmit(), Symbol("autoComplete") -> "off") {
+@formHelper(action = FcaArticlesOrganisationController.onSubmit(), Symbol("autoComplete") -> "off") {
 
 @if(form.errors.nonEmpty) {
 @govukErrorSummary(

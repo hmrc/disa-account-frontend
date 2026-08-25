@@ -23,7 +23,7 @@ import uk.gov.hmrc.disaaccountfrontend.models.articles.FcaArticles
 
 import javax.inject.Inject
 
-class FCAArticlesFormProvider @Inject() extends Mappings {
+class FcaArticlesFormProvider @Inject() extends Mappings {
   def apply(): Form[Set[FcaArticles]] =
     Form(
       "value" -> set(enumerable[FcaArticles]("FCAArticlesOrganisation.error.required"))

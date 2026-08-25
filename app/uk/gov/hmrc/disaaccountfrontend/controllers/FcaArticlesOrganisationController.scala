@@ -24,26 +24,26 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction, PageGuardAction}
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
 import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator
-import uk.gov.hmrc.disaaccountfrontend.views.html.FCAArticlesOrganisationView
-import uk.gov.hmrc.disaaccountfrontend.forms.FCAArticlesFormProvider
+import uk.gov.hmrc.disaaccountfrontend.views.html.FcaArticlesOrganisationView
+import uk.gov.hmrc.disaaccountfrontend.forms.FcaArticlesFormProvider
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.disaaccountfrontend.models.pages.FCAArticlesPage
+import uk.gov.hmrc.disaaccountfrontend.models.pages.FcaArticlesPage
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class FCAArticlesOrganisationController @Inject() (
+class FcaArticlesOrganisationController @Inject()(
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   guardPage: PageGuardAction,
   userAnswersRepository: UserAnswersRepository,
   navigator: Navigator,
-  formProvider: FCAArticlesFormProvider,
+  formProvider: FcaArticlesFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: FCAArticlesOrganisationView
+  view: FcaArticlesOrganisationView
 )(implicit ec: ExecutionContext)
-    extends PageController(FCAArticlesPage, navigator)
+    extends PageController(FcaArticlesPage, navigator)
     with FrontendBaseController
     with I18nSupport {
 
