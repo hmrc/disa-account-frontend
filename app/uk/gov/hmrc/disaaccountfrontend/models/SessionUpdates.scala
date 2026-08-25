@@ -29,6 +29,8 @@ case class SessionUpdates(
   innovativeFinancialProducts: AnswerUpdate[Seq[InnovativeFinancialProduct]] = Unchanged,
   p2pPlatform: AnswerUpdate[String] = Unchanged,
   p2pPlatformNumber: AnswerUpdate[String] = Unchanged,
+  organisationEmailAddress: AnswerUpdate[String] = Unchanged,
+  organisationEmailVerified: AnswerUpdate[Boolean] = Unchanged,
   financialOrganisation: AnswerUpdate[Seq[FinancialOrganisation]] = Unchanged
 ) {
   def getUpdatedEffectiveAnswers(answers: Answers): Answers =
@@ -40,6 +42,8 @@ case class SessionUpdates(
       innovativeFinancialProducts = innovativeFinancialProducts.getEffectiveAnswer(answers.innovativeFinancialProducts),
       p2pPlatform = p2pPlatform.getEffectiveAnswer(answers.p2pPlatform),
       p2pPlatformNumber = p2pPlatformNumber.getEffectiveAnswer(answers.p2pPlatformNumber),
+      organisationEmailAddress = organisationEmailAddress.getEffectiveAnswer(answers.organisationEmailAddress),
+      organisationEmailVerified = organisationEmailVerified.getEffectiveAnswer(answers.organisationEmailVerified),
       financialOrganisation = financialOrganisation.getEffectiveAnswer(answers.financialOrganisation)
     )
 }

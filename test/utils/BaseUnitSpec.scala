@@ -34,7 +34,7 @@ import play.api.test.Helpers.stubControllerComponents
 import play.api.test.{DefaultAwaitTimeout, FakeRequest}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.disaaccountfrontend.config.AppConfig
-import uk.gov.hmrc.disaaccountfrontend.connectors.RegistrationConnector
+import uk.gov.hmrc.disaaccountfrontend.connectors.{EmailVerificationConnector, RegistrationConnector}
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{AuthenticatedIdentifierAction, DataRetrievalAction, IdentifierAction}
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, UserAnswers}
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
@@ -63,12 +63,13 @@ abstract class BaseUnitSpec
   lazy val retryConfig: Config      = app.configuration.underlying
   lazy val actorSystem: ActorSystem = app.actorSystem
 
-  val mockHttpClient: HttpClientV2                     = mock[HttpClientV2]
-  val mockAppConfig: AppConfig                         = mock[AppConfig]
-  val mockRequestBuilder: RequestBuilder               = mock[RequestBuilder]
-  val mockAuthConnector: AuthConnector                 = mock[AuthConnector]
-  val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
-  val mockUserAnswersRepository: UserAnswersRepository = mock[UserAnswersRepository]
+  val mockHttpClient: HttpClientV2                               = mock[HttpClientV2]
+  val mockAppConfig: AppConfig                                   = mock[AppConfig]
+  val mockRequestBuilder: RequestBuilder                         = mock[RequestBuilder]
+  val mockAuthConnector: AuthConnector                           = mock[AuthConnector]
+  val mockRegistrationConnector: RegistrationConnector           = mock[RegistrationConnector]
+  val mockUserAnswersRepository: UserAnswersRepository           = mock[UserAnswersRepository]
+  val mockEmailVerificationConnector: EmailVerificationConnector = mock[EmailVerificationConnector]
 
   override def beforeEach(): Unit = {
     Mockito.reset(
@@ -77,7 +78,8 @@ abstract class BaseUnitSpec
       mockRequestBuilder,
       mockAuthConnector,
       mockRegistrationConnector,
-      mockUserAnswersRepository
+      mockUserAnswersRepository,
+      mockEmailVerificationConnector
     )
 
     // Sane defaults for anything that constructs an AuthenticatedIdentifierAction directly from mockAppConfig.
@@ -116,7 +118,8 @@ abstract class BaseUnitSpec
       .overrides(
         bind[IdentifierAction].toInstance(new FakeIdentifierAction(bodyParsers, zReference, credentialId, sessionId)),
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(effectiveAnswers, sessionAnswers)),
-        bind[UserAnswersRepository].toInstance(mockUserAnswersRepository)
+        bind[UserAnswersRepository].toInstance(mockUserAnswersRepository),
+        bind[EmailVerificationConnector].toInstance(mockEmailVerificationConnector)
       )
   }
 

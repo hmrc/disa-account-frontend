@@ -24,7 +24,7 @@ import uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority.{Certifica
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.{CrowdFundedDebentures, PeertopeerLoansAndHave36hPermissions}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct.{CashIsas, InnovativeFinanceIsas}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
-import uk.gov.hmrc.disaaccountfrontend.models.registration.{OrganisationDetails, RegistrationDetails}
+import uk.gov.hmrc.disaaccountfrontend.models.registration.{OrganisationDetails, OrganisationEmail, RegistrationDetails}
 
 trait TestData {
   val testZref: String         = "Z1234"
@@ -43,9 +43,10 @@ trait TestData {
     postCode = Some("AA1 1AA")
   )
 
-  val testOrgTelephoneNumber: String = "01642123456"
-  val testP2pPlatform: String        = "Platform r Us"
-  val testP2pPlatformNumber: String  = "1234567"
+  val testOrgTelephoneNumber: String       = "01642123456"
+  val testOrganisationEmailAddress: String = "test@example.com"
+  val testP2pPlatform: String              = "Platform r Us"
+  val testP2pPlatformNumber: String        = "1234567"
 
   val testRegistrationDetails: RegistrationDetails = RegistrationDetails(
     organisationDetails = Some(
@@ -53,6 +54,9 @@ trait TestData {
         correspondenceAddress = Some(testCorrespondenceAddress),
         orgTelephoneNumber = Some(testOrgTelephoneNumber)
       )
+    ),
+    organisationEmail = Some(
+      OrganisationEmail(organisationEmail = Some(testOrganisationEmailAddress))
     )
   )
 
