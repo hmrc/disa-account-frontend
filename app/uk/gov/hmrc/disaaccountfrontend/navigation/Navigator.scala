@@ -19,7 +19,7 @@ package uk.gov.hmrc.disaaccountfrontend.navigation
 import play.api.mvc.Call
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.{OrganisationTelephoneNumberController, TradingNameController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.routes.EmailVerificationCodeController
-import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, PeerToPeerPlatformController, FcaArticlesOrganisationController}
+import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, FcaArticlesOrganisationController, PeerToPeerPlatformController}
 import uk.gov.hmrc.disaaccountfrontend.models.Answers
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
 import uk.gov.hmrc.disaaccountfrontend.models.pages.*
@@ -36,7 +36,7 @@ class Navigator @Inject() () {
     case TradingNamePage                  => TradingNameController.onPageLoad()
     case InnovativeFinancialProductsPage  => innovativeFinancialProductsNextPage(answers)
     case PeerToPeerPlatformPage           => peerToPeerPlatformNextPage(answers)
-    case FcaArticlesPage                  => fcaArticlesNextPage(answers),
+    case FcaArticlesPage                  => fcaArticlesNextPage(answers)
     case OrganisationEmailAddressPage     => EmailVerificationCodeController.onPageLoad()
     case EmailVerificationCodePage        => ChangeOfCircumstancesController.onPageLoad()
     // TODO: replace with the organisation email check-your-answers page once it exists.
