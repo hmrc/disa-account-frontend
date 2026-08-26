@@ -28,4 +28,4 @@ GET        /sign-out                           uk.gov.hmrc.disaaccountfrontend.c
 GET        /signed-out                         uk.gov.hmrc.disaaccountfrontend.controllers.auth.SignedOutController.onPageLoad()
 
 GET        /fca-articles                       uk.gov.hmrc.disaaccountfrontend.controllers.FcaArticlesOrganisationController.onPageLoad()
-GET        /fca-articles                       uk.gov.hmrc.disaaccountfrontend.controllers.FcaArticlesOrganisationController.onSubmit()
+POST       /fca-articles                       uk.gov.hmrc.disaaccountfrontend.controllers.FcaArticlesOrganisationController.onSubmit()
