@@ -39,6 +39,9 @@ class RegistrationConnectorISpec extends BaseIntegrationSpec {
            |  "organisationDetails": {
            |    "correspondenceAddress": ${Json.toJson(testCorrespondenceAddress)},
            |    "orgTelephoneNumber": "$testOrgTelephoneNumber"
+           |  },
+           |  "organisationEmail": {
+           |    "organisationEmail": "$testOrganisationEmailAddress"
            |  }
            |}""".stripMargin
       stubGet(registrationUrl, OK, responseBody)

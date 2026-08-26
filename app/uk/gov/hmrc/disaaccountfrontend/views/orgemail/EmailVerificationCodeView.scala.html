@@ -1,0 +1,77 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.routes.{EmailVerificationCodeController, OrganisationEmailAddressController}
+@import uk.gov.hmrc.disaaccountfrontend.viewmodels.InputWidth._
+@import uk.gov.hmrc.disaaccountfrontend.views.html.Layout
+
+@this(
+    layout: Layout,
+    formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukInput: GovukInput,
+    govukButton: GovukButton
+)
+
+@(form: Form[_], email: String)(implicit request: Request[_], messages: Messages)
+
+@changeEmailLink = @{
+    HtmlFormat.raw(
+        s"""<a class="govuk-link govuk-body" href="${OrganisationEmailAddressController.onPageLoad().url}">${messages("emailVerificationCode.p2.link")}</a>"""
+    )
+}
+
+@layout(pageTitle = Some(title(form, "emailVerificationCode.title", Some("sectionTitle.organisationEmail")))) {
+
+    @formHelper(action = EmailVerificationCodeController.onSubmit()) {
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form))
+        }
+
+        <span class="govuk-caption-l">@messages("sectionTitle.organisationEmail")</span>
+        <h1 class="govuk-heading-l">@messages("emailVerificationCode.heading")</h1>
+
+        <p class="govuk-body">@HtmlFormat.raw(messages("emailVerificationCode.p1", email))</p>
+        <p class="govuk-body">@HtmlFormat.raw(messages("emailVerificationCode.p2", changeEmailLink))</p>
+
+        @govukInput(
+            InputViewModel(
+                field = form("value"),
+                label = LabelViewModel(Text(messages("emailVerificationCode.label"))).copy(classes = "govuk-label--m")
+            )
+            .withHint(HintViewModel(messages("emailVerificationCode.hint")))
+            .withWidth(Fixed10)
+        )
+
+        <div class="govuk-button-group">
+            @govukButton(
+                ButtonViewModel(messages("site.continue"))
+            )
+            @govukButton(
+                Button(
+                    preventDoubleClick = Some(true),
+                    classes = "govuk-button--secondary",
+                    attributes = Map(
+                        "formaction" -> EmailVerificationCodeController.requestNewCode().url,
+                        "formmethod" -> "post"
+                    ),
+                    content = Text(messages("emailVerificationCode.link"))
+                )
+            )
+        </div>
+    }
+}

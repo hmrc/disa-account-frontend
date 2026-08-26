@@ -18,7 +18,7 @@ package utils
 
 trait TestEndpoints {
 
-  private val accountFrontendRoutePrefix = "/obligations/account/isa"
+  val accountFrontendRoutePrefix: String = "/obligations/account/isa"
 
   val enterYourOrganisationAddressEndpoint: String =
     s"$accountFrontendRoutePrefix/enter-your-organisation-address"
@@ -28,6 +28,10 @@ trait TestEndpoints {
   val innovativeFinancialProductsEndpoint: String  =
     s"$accountFrontendRoutePrefix/innovative-financial-products"
   val peerToPeerPlatformEndpoint: String           = s"$accountFrontendRoutePrefix/peer-to-peer-loans"
+  val organisationEmailAddressEndpoint: String     = s"$accountFrontendRoutePrefix/organisation-email-address"
+  val emailVerificationCodeEndpoint: String        = s"$accountFrontendRoutePrefix/email-verification-code"
+  val requestNewCodeEndpoint: String               = s"$accountFrontendRoutePrefix/request-new-code"
+  val financialOrganisationEndpoint: String        = s"$accountFrontendRoutePrefix/financial-organisation"
   val changeOfCircumstancesEndpoint: String        = s"$accountFrontendRoutePrefix/change-of-circumstances"
   val keepAliveEndpoint: String                    = s"$accountFrontendRoutePrefix/refresh-session"
   val signOutEndpoint: String                      = s"$accountFrontendRoutePrefix/sign-out"
@@ -39,7 +43,14 @@ trait TestEndpoints {
     "http://localhost:12107/disa-account-frontend/enter-your-organisation-address"
   val basGatewaySignOutEndpoint: String   = "http://localhost:9553/bas-gateway/sign-out-without-state"
   val disaAccountBaseUrl: String          = "http://localhost:12105"
+  val emailVerificationBaseUrl: String    = "http://localhost:9891"
 
   def disaAccountRegistrationEndpoint(zReference: String): String =
     s"$disaAccountBaseUrl/disa-account/registration/$zReference"
+
+  val emailVerificationSendCodeEndpoint: String =
+    s"$emailVerificationBaseUrl/email-verification/v2/send-code"
+
+  val emailVerificationVerifyCodeEndpoint: String =
+    s"$emailVerificationBaseUrl/email-verification/v2/verify-code"
 }

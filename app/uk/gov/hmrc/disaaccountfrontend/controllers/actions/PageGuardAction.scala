@@ -28,7 +28,7 @@ import scala.concurrent.{ExecutionContext, Future}
 trait PageGuardAction {
   def apply(page: GuardedPage): ActionRefiner[DataRequest, DataRequest]
 
-  def apply(page: GuardedPage, redirectLocation: Call): ActionRefiner[DataRequest, DataRequest]
+  def apply(page: GuardedPage, redirectLocation: => Call): ActionRefiner[DataRequest, DataRequest]
 }
 
 @Singleton
@@ -39,7 +39,7 @@ class PageGuardActionImpl @Inject() (implicit ec: ExecutionContext) extends Page
 
   override def apply(
     page: GuardedPage,
-    redirectLocation: Call
+    redirectLocation: => Call
   ): ActionRefiner[DataRequest, DataRequest] = new ActionRefiner[DataRequest, DataRequest] {
 
     override protected val executionContext: ExecutionContext = ec

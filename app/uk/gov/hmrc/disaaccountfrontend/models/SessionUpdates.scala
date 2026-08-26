@@ -19,6 +19,7 @@ package uk.gov.hmrc.disaaccountfrontend.models
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Unchanged
 import uk.gov.hmrc.disaaccountfrontend.models.articles.FcaArticles
+import uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority.FinancialOrganisation
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.{InnovativeFinancialProduct, IsaProduct}
 
 case class SessionUpdates(
@@ -29,7 +30,10 @@ case class SessionUpdates(
   innovativeFinancialProducts: AnswerUpdate[Seq[InnovativeFinancialProduct]] = Unchanged,
   p2pPlatform: AnswerUpdate[String] = Unchanged,
   p2pPlatformNumber: AnswerUpdate[String] = Unchanged,
-  fcaArticles: AnswerUpdate[Seq[FcaArticles]] = Unchanged
+  fcaArticles: AnswerUpdate[Seq[FcaArticles]] = Unchanged,
+  organisationEmailAddress: AnswerUpdate[String] = Unchanged,
+  organisationEmailVerified: AnswerUpdate[Boolean] = Unchanged,
+  financialOrganisation: AnswerUpdate[Seq[FinancialOrganisation]] = Unchanged
 ) {
   def getUpdatedEffectiveAnswers(answers: Answers): Answers =
     Answers(
@@ -40,7 +44,10 @@ case class SessionUpdates(
       innovativeFinancialProducts = innovativeFinancialProducts.getEffectiveAnswer(answers.innovativeFinancialProducts),
       p2pPlatform = p2pPlatform.getEffectiveAnswer(answers.p2pPlatform),
       p2pPlatformNumber = p2pPlatformNumber.getEffectiveAnswer(answers.p2pPlatformNumber),
-      fcaArticles = fcaArticles.getEffectiveAnswer(answers.fcaArticles)
+      fcaArticles = fcaArticles.getEffectiveAnswer(answers.fcaArticles),
+      organisationEmailAddress = organisationEmailAddress.getEffectiveAnswer(answers.organisationEmailAddress),
+      organisationEmailVerified = organisationEmailVerified.getEffectiveAnswer(answers.organisationEmailVerified),
+      financialOrganisation = financialOrganisation.getEffectiveAnswer(answers.financialOrganisation)
     )
 }
 

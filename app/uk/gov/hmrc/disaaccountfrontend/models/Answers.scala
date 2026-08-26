@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.disaaccountfrontend.models
 
+import uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority.FinancialOrganisation
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.{InnovativeFinancialProduct, IsaProduct}
 import uk.gov.hmrc.disaaccountfrontend.models.articles.FcaArticles
 
@@ -27,5 +28,8 @@ case class Answers(
   innovativeFinancialProducts: Option[Seq[InnovativeFinancialProduct]] = None,
   p2pPlatform: Option[String] = None,
   p2pPlatformNumber: Option[String] = None,
-  fcaArticles: Option[Seq[FcaArticles]] = None
+  fcaArticles: Option[Seq[FcaArticles]] = None,
+  organisationEmailAddress: Option[String] = None,
+  organisationEmailVerified: Option[Boolean] = None,
+  financialOrganisation: Option[Seq[FinancialOrganisation]] = None
 )

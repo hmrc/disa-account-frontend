@@ -17,11 +17,12 @@
 package uk.gov.hmrc.disaaccountfrontend.navigation
 
 import play.api.mvc.Call
-import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, PeerToPeerPlatformController, FcaArticlesOrganisationController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.{OrganisationTelephoneNumberController, TradingNameController}
+import uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.routes.EmailVerificationCodeController
+import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, PeerToPeerPlatformController, FcaArticlesOrganisationController}
 import uk.gov.hmrc.disaaccountfrontend.models.Answers
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
-import uk.gov.hmrc.disaaccountfrontend.models.pages.{EnterYourOrganisationAddressPage, FcaArticlesPage, InnovativeFinancialProductsPage, OrganisationTelephoneNumberPage, Page, PeerToPeerPlatformPage, TradingNamePage}
+import uk.gov.hmrc.disaaccountfrontend.models.pages.*
 
 import javax.inject.{Inject, Singleton}
 
@@ -35,7 +36,11 @@ class Navigator @Inject() () {
     case TradingNamePage                  => TradingNameController.onPageLoad()
     case InnovativeFinancialProductsPage  => innovativeFinancialProductsNextPage(answers)
     case PeerToPeerPlatformPage           => peerToPeerPlatformNextPage(answers)
-    case FcaArticlesPage                  => fcaArticlesNextPage(answers)
+    case FcaArticlesPage                  => fcaArticlesNextPage(answers),
+    case OrganisationEmailAddressPage     => EmailVerificationCodeController.onPageLoad()
+    case EmailVerificationCodePage        => ChangeOfCircumstancesController.onPageLoad()
+    // TODO: replace with the organisation email check-your-answers page once it exists.
+    case FinancialOrganisationPage        => ChangeOfCircumstancesController.onPageLoad()
     case unsupportedPage                  =>
       throw new IllegalArgumentException(s"No navigation defined for page: $unsupportedPage")
   }

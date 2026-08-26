@@ -18,6 +18,7 @@ package uk.gov.hmrc.disaaccountfrontend.models.registration
 
 import play.api.libs.json.{Json, Reads}
 import uk.gov.hmrc.disaaccountfrontend.models.CorrespondenceAddress
+import uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority.{CertificatesOfAuthority, FinancialOrganisation}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
 
 case class OrganisationDetails(
@@ -30,13 +31,22 @@ object OrganisationDetails {
   implicit val reads: Reads[OrganisationDetails] = Json.reads[OrganisationDetails]
 }
 
+case class OrganisationEmail(organisationEmail: Option[String] = None, verified: Option[Boolean] = None)
+
+object OrganisationEmail {
+  implicit val reads: Reads[OrganisationEmail] = Json.reads[OrganisationEmail]
+}
+
 case class RegistrationDetails(
   organisationDetails: Option[OrganisationDetails] = None,
-  isaProducts: Option[IsaProducts] = None
+  organisationEmail: Option[OrganisationEmail] = None,
+  isaProducts: Option[IsaProducts] = None,
+  certificatesOfAuthority: Option[CertificatesOfAuthority] = None
 ) {
   def correspondenceAddress: Option[CorrespondenceAddress] = organisationDetails.flatMap(_.correspondenceAddress)
   def orgTelephoneNumber: Option[String]                   = organisationDetails.flatMap(_.orgTelephoneNumber)
   def tradingName: Option[String]                          = organisationDetails.flatMap(_.tradingName)
+  def organisationEmailAddress: Option[String]             = organisationEmail.flatMap(_.organisationEmail)
 
   def isaProductSelections: Option[Seq[IsaProduct]] = isaProducts.flatMap(_.isaProducts)
 
@@ -46,6 +56,9 @@ case class RegistrationDetails(
   def p2pPlatform: Option[String] = isaProducts.flatMap(_.p2pPlatform)
 
   def p2pPlatformNumber: Option[String] = isaProducts.flatMap(_.p2pPlatformNumber)
+
+  def financialOrganisation: Option[Seq[FinancialOrganisation]] =
+    certificatesOfAuthority.flatMap(_.financialOrganisation)
 }
 
 object RegistrationDetails {

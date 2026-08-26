@@ -19,10 +19,12 @@ package utils
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments}
 import uk.gov.hmrc.disaaccountfrontend.models.CorrespondenceAddress
+import uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority.FinancialOrganisation.{BuildingSociety, InsuranceCompany}
+import uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority.{CertificatesOfAuthority, FinancialOrganisation}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.{CrowdFundedDebentures, PeertopeerLoansAndHave36hPermissions}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct.{CashIsas, InnovativeFinanceIsas}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
-import uk.gov.hmrc.disaaccountfrontend.models.registration.{OrganisationDetails, RegistrationDetails}
+import uk.gov.hmrc.disaaccountfrontend.models.registration.{OrganisationDetails, OrganisationEmail, RegistrationDetails}
 
 trait TestData {
   val testZref: String         = "Z1234"
@@ -41,9 +43,10 @@ trait TestData {
     postCode = Some("AA1 1AA")
   )
 
-  val testOrgTelephoneNumber: String = "01642123456"
-  val testP2pPlatform: String        = "Platform r Us"
-  val testP2pPlatformNumber: String  = "1234567"
+  val testOrgTelephoneNumber: String       = "01642123456"
+  val testOrganisationEmailAddress: String = "test@example.com"
+  val testP2pPlatform: String              = "Platform r Us"
+  val testP2pPlatformNumber: String        = "1234567"
 
   val testRegistrationDetails: RegistrationDetails = RegistrationDetails(
     organisationDetails = Some(
@@ -51,6 +54,9 @@ trait TestData {
         correspondenceAddress = Some(testCorrespondenceAddress),
         orgTelephoneNumber = Some(testOrgTelephoneNumber)
       )
+    ),
+    organisationEmail = Some(
+      OrganisationEmail(organisationEmail = Some(testOrganisationEmailAddress))
     )
   )
 
@@ -68,6 +74,16 @@ trait TestData {
           p2pPlatform = Some(testP2pPlatform),
           p2pPlatformNumber = Some(testP2pPlatformNumber)
         )
+      )
+    )
+
+  val testFinancialOrganisationSelections: Seq[FinancialOrganisation] =
+    Seq(BuildingSociety, InsuranceCompany)
+
+  val testRegistrationDetailsWithFinancialOrganisation: RegistrationDetails =
+    testRegistrationDetailsWithInnovativeFinanceIsa.copy(
+      certificatesOfAuthority = Some(
+        CertificatesOfAuthority(financialOrganisation = Some(testFinancialOrganisationSelections))
       )
     )
 }
