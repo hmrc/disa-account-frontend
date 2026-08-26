@@ -14,21 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.models.pages
+package uk.gov.hmrc.disaaccountfrontend.utils
 
-import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
-import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates}
+import java.util.UUID
+import javax.inject.Singleton
 
-sealed trait Page
-
-trait IdentifiedPage extends Page {
-  def id: String
-}
-
-trait GuardedPage extends Page {
-  def canBeAccessedWith(answers: Answers): Boolean
-}
-
-trait PageWithAnswers[A] extends Page {
-  def saveAnswerAndHandleDependents(request: DataRequest[_], newAnswer: A): SessionUpdates
+@Singleton
+class UuidGenerator {
+  def generate(): String = UUID.randomUUID().toString
 }

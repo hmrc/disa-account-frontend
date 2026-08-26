@@ -40,7 +40,7 @@ class FinancialOrganisationController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: FinancialOrganisationView
 )(implicit ec: ExecutionContext)
-    extends PageController(FinancialOrganisationPage, navigator)
+    extends PageController(navigator)
     with FrontendBaseController
     with I18nSupport {
 
@@ -57,11 +57,11 @@ class FinancialOrganisationController @Inject() (
       .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
         answer => {
-          val sessionUpdates = getSessionUpdates(answer)
+          val sessionUpdates = getSessionUpdates(FinancialOrganisationPage, answer)
 
           userAnswersRepository
             .set(UserAnswers(id = request.sessionId, updates = sessionUpdates))
-            .map(_ => Redirect(nextPage(sessionUpdates)))
+            .map(_ => Redirect(nextPage(FinancialOrganisationPage, sessionUpdates)))
         }
       )
   }

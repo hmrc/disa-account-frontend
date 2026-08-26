@@ -108,6 +108,12 @@ financialOrganisation.registeredFriendlySociety = A registered friendly society
 financialOrganisation.assuranceUndertaking = An organisation that offers assurance undertaking services
 financialOrganisation.error.required = You need to tell us which organisation type you are. Select from the options
 
+liaisonOfficerName.title = What is the full name of the liaison officer?
+liaisonOfficerName.heading = What is the full name of the liaison officer?
+liaisonOfficerName.hint = You must have at least 1 liaison officer to register your organisation as an ISA manager. You can add up to 15 liaison officers.
+liaisonOfficerName.error.required = Enter the full name of the liaison officer you’re adding
+liaisonOfficerName.error.invalid = The full name must only include letters a to z, hyphens, spaces and apostrophes
+
 unauthorised.title = You cannot access this service
 unauthorised.heading = You cannot access this service
 unauthorised.body = You need to be signed in with an organisation that is enrolled to manage ISAs to use this service.

@@ -14,21 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.models.pages
+package uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers
 
-import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
-import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates}
+import play.api.libs.json.{Json, OFormat}
 
-sealed trait Page
+case class LiaisonOfficer(
+  id: String,
+  fullName: Option[String] = None,
+  phoneNumber: Option[String] = None,
+  communication: Set[LiaisonOfficerCommunication] = Set.empty,
+  email: Option[String] = None
+)
 
-trait IdentifiedPage extends Page {
-  def id: String
-}
-
-trait GuardedPage extends Page {
-  def canBeAccessedWith(answers: Answers): Boolean
-}
-
-trait PageWithAnswers[A] extends Page {
-  def saveAnswerAndHandleDependents(request: DataRequest[_], newAnswer: A): SessionUpdates
+object LiaisonOfficer {
+  implicit val format: OFormat[LiaisonOfficer] = Json.format[LiaisonOfficer]
 }

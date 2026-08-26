@@ -14,55 +14,69 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails
+package uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers
 
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.disaaccountfrontend.controllers.PageController
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction}
-import uk.gov.hmrc.disaaccountfrontend.forms.TelephoneNumberFormProvider
+import uk.gov.hmrc.disaaccountfrontend.forms.LiaisonOfficerNameFormProvider
 import uk.gov.hmrc.disaaccountfrontend.models.UserAnswers
-import uk.gov.hmrc.disaaccountfrontend.models.pages.OrganisationTelephoneNumberPage
+import uk.gov.hmrc.disaaccountfrontend.models.pages.LiaisonOfficerNamePage
 import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
-import uk.gov.hmrc.disaaccountfrontend.views.html.orgdetails.OrganisationTelephoneNumberView
+import uk.gov.hmrc.disaaccountfrontend.utils.UuidGenerator
+import uk.gov.hmrc.disaaccountfrontend.views.html.liaisonofficers.LiaisonOfficerNameView
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class OrganisationTelephoneNumberController @Inject() (
+class LiaisonOfficerNameController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   userAnswersRepository: UserAnswersRepository,
   navigator: Navigator,
-  formProvider: TelephoneNumberFormProvider,
+  uuidGenerator: UuidGenerator,
+  formProvider: LiaisonOfficerNameFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: OrganisationTelephoneNumberView
+  view: LiaisonOfficerNameView
 )(implicit ec: ExecutionContext)
     extends PageController(navigator)
     with FrontendBaseController
     with I18nSupport {
 
-  private val form = formProvider("organisationTelephoneNumber")
+  val form: Form[String] = formProvider()
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData) { implicit request =>
-    val preparedForm = request.effectiveAnswers.organisationTelephoneNumber.fold(form)(form.fill)
-    Ok(view(preparedForm))
+  def onPageLoad(id: Option[String]): Action[AnyContent] = (identify andThen getData) { implicit request =>
+    id match {
+      case None             =>
+        Redirect(routes.LiaisonOfficerNameController.onPageLoad(Some(uuidGenerator.generate())))
+      case Some(existingId) =>
+        val savedName =
+          request.effectiveAnswers.liaisonOfficers
+            .flatMap(_.liaisonOfficers.find(_.id == existingId))
+            .flatMap(_.fullName)
+        val preparedForm = savedName.fold(form)(form.fill)
+
+        Ok(view(existingId, preparedForm))
+    }
   }
 
-  def onSubmit(): Action[AnyContent] = (identify andThen getData).async { implicit request =>
+  def onSubmit(id: String): Action[AnyContent] = (identify andThen getData).async { implicit request =>
     form
       .bindFromRequest()
       .fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
+        formWithErrors => Future.successful(BadRequest(view(id, formWithErrors))),
         answer => {
-          val sessionUpdates = getSessionUpdates(OrganisationTelephoneNumberPage, answer)
+          val currentPage   = LiaisonOfficerNamePage(id)
+          val sessionUpdates = getSessionUpdates(currentPage, answer)
 
           userAnswersRepository
             .set(UserAnswers(id = request.sessionId, updates = sessionUpdates))
-            .map(_ => Redirect(nextPage(OrganisationTelephoneNumberPage, sessionUpdates)))
+            .map(_ => Redirect(nextPage(currentPage, sessionUpdates)))
         }
       )
   }
