@@ -30,7 +30,7 @@ class SignatoryNamePageSpec extends BaseUnitSpec {
 
     "add a new signatory to an empty list and preserve existing session updates" in {
       val existingUpdates = SessionUpdates(organisationTelephoneNumber = Assign(testOrgTelephoneNumber))
-      val request          = DataRequest(
+      val request         = DataRequest(
         FakeRequest(),
         testZref,
         testCredentialId,
@@ -61,7 +61,7 @@ class SignatoryNamePageSpec extends BaseUnitSpec {
 
     "update the matching signatory's name and preserve their job title" in {
       val existingSignatory = Signatory(testSignatoryId, fullName = Some("Old Name"), jobTitle = Some("Director"))
-      val request            = DataRequest(
+      val request           = DataRequest(
         FakeRequest(),
         testZref,
         testCredentialId,

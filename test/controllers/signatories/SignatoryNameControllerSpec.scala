@@ -43,7 +43,7 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
       running(application) {
         val result = route(application, FakeRequest(GET, signatoryNameEndpoint)).value
 
-        status(result)           shouldBe SEE_OTHER
+        status(result)               shouldBe SEE_OTHER
         redirectLocation(result).value should startWith(s"$signatoryNameEndpoint?id=")
       }
     }
@@ -82,7 +82,7 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
       running(application) {
         val result = route(application, FakeRequest(GET, signatoryNameEndpoint)).value
 
-        status(result)             shouldBe SEE_OTHER
+        status(result)                 shouldBe SEE_OTHER
         redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
       }
     }
@@ -98,8 +98,8 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
       ).build()
 
       running(application) {
-        val newId      = "signatory-2"
-        val request    =
+        val newId   = "signatory-2"
+        val request =
           FakeRequest(POST, s"$signatoryNameEndpoint?id=$newId")
             .withFormUrlEncodedBody(validFormData.toSeq: _*)
             .withHeaders("Csrf-Token" -> "nocheck")
@@ -120,7 +120,7 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
 
       val existingSignatory = Signatory(testSignatoryId, fullName = Some("Old Name"), jobTitle = Some("Director"))
-      val application        = applicationBuilder(
+      val application       = applicationBuilder(
         effectiveAnswers = Answers(signatories = Some(Seq(existingSignatory)))
       ).build()
 
@@ -171,7 +171,7 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
 
         val result = route(application, request).value
 
-        status(result)             shouldBe SEE_OTHER
+        status(result)                 shouldBe SEE_OTHER
         redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
         verify(mockUserAnswersRepository, never).set(any())
       }

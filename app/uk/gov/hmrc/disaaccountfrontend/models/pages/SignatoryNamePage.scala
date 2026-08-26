@@ -24,7 +24,7 @@ import uk.gov.hmrc.disaaccountfrontend.models.signatories.Signatory
 case class SignatoryNamePage(id: String) extends PageWithAnswers[String] {
 
   def saveAnswerAndHandleDependents(request: DataRequest[_], newAnswer: String): SessionUpdates = {
-    val existingUpdates    = request.sessionAnswers.fold(SessionUpdates())(_.updates)
+    val existingUpdates     = request.sessionAnswers.fold(SessionUpdates())(_.updates)
     val existingSignatories = request.effectiveAnswers.signatories.getOrElse(Seq.empty)
     val exists              = existingSignatories.exists(_.id == id)
 
