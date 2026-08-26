@@ -25,6 +25,7 @@ import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialPro
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct.{CashIsas, InnovativeFinanceIsas}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
 import uk.gov.hmrc.disaaccountfrontend.models.registration.{OrganisationDetails, OrganisationEmail, RegistrationDetails}
+import uk.gov.hmrc.disaaccountfrontend.models.signatories.{Signatories, Signatory}
 
 trait TestData {
   val testZref: String         = "Z1234"
@@ -85,5 +86,15 @@ trait TestData {
       certificatesOfAuthority = Some(
         CertificatesOfAuthority(financialOrganisation = Some(testFinancialOrganisationSelections))
       )
+    )
+
+  val testSignatoryId: String   = "signatory-1"
+  val testSignatoryName: String = "Jane Smith"
+
+  val testSignatories: Seq[Signatory] = Seq(Signatory(testSignatoryId, fullName = Some(testSignatoryName)))
+
+  val testRegistrationDetailsWithSignatories: RegistrationDetails =
+    testRegistrationDetailsWithFinancialOrganisation.copy(
+      signatories = Some(Signatories(testSignatories))
     )
 }

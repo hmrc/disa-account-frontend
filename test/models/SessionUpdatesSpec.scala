@@ -19,6 +19,7 @@ package models
 import play.api.libs.json.{JsNull, JsSuccess, Json}
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.{Assign, Clear, Unchanged}
 import uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority.FinancialOrganisation.{Bank, BuildingSociety}
+import uk.gov.hmrc.disaaccountfrontend.models.signatories.Signatory
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates}
 import utils.BaseUnitSpec
 
@@ -33,6 +34,7 @@ class SessionUpdatesSpec extends BaseUnitSpec {
         correspondenceAddress = Assign(testCorrespondenceAddress),
         isaProducts = Assign(Seq.empty),
         financialOrganisation = Assign(Seq(Bank)),
+        signatories = Assign(testSignatories),
         p2pPlatform = Clear
       )
 
@@ -60,22 +62,26 @@ class SessionUpdatesSpec extends BaseUnitSpec {
     }
 
     "apply typed updates to an answer snapshot" in {
-      val answers = Answers(
+      val answers          = Answers(
         correspondenceAddress = Some(testCorrespondenceAddress),
         organisationTelephoneNumber = Some(testOrgTelephoneNumber),
         financialOrganisation = Some(Seq(BuildingSociety)),
+        signatories = Some(testSignatories),
         p2pPlatform = Some(testP2pPlatform)
       )
-      val updates = SessionUpdates(
+      val updatedSignatory = Signatory(testSignatoryId, fullName = Some("Updated Name"))
+      val updates          = SessionUpdates(
         organisationTelephoneNumber = Assign(updatedOrgTelephoneNumber),
         financialOrganisation = Assign(Seq(Bank)),
+        signatories = Assign(Seq(updatedSignatory)),
         p2pPlatform = Clear
       )
 
       updates.getUpdatedEffectiveAnswers(answers) shouldBe Answers(
         correspondenceAddress = Some(testCorrespondenceAddress),
         organisationTelephoneNumber = Some(updatedOrgTelephoneNumber),
-        financialOrganisation = Some(Seq(Bank))
+        financialOrganisation = Some(Seq(Bank)),
+        signatories = Some(Seq(updatedSignatory))
       )
     }
   }

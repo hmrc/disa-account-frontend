@@ -20,6 +20,7 @@ import play.api.libs.json.{Json, Reads}
 import uk.gov.hmrc.disaaccountfrontend.models.CorrespondenceAddress
 import uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority.{CertificatesOfAuthority, FinancialOrganisation}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
+import uk.gov.hmrc.disaaccountfrontend.models.signatories.{Signatories, Signatory}
 
 case class OrganisationDetails(
   correspondenceAddress: Option[CorrespondenceAddress] = None,
@@ -41,12 +42,14 @@ case class RegistrationDetails(
   organisationDetails: Option[OrganisationDetails] = None,
   organisationEmail: Option[OrganisationEmail] = None,
   isaProducts: Option[IsaProducts] = None,
-  certificatesOfAuthority: Option[CertificatesOfAuthority] = None
+  certificatesOfAuthority: Option[CertificatesOfAuthority] = None,
+  signatories: Option[Signatories] = None
 ) {
   def correspondenceAddress: Option[CorrespondenceAddress] = organisationDetails.flatMap(_.correspondenceAddress)
   def orgTelephoneNumber: Option[String]                   = organisationDetails.flatMap(_.orgTelephoneNumber)
   def tradingName: Option[String]                          = organisationDetails.flatMap(_.tradingName)
   def organisationEmailAddress: Option[String]             = organisationEmail.flatMap(_.organisationEmail)
+  def signatoriesList: Option[Seq[Signatory]]              = signatories.map(_.signatories)
 
   def isaProductSelections: Option[Seq[IsaProduct]] = isaProducts.flatMap(_.isaProducts)
 

@@ -108,6 +108,13 @@ financialOrganisation.registeredFriendlySociety = A registered friendly society
 financialOrganisation.assuranceUndertaking = An organisation that offers assurance undertaking services
 financialOrganisation.error.required = You need to tell us which organisation type you are. Select from the options
 
+signatoryName.title = What is the full name of the signatory?
+signatoryName.heading = What is the full name of the signatory?
+signatoryName.error.required = Enter the full name of the signatory you’re adding
+signatoryName.error.invalid = The full name must only include letters a to z, hyphens, spaces and apostrophes
+signatoryName.checkYourAnswersLabel = Name
+signatoryName.change.hidden = name of signatory
+
 unauthorised.title = You cannot access this service
 unauthorised.heading = You cannot access this service
 unauthorised.body = You need to be signed in with an organisation that is enrolled to manage ISAs to use this service.
