@@ -35,7 +35,6 @@ class Navigator @Inject() () {
     case TradingNamePage                  => TradingNameController.onPageLoad()
     case InnovativeFinancialProductsPage  => innovativeFinancialProductsNextPage(answers)
     case PeerToPeerPlatformPage           => peerToPeerPlatformNextPage(answers)
-    // TODO: replace with the next page in the journey once it exists.
     case FcaArticlesPage                  => fcaArticlesNextPage(answers)
     case unsupportedPage                  =>
       throw new IllegalArgumentException(s"No navigation defined for page: $unsupportedPage")
