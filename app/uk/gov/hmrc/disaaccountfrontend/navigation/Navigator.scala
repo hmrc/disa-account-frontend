@@ -19,7 +19,7 @@ package uk.gov.hmrc.disaaccountfrontend.navigation
 import play.api.mvc.Call
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.{OrganisationTelephoneNumberController, TradingNameController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.routes.EmailVerificationCodeController
-import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, FcaArticlesOrganisationController, PeerToPeerPlatformController}
+import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, PeerToPeerPlatformController}
 import uk.gov.hmrc.disaaccountfrontend.models.Answers
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
 import uk.gov.hmrc.disaaccountfrontend.models.pages.*
@@ -63,7 +63,8 @@ class Navigator @Inject() () {
     }
 
   private def peerToPeerPlatformNumberQuestionPage: Call =
-    FcaArticlesOrganisationController.onPageLoad()
+    // TODO: Replace this fallback with the FCA/FRN question (NOT FCA Articles!) when that page is implemented.
+    ChangeOfCircumstancesController.onPageLoad()
 
   private def fcaArticlesNextPage(answers: Answers): Call =
     answers.fcaArticles match {
@@ -72,6 +73,5 @@ class Navigator @Inject() () {
     }
 
   private def fcaArticlesQuestionPage: Call =
-    // TODO: Replace this fallback with the next question-page when that page is implemented.
     ChangeOfCircumstancesController.onPageLoad()
 }

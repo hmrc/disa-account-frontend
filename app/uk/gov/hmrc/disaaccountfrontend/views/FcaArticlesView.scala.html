@@ -29,9 +29,9 @@ hmrcPageHeading: HmrcPageHeading
 
 @(form: Form[_])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = Some(title(form, "FcaArticlesOrganisation.title", Some("sectionTitle.isaProducts")))) {
+@layout(pageTitle = Some(title(form, "FcaArticles.title", Some("sectionTitle.isaProducts")))) {
 
-@formHelper(action = FcaArticlesOrganisationController.onSubmit(), Symbol("autoComplete") -> "off") {
+@formHelper(action = FcaArticlesController.onSubmit(), Symbol("autoComplete") -> "off") {
 
 @if(form.errors.nonEmpty) {
 @govukErrorSummary(
@@ -43,20 +43,20 @@ errorLinkOverrides = Map("value" -> "value_0", "value[0]" -> "value_0")
 }
 
 @hmrcPageHeading(PageHeading(
-text = messages("FCAArticlesOrganisation.heading"),
+text = messages("FcaArticles.heading"),
 section = None,
 headingClasses = Some("govuk-heading-l"),
 captionClasses = Some("govuk-caption-l")
 ))
 
-<p class="govuk-body">@messages("FCAArticlesOrganisation.p1")</p>
+<p class="govuk-body">@messages("FcaArticles.p1")</p>
 
 @govukCheckboxes(
 CheckboxesViewModel(
 form = form,
 name = "value",
-hint = Some(Hint(content = Text(messages("FCAArticlesOrganisation.hint")))),
-legend = Legend(Text(messages("FCAArticlesOrganisation.h2")),"govuk-fieldset__legend--m"),
+hint = Some(Hint(content = Text(messages("FcaArticles.hint")))),
+legend = Legend(Text(messages("FcaArticles.h2")),"govuk-fieldset__legend--m"),
 items = FcaArticles.checkboxItems
 )
 )

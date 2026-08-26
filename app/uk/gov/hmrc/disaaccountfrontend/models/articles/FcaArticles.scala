@@ -71,7 +71,7 @@ object FcaArticles extends Enumerable.Implicits {
   def checkboxItems(implicit messages: Messages): Seq[CheckboxItem] =
     values.zipWithIndex.map { case (value, index) =>
       CheckboxItemViewModel(
-        content = Text(messages(s"FCAArticlesOrganisation.${value.toString}")),
+        content = Text(messages(s"FcaArticles.${value.toString}")),
         fieldId = "value",
         index = index,
         value = value.toString

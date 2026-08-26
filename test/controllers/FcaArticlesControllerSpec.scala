@@ -14,19 +14,6 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.forms
+package controllers
 
-import play.api.data.Form
-import play.api.data.Forms.set
-import uk.gov.hmrc.disaaccountfrontend.forms.mappings.Mappings
-import uk.gov.hmrc.disaaccountfrontend.models.articles.FcaArticles
-
-import javax.inject.Inject
-
-class FcaArticlesFormProvider @Inject() extends Mappings {
-  def apply(): Form[Set[FcaArticles]] =
-    Form(
-      "value" -> set(enumerable[FcaArticles]("FcaArticles.error.required"))
-        .verifying(nonEmptySet("FcaArticles.error.required"))
-    )
-}
+class FcaArticlesControllerSpec {}

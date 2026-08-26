@@ -24,15 +24,15 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction, PageGuardAction}
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
 import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator
-import uk.gov.hmrc.disaaccountfrontend.views.html.FcaArticlesOrganisationView
+import uk.gov.hmrc.disaaccountfrontend.views.html.FcaArticlesView
 import uk.gov.hmrc.disaaccountfrontend.forms.FcaArticlesFormProvider
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.disaaccountfrontend.models.pages.FcaArticlesPage
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class FcaArticlesOrganisationController @Inject() (
+class FcaArticlesController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
@@ -41,7 +41,7 @@ class FcaArticlesOrganisationController @Inject() (
   navigator: Navigator,
   formProvider: FcaArticlesFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: FcaArticlesOrganisationView
+  view: FcaArticlesView
 )(implicit ec: ExecutionContext)
     extends PageController(FcaArticlesPage, navigator)
     with FrontendBaseController
