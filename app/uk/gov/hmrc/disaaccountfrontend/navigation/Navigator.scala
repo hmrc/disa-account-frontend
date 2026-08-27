@@ -20,6 +20,7 @@ import play.api.mvc.Call
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.{OrganisationTelephoneNumberController, TradingNameController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.routes.EmailVerificationCodeController
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, PeerToPeerPlatformController}
+import uk.gov.hmrc.disaaccountfrontend.controllers.signatories.routes.SignatoryJobTitleController
 import uk.gov.hmrc.disaaccountfrontend.models.Answers
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
 import uk.gov.hmrc.disaaccountfrontend.models.pages.*
@@ -40,8 +41,11 @@ class Navigator @Inject() () {
     case EmailVerificationCodePage        => ChangeOfCircumstancesController.onPageLoad()
     // TODO: replace with the organisation email check-your-answers page once it exists.
     case FinancialOrganisationPage        => ChangeOfCircumstancesController.onPageLoad()
+    case SignatoryNamePage(id)            => SignatoryJobTitleController.onPageLoad(id)
     // TODO: replace with the add-another-signatory / signatories check-your-answers page once it exists.
-    case SignatoryNamePage(_)             => ChangeOfCircumstancesController.onPageLoad()
+    case SignatoryJobTitlePage(_)         => ChangeOfCircumstancesController.onPageLoad()
+    // TODO: replace with the next liaison officer page once it exists.
+    case LiaisonOfficerNamePage(_)        => ChangeOfCircumstancesController.onPageLoad()
     case unsupportedPage                  =>
       throw new IllegalArgumentException(s"No navigation defined for page: $unsupportedPage")
   }

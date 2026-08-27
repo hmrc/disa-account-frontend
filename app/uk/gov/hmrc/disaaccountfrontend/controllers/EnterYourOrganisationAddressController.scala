@@ -40,7 +40,7 @@ class EnterYourOrganisationAddressController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: EnterYourOrganisationAddressView
 )(implicit ec: ExecutionContext)
-    extends PageController(EnterYourOrganisationAddressPage, navigator)
+    extends PageController(navigator)
     with FrontendBaseController
     with I18nSupport {
 
@@ -57,11 +57,11 @@ class EnterYourOrganisationAddressController @Inject() (
       .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
         answer => {
-          val sessionUpdates = getSessionUpdates(answer)
+          val sessionUpdates = getSessionUpdates(EnterYourOrganisationAddressPage, answer)
 
           userAnswersRepository
             .set(UserAnswers(id = request.sessionId, updates = sessionUpdates))
-            .map(_ => Redirect(nextPage(sessionUpdates)))
+            .map(_ => Redirect(nextPage(EnterYourOrganisationAddressPage, sessionUpdates)))
         }
       )
   }

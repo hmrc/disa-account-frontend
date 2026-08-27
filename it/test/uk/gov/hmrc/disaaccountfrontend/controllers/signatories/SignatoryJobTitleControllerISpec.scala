@@ -28,7 +28,7 @@ import uk.gov.hmrc.disaaccountfrontend.utils.WiremockHelper.stubGet
 import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.mongo.MongoComponent
 
-class SignatoryNameControllerISpec extends BaseIntegrationSpec {
+class SignatoryJobTitleControllerISpec extends BaseIntegrationSpec {
 
   private val databaseName: String                    = "disa-account-frontend-controller-test"
   private lazy val mongoUri: String                   = s"mongodb://127.0.0.1:27017/$databaseName"
@@ -52,8 +52,8 @@ class SignatoryNameControllerISpec extends BaseIntegrationSpec {
     await(repo.collection.drop().toFuture())
   }
 
-  val signatoryNamePath: String = "/obligations/account/isa/signatory-name"
-  val registrationUrl: String   = s"/disa-account/registration/$testZref"
+  val signatoryJobTitlePath: String = "/obligations/account/isa/signatory-job-title"
+  val registrationUrl: String       = s"/disa-account/registration/$testZref"
 
   val signatoryId: String = "294da0a8-7484-4675-bce2-fe9195dc1bca"
 
@@ -93,18 +93,19 @@ class SignatoryNameControllerISpec extends BaseIntegrationSpec {
        |}""".stripMargin
 
   def authenticatedGet(id: String): FakeRequest[AnyContentAsEmpty.type] =
-    FakeRequest(GET, s"$signatoryNamePath?id=$id")
+    FakeRequest(GET, s"$signatoryJobTitlePath?id=$id")
       .withSession(SessionKeys.authToken -> "Bearer mock-bearer-token", SessionKeys.sessionId -> testSessionId)
 
-  "GET /signatory-name" should {
+  "GET /signatory-job-title" should {
 
-    "return 200 OK prefilled with the matching signatory's name from disa-account" in {
+    "return 200 OK prefilled with the matching signatory's job title from disa-account" in {
       stubAuth(testZref, testCredentialId)
       stubGet(registrationUrl, OK, registrationResponseBody)
 
       val result = route(app, authenticatedGet(signatoryId)).get
 
       status(result)        shouldBe OK
+      contentAsString(result) should include("Director")
       contentAsString(result) should include("Test Signatory")
     }
   }
