@@ -18,8 +18,10 @@ package uk.gov.hmrc.disaaccountfrontend.controllers.actions
 
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionRefiner, Call, Result}
+import uk.gov.hmrc.disaaccountfrontend.config.AppConfig
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes
-import uk.gov.hmrc.disaaccountfrontend.models.pages.GuardedPage
+import uk.gov.hmrc.disaaccountfrontend.models.Answers
+import uk.gov.hmrc.disaaccountfrontend.models.pages.{ConfiguredGuardedPage, GuardedPage}
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
 
 import javax.inject.{Inject, Singleton}
@@ -29,6 +31,17 @@ trait PageGuardAction {
   def apply(page: GuardedPage): ActionRefiner[DataRequest, DataRequest]
 
   def apply(page: GuardedPage, redirectLocation: => Call): ActionRefiner[DataRequest, DataRequest]
+
+  def apply(
+    page: ConfiguredGuardedPage,
+    appConfig: AppConfig
+  ): ActionRefiner[DataRequest, DataRequest]
+
+  def apply(
+    page: ConfiguredGuardedPage,
+    appConfig: AppConfig,
+    redirectLocation: => Call
+  ): ActionRefiner[DataRequest, DataRequest]
 }
 
 @Singleton
@@ -40,12 +53,31 @@ class PageGuardActionImpl @Inject() (implicit ec: ExecutionContext) extends Page
   override def apply(
     page: GuardedPage,
     redirectLocation: => Call
+  ): ActionRefiner[DataRequest, DataRequest] =
+    refineWith(page.canBeAccessedWith, redirectLocation)
+
+  override def apply(
+    page: ConfiguredGuardedPage,
+    appConfig: AppConfig
+  ): ActionRefiner[DataRequest, DataRequest] =
+    apply(page, appConfig, routes.ChangeOfCircumstancesController.onPageLoad())
+
+  override def apply(
+    page: ConfiguredGuardedPage,
+    appConfig: AppConfig,
+    redirectLocation: => Call
+  ): ActionRefiner[DataRequest, DataRequest] =
+    refineWith(page.canBeAccessedWith(_, appConfig), redirectLocation)
+
+  private def refineWith(
+    canBeAccessedWith: Answers => Boolean,
+    redirectLocation: => Call
   ): ActionRefiner[DataRequest, DataRequest] = new ActionRefiner[DataRequest, DataRequest] {
 
     override protected val executionContext: ExecutionContext = ec
 
     override protected def refine[A](request: DataRequest[A]): Future[Either[Result, DataRequest[A]]] =
-      if (page.canBeAccessedWith(request.effectiveAnswers)) Future.successful(Right(request))
+      if (canBeAccessedWith(request.effectiveAnswers)) Future.successful(Right(request))
       else Future.successful(Left(Redirect(redirectLocation)))
   }
 }

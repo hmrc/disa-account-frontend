@@ -42,6 +42,8 @@ class Navigator @Inject() () {
     case FinancialOrganisationPage        => ChangeOfCircumstancesController.onPageLoad()
     // TODO: replace with the add-another-signatory / signatories check-your-answers page once it exists.
     case SignatoryNamePage(_)             => ChangeOfCircumstancesController.onPageLoad()
+    // TODO: replace with the next liaison officer page once it exists.
+    case LiaisonOfficerNamePage(_)        => ChangeOfCircumstancesController.onPageLoad()
     case unsupportedPage                  =>
       throw new IllegalArgumentException(s"No navigation defined for page: $unsupportedPage")
   }

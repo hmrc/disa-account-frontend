@@ -16,13 +16,22 @@
 
 package uk.gov.hmrc.disaaccountfrontend.models.pages
 
+import uk.gov.hmrc.disaaccountfrontend.config.AppConfig
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates}
 
 sealed trait Page
 
+trait IdentifiedPage extends Page {
+  def id: String
+}
+
 trait GuardedPage extends Page {
   def canBeAccessedWith(answers: Answers): Boolean
+}
+
+trait ConfiguredGuardedPage extends Page {
+  def canBeAccessedWith(answers: Answers, appConfig: AppConfig): Boolean
 }
 
 trait PageWithAnswers[A] extends Page {

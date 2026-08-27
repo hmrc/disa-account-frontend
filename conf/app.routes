@@ -28,6 +28,11 @@ GET        /unauthorised                       uk.gov.hmrc.disaaccountfrontend.c
 
 GET        /change-of-circumstances            uk.gov.hmrc.disaaccountfrontend.controllers.ChangeOfCircumstancesController.onPageLoad()
 
+## Liaison officers
+
+GET        /liaison-officer-name               uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerNameController.onPageLoad(id: Option[String])
+POST       /liaison-officer-name               uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerNameController.onSubmit(id: String)
+
 ## Organisation Email
 
 GET        /organisation-email-address         uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.OrganisationEmailAddressController.onPageLoad()
