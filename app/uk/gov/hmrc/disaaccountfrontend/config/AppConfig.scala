@@ -43,6 +43,6 @@ class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig
 
   val cacheTtl: Long = config.get[Long]("cache.ttlInSeconds")
 
-  val maxSignatories: Int = config.get[Int]("max-signatories")
+  val maxSignatories: Int     = config.get[Int]("max-signatories")
   val maxLiaisonOfficers: Int = config.get[Int]("max-liaison-officers")
 }

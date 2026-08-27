@@ -75,7 +75,7 @@ class NavigatorSpec extends BaseUnitSpec {
     "temporarily go from SignatoryNamePage to change of circumstances until the next page in the journey exists" in {
       navigator.nextPage(SignatoryNamePage(testSignatoryId)) shouldBe ChangeOfCircumstancesController.onPageLoad()
     }
-    
+
     "temporarily go from LiaisonOfficerNamePage to change of circumstances until the next page exists" in {
       navigator.nextPage(LiaisonOfficerNamePage("liaison-officer-1")) shouldBe
         ChangeOfCircumstancesController.onPageLoad()
