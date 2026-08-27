@@ -20,6 +20,7 @@ import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Unchanged
 import uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority.FinancialOrganisation
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.{InnovativeFinancialProduct, IsaProduct}
+import uk.gov.hmrc.disaaccountfrontend.models.signatories.Signatory
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficers
 
 case class SessionUpdates(
@@ -33,6 +34,7 @@ case class SessionUpdates(
   organisationEmailAddress: AnswerUpdate[String] = Unchanged,
   organisationEmailVerified: AnswerUpdate[Boolean] = Unchanged,
   financialOrganisation: AnswerUpdate[Seq[FinancialOrganisation]] = Unchanged,
+  signatories: AnswerUpdate[Seq[Signatory]] = Unchanged,
   liaisonOfficers: AnswerUpdate[LiaisonOfficers] = Unchanged
 ) {
   def getUpdatedEffectiveAnswers(answers: Answers): Answers =
@@ -47,6 +49,7 @@ case class SessionUpdates(
       organisationEmailAddress = organisationEmailAddress.getEffectiveAnswer(answers.organisationEmailAddress),
       organisationEmailVerified = organisationEmailVerified.getEffectiveAnswer(answers.organisationEmailVerified),
       financialOrganisation = financialOrganisation.getEffectiveAnswer(answers.financialOrganisation),
+      signatories = signatories.getEffectiveAnswer(answers.signatories),
       liaisonOfficers = liaisonOfficers.getEffectiveAnswer(answers.liaisonOfficers)
     )
 }

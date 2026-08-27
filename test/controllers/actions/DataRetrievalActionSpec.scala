@@ -27,6 +27,7 @@ import uk.gov.hmrc.disaaccountfrontend.controllers.actions.DataRetrievalActionIm
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.{Assign, Clear}
 import uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority.FinancialOrganisation.Bank
 import uk.gov.hmrc.disaaccountfrontend.models.requests.{DataRequest, IdentifierRequest}
+import uk.gov.hmrc.disaaccountfrontend.models.signatories.Signatory
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates, UserAnswers}
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
 import utils.BaseUnitSpec
@@ -120,6 +121,36 @@ class DataRetrievalActionSpec extends BaseUnitSpec {
           )
         )
       )
+    }
+
+    "prepopulate signatories from registration details when there are no session answers" in {
+      val request = FakeRequest()
+      when(mockRegistrationConnector.getRegistrationDetails(eqTo(testZref))(any()))
+        .thenReturn(Future.successful(Some(testRegistrationDetailsWithSignatories)))
+      when(mockUserAnswersRepository.get(testSessionId)).thenReturn(Future.successful(None))
+
+      val result = action
+        .callRefine(IdentifierRequest(request, testZref, testCredentialId, testSessionId))
+        .futureValue
+
+      result.value.effectiveAnswers.signatories shouldBe Some(testSignatories)
+    }
+
+    "let a session-cached signatories update take precedence over the registration details response" in {
+      val request          = FakeRequest()
+      val updatedSignatory = Signatory(testSignatoryId, fullName = Some("Updated Name"))
+      val savedAnswers     =
+        UserAnswers(testSessionId, SessionUpdates(signatories = Assign(Seq(updatedSignatory))))
+
+      when(mockRegistrationConnector.getRegistrationDetails(eqTo(testZref))(any()))
+        .thenReturn(Future.successful(Some(testRegistrationDetailsWithSignatories)))
+      when(mockUserAnswersRepository.get(testSessionId)).thenReturn(Future.successful(Some(savedAnswers)))
+
+      val result = action
+        .callRefine(IdentifierRequest(request, testZref, testCredentialId, testSessionId))
+        .futureValue
+
+      result.value.effectiveAnswers.signatories shouldBe Some(Seq(updatedSignatory))
     }
 
     "use empty effective answers when neither source has answers" in {
