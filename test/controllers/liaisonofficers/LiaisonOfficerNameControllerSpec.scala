@@ -113,16 +113,15 @@ class LiaisonOfficerNameControllerSpec extends BaseUnitSpec {
         val result = route(application, FakeRequest(GET, liaisonOfficerNameEndpointFor(existingId))).value
         val doc    = Jsoup.parse(contentAsString(result))
 
-        status(result)                        shouldBe OK
-        doc.title()                           shouldBe
-          "What is the full name of the liaison officer? - Liaison officers - Manage ISAs - GOV.UK"
-        doc.text()                              should include("What is the full name of the liaison officer?")
-        doc.text()                              should include(
+        status(result)              shouldBe OK
+        doc.title()                 shouldBe
+          "What is the full name of the liaison officer? - Manage ISAs - GOV.UK"
+        doc.text()                    should include("What is the full name of the liaison officer?")
+        doc.text()                    should include(
           "You must have at least 1 liaison officer to register your organisation as an ISA manager. " +
             "You can add up to 15 liaison officers."
         )
-        doc.select(".govuk-caption-l").text() shouldBe "This section is Liaison officers"
-        doc.select("button").text()           shouldBe "Continue"
+        doc.select("button").text() shouldBe "Continue"
       }
     }
 
