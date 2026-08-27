@@ -43,7 +43,7 @@ class TradingNameController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: TradingNameView
 )(implicit ec: ExecutionContext)
-    extends PageController(TradingNamePage, navigator)
+    extends PageController(navigator)
     with FrontendBaseController
     with I18nSupport
     with Logging {
@@ -61,11 +61,11 @@ class TradingNameController @Inject() (
       .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
         answer => {
-          val sessionUpdates = getSessionUpdates(answer)
+          val sessionUpdates = getSessionUpdates(TradingNamePage, answer)
 
           userAnswersRepository
             .set(UserAnswers(id = request.sessionId, updates = sessionUpdates))
-            .map(_ => Redirect(nextPage(sessionUpdates)))
+            .map(_ => Redirect(nextPage(TradingNamePage, sessionUpdates)))
         }
       )
   }

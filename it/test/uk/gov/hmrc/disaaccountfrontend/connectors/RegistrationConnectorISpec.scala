@@ -42,13 +42,16 @@ class RegistrationConnectorISpec extends BaseIntegrationSpec {
            |  },
            |  "organisationEmail": {
            |    "organisationEmail": "$testOrganisationEmailAddress"
+           |  },
+           |  "liaisonOfficers": {
+           |    "liaisonOfficers": ${Json.toJson(testLiaisonOfficers.liaisonOfficers)}
            |  }
            |}""".stripMargin
       stubGet(registrationUrl, OK, responseBody)
 
       val result: Option[RegistrationDetails] = await(connector.getRegistrationDetails(testZref))
 
-      result shouldBe Some(testRegistrationDetails)
+      result shouldBe Some(testRegistrationDetails.copy(liaisonOfficers = Some(testLiaisonOfficers)))
     }
 
     "return None when the backend returns a 404" in {

@@ -26,6 +26,8 @@ import uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority.{Certifica
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.{CrowdFundedDebentures, PeertopeerLoansAndHave36hPermissions}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct.{CashIsas, InnovativeFinanceIsas}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
+import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficerCommunication.ByEmail
+import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
 import uk.gov.hmrc.disaaccountfrontend.models.registration.{OrganisationDetails, OrganisationEmail, RegistrationDetails}
 
 trait TestData {
@@ -82,11 +84,24 @@ trait TestData {
   val testFinancialOrganisationSelections: Seq[FinancialOrganisation] =
     Seq(BuildingSociety, InsuranceCompany)
 
+  val testLiaisonOfficers: LiaisonOfficers = LiaisonOfficers(
+    Seq(
+      LiaisonOfficer(
+        id = "liaison-officer-1",
+        fullName = Some("Jane Smith"),
+        phoneNumber = Some("07777777777"),
+        communication = Set(ByEmail),
+        email = Some("jane.smith@example.com")
+      )
+    )
+  )
+
   val testRegistrationDetailsWithFinancialOrganisation: RegistrationDetails =
     testRegistrationDetailsWithInnovativeFinanceIsa.copy(
       certificatesOfAuthority = Some(
         CertificatesOfAuthority(financialOrganisation = Some(testFinancialOrganisationSelections))
-      )
+      ),
+      liaisonOfficers = Some(testLiaisonOfficers)
     )
 
   val testFcaArticlesCheckedBoxes: Seq[FcaArticles] = Seq(FcaArticle14, FcaArticle64)

@@ -53,14 +53,17 @@ class EmailVerificationCodeController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: EmailVerificationCodeView
 )(implicit ec: ExecutionContext)
-    extends PageController(EmailVerificationCodePage, navigator)
+    extends PageController(navigator)
     with FrontendBaseController
     with I18nSupport
     with Logging {
 
   private val form       = formProvider()
   private val pageAction =
-    identify andThen getData andThen guardPage(page, OrganisationEmailAddressRoutes.onPageLoad())
+    identify andThen getData andThen guardPage(
+      EmailVerificationCodePage,
+      OrganisationEmailAddressRoutes.onPageLoad()
+    )
 
   def onPageLoad(): Action[AnyContent] = pageAction { implicit request =>
     Ok(view(form, request.effectiveAnswers.organisationEmailAddress.get))
@@ -78,10 +81,10 @@ class EmailVerificationCodeController @Inject() (
             .verifyCode(email, code)
             .flatMap {
               case VerifyEmailCodeResult.Verified    =>
-                val sessionUpdates = getSessionUpdates(true)
+                val sessionUpdates = getSessionUpdates(EmailVerificationCodePage, true)
                 userAnswersRepository
                   .set(UserAnswers(id = request.sessionId, updates = sessionUpdates))
-                  .map(_ => Redirect(nextPage(sessionUpdates)))
+                  .map(_ => Redirect(nextPage(EmailVerificationCodePage, sessionUpdates)))
               case VerifyEmailCodeResult.InvalidCode =>
                 Future
                   .successful(BadRequest(view(form.withError("value", "emailVerificationCode.error.invalid"), email)))

@@ -21,6 +21,7 @@ import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Unchanged
 import uk.gov.hmrc.disaaccountfrontend.models.articles.FcaArticles
 import uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority.FinancialOrganisation
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.{InnovativeFinancialProduct, IsaProduct}
+import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficers
 
 case class SessionUpdates(
   correspondenceAddress: AnswerUpdate[CorrespondenceAddress] = Unchanged,
@@ -33,7 +34,8 @@ case class SessionUpdates(
   fcaArticles: AnswerUpdate[Seq[FcaArticles]] = Unchanged,
   organisationEmailAddress: AnswerUpdate[String] = Unchanged,
   organisationEmailVerified: AnswerUpdate[Boolean] = Unchanged,
-  financialOrganisation: AnswerUpdate[Seq[FinancialOrganisation]] = Unchanged
+  financialOrganisation: AnswerUpdate[Seq[FinancialOrganisation]] = Unchanged,
+  liaisonOfficers: AnswerUpdate[LiaisonOfficers] = Unchanged
 ) {
   def getUpdatedEffectiveAnswers(answers: Answers): Answers =
     Answers(
@@ -47,7 +49,8 @@ case class SessionUpdates(
       fcaArticles = fcaArticles.getEffectiveAnswer(answers.fcaArticles),
       organisationEmailAddress = organisationEmailAddress.getEffectiveAnswer(answers.organisationEmailAddress),
       organisationEmailVerified = organisationEmailVerified.getEffectiveAnswer(answers.organisationEmailVerified),
-      financialOrganisation = financialOrganisation.getEffectiveAnswer(answers.financialOrganisation)
+      financialOrganisation = financialOrganisation.getEffectiveAnswer(answers.financialOrganisation),
+      liaisonOfficers = liaisonOfficers.getEffectiveAnswer(answers.liaisonOfficers)
     )
 }
 

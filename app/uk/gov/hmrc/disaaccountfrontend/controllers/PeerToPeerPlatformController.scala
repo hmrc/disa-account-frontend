@@ -41,12 +41,12 @@ class PeerToPeerPlatformController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: PeerToPeerPlatformView
 )(implicit ec: ExecutionContext)
-    extends PageController(PeerToPeerPlatformPage, navigator)
+    extends PageController(navigator)
     with FrontendBaseController
     with I18nSupport {
 
   private val form       = formProvider()
-  private val pageAction = identify andThen getData andThen guardPage(page)
+  private val pageAction = identify andThen getData andThen guardPage(PeerToPeerPlatformPage)
 
   def onPageLoad(): Action[AnyContent] = pageAction { implicit request =>
     val preparedForm = request.effectiveAnswers.p2pPlatform.fold(form)(form.fill)
@@ -59,11 +59,11 @@ class PeerToPeerPlatformController @Inject() (
       .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
         answer => {
-          val sessionUpdates = getSessionUpdates(answer)
+          val sessionUpdates = getSessionUpdates(PeerToPeerPlatformPage, answer)
 
           userAnswersRepository
             .set(UserAnswers(id = request.sessionId, updates = sessionUpdates))
-            .map(_ => Redirect(nextPage(sessionUpdates)))
+            .map(_ => Redirect(nextPage(PeerToPeerPlatformPage, sessionUpdates)))
         }
       )
   }

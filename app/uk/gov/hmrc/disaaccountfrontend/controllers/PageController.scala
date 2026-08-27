@@ -18,21 +18,20 @@ package uk.gov.hmrc.disaaccountfrontend.controllers
 
 import play.api.mvc.Call
 import uk.gov.hmrc.disaaccountfrontend.models.SessionUpdates
-import uk.gov.hmrc.disaaccountfrontend.models.pages.PageWithAnswers
+import uk.gov.hmrc.disaaccountfrontend.models.pages.{Page, PageWithAnswers}
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
 import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator
 
-abstract class PageController[A, P <: PageWithAnswers[A]](
-  protected val page: P,
-  navigator: Navigator
-) {
+abstract class PageController(navigator: Navigator) {
 
-  protected def getSessionUpdates(
+  protected def getSessionUpdates[A](
+    page: PageWithAnswers[A],
     answer: A
   )(implicit request: DataRequest[_]): SessionUpdates =
     page.saveAnswerAndHandleDependents(request, answer)
 
   protected def nextPage(
+    page: Page,
     sessionUpdates: SessionUpdates
   )(implicit request: DataRequest[_]): Call =
     navigator.nextPage(
