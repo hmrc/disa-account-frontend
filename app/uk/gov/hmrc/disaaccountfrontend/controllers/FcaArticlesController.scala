@@ -48,7 +48,7 @@ class FcaArticlesController @Inject() (
     with I18nSupport {
 
   private val form       = formProvider()
-  private val pageAction = identify andThen getData andThen guardPage(page)
+  private val pageAction = identify andThen getData
 
   def onPageLoad(): Action[AnyContent] = pageAction { implicit request =>
     val preparedForm = request.effectiveAnswers.fcaArticles.fold(form)(answer => form.fill(answer.toSet))
