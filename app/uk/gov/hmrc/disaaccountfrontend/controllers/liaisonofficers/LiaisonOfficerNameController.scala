@@ -19,8 +19,9 @@ package uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.disaaccountfrontend.config.AppConfig
 import uk.gov.hmrc.disaaccountfrontend.controllers.PageController
-import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction}
+import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction, PageGuardAction}
 import uk.gov.hmrc.disaaccountfrontend.forms.LiaisonOfficerNameFormProvider
 import uk.gov.hmrc.disaaccountfrontend.models.UserAnswers
 import uk.gov.hmrc.disaaccountfrontend.models.pages.LiaisonOfficerNamePage
@@ -37,7 +38,9 @@ class LiaisonOfficerNameController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  guardPage: PageGuardAction,
   userAnswersRepository: UserAnswersRepository,
+  appConfig: AppConfig,
   navigator: Navigator,
   uuidGenerator: UuidGenerator,
   formProvider: LiaisonOfficerNameFormProvider,
@@ -50,34 +53,48 @@ class LiaisonOfficerNameController @Inject() (
 
   val form: Form[String] = formProvider()
 
-  def onPageLoad(id: Option[String]): Action[AnyContent] = (identify andThen getData) { implicit request =>
-    id match {
-      case None             =>
-        Redirect(routes.LiaisonOfficerNameController.onPageLoad(Some(uuidGenerator.generate())))
-      case Some(existingId) =>
-        val savedName =
-          request.effectiveAnswers.liaisonOfficers
-            .flatMap(_.liaisonOfficers.find(_.id == existingId))
-            .flatMap(_.fullName)
-        val preparedForm = savedName.fold(form)(form.fill)
+  private def page(id: String): LiaisonOfficerNamePage =
+    LiaisonOfficerNamePage(id)
 
-        Ok(view(existingId, preparedForm))
+  private def pageAction(page: LiaisonOfficerNamePage) =
+    identify andThen getData andThen guardPage(page, appConfig)
+
+  def onPageLoad(id: Option[String]): Action[AnyContent] = {
+    val currentPage = page(id.getOrElse(uuidGenerator.generate()))
+
+    pageAction(currentPage) { implicit request =>
+      id match {
+        case None             =>
+          Redirect(routes.LiaisonOfficerNameController.onPageLoad(Some(currentPage.id)))
+        case Some(existingId) =>
+          val savedName    =
+            request.effectiveAnswers.liaisonOfficers.toSeq
+              .flatMap(_.liaisonOfficers)
+              .find(_.id == existingId)
+              .flatMap(_.fullName)
+          val preparedForm = savedName.fold(form)(form.fill)
+
+          Ok(view(existingId, preparedForm))
+      }
     }
   }
 
-  def onSubmit(id: String): Action[AnyContent] = (identify andThen getData).async { implicit request =>
-    form
-      .bindFromRequest()
-      .fold(
-        formWithErrors => Future.successful(BadRequest(view(id, formWithErrors))),
-        answer => {
-          val currentPage   = LiaisonOfficerNamePage(id)
-          val sessionUpdates = getSessionUpdates(currentPage, answer)
+  def onSubmit(id: String): Action[AnyContent] = {
+    val currentPage = page(id)
 
-          userAnswersRepository
-            .set(UserAnswers(id = request.sessionId, updates = sessionUpdates))
-            .map(_ => Redirect(nextPage(currentPage, sessionUpdates)))
-        }
-      )
+    pageAction(currentPage).async { implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(id, formWithErrors))),
+          answer => {
+            val sessionUpdates = getSessionUpdates(currentPage, answer)
+
+            userAnswersRepository
+              .set(UserAnswers(id = request.sessionId, updates = sessionUpdates))
+              .map(_ => Redirect(nextPage(currentPage, sessionUpdates)))
+          }
+        )
+    }
   }
 }

@@ -16,6 +16,7 @@
 
 package models.pages
 
+import org.mockito.Mockito.when
 import play.api.test.FakeRequest
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
@@ -25,6 +26,13 @@ import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates, UserAnsw
 import utils.BaseUnitSpec
 
 class LiaisonOfficerNamePageSpec extends BaseUnitSpec {
+
+  private val maxLiaisonOfficers = 15
+
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    when(mockAppConfig.maxLiaisonOfficers).thenReturn(maxLiaisonOfficers)
+  }
 
   "LiaisonOfficerNamePage" should {
 
@@ -47,6 +55,28 @@ class LiaisonOfficerNamePageSpec extends BaseUnitSpec {
             LiaisonOfficers(Seq(otherOfficer, targetOfficer.copy(fullName = Some("Updated Name"))))
           )
         )
+    }
+
+    "allow a new liaison officer below the configured maximum" in {
+      val officers = LiaisonOfficers((1 until maxLiaisonOfficers).map(index => LiaisonOfficer(s"officer-$index")))
+      val answers  = Answers(liaisonOfficers = Some(officers))
+
+      LiaisonOfficerNamePage("new-id").canBeAccessedWith(answers, mockAppConfig) shouldBe true
+    }
+
+    "not allow a new liaison officer at the configured maximum" in {
+      val officers = LiaisonOfficers((1 to maxLiaisonOfficers).map(index => LiaisonOfficer(s"officer-$index")))
+      val answers  = Answers(liaisonOfficers = Some(officers))
+
+      LiaisonOfficerNamePage("new-id").canBeAccessedWith(answers, mockAppConfig) shouldBe false
+    }
+
+    "allow an existing liaison officer to be edited at the configured maximum" in {
+      val officers = LiaisonOfficers((1 to maxLiaisonOfficers).map(index => LiaisonOfficer(s"officer-$index")))
+      val answers  = Answers(liaisonOfficers = Some(officers))
+
+      LiaisonOfficerNamePage(s"officer-$maxLiaisonOfficers")
+        .canBeAccessedWith(answers, mockAppConfig) shouldBe true
     }
   }
 }

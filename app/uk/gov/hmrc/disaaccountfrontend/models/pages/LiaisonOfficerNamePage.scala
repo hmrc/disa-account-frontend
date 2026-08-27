@@ -16,12 +16,22 @@
 
 package uk.gov.hmrc.disaaccountfrontend.models.pages
 
+import uk.gov.hmrc.disaaccountfrontend.config.AppConfig
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficers
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
-import uk.gov.hmrc.disaaccountfrontend.models.SessionUpdates
+import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates}
 
-final case class LiaisonOfficerNamePage(id: String) extends IdentifiedPage with PageWithAnswers[String] {
+final case class LiaisonOfficerNamePage(id: String)
+    extends IdentifiedPage
+    with ConfiguredGuardedPage
+    with PageWithAnswers[String] {
+
+  override def canBeAccessedWith(answers: Answers, appConfig: AppConfig): Boolean = {
+    val existingOfficers = answers.liaisonOfficers.fold(Seq.empty)(_.liaisonOfficers)
+
+    existingOfficers.exists(_.id == id) || existingOfficers.size < appConfig.maxLiaisonOfficers
+  }
 
   override def saveAnswerAndHandleDependents(request: DataRequest[_], newAnswer: String): SessionUpdates = {
     val existingUpdates        = request.sessionAnswers.fold(SessionUpdates())(_.updates)

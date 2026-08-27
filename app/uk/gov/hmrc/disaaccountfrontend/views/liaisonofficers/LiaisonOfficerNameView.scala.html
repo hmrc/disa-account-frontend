@@ -15,10 +15,12 @@
  *@
 
 @import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.LiaisonOfficerNameController
+@import uk.gov.hmrc.disaaccountfrontend.config.AppConfig
 @import uk.gov.hmrc.disaaccountfrontend.viewmodels.InputWidth._
 @import uk.gov.hmrc.disaaccountfrontend.views.html.Layout
 
 @this(
+    appConfig: AppConfig,
     layout: Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
@@ -46,7 +48,7 @@
                 )
             )
             .withWidth(Full)
-            .withHint(HintViewModel(messages("liaisonOfficerName.hint")))
+            .withHint(HintViewModel(messages("liaisonOfficerName.hint", appConfig.maxLiaisonOfficers)))
         )
 
         @govukButton(

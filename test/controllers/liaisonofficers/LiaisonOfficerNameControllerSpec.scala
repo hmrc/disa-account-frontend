@@ -44,6 +44,12 @@ class LiaisonOfficerNameControllerSpec extends BaseUnitSpec {
     email = Some("old.name@example.com")
   )
 
+  private val otherOfficers = (1 until 15).map { index =>
+    LiaisonOfficer(s"officer-$index", Some(s"Officer $index"))
+  }
+
+  private val officersAtLimit = LiaisonOfficers(otherOfficers :+ existingOfficer)
+
   "LiaisonOfficerNameController.onPageLoad" should {
 
     "generate an id and redirect to the canonical URL when no id is supplied" in {
@@ -58,8 +64,27 @@ class LiaisonOfficerNameControllerSpec extends BaseUnitSpec {
       running(application) {
         val result = route(application, FakeRequest(GET, liaisonOfficerNameEndpoint)).value
 
-        status(result) shouldBe SEE_OTHER
+        status(result)                 shouldBe SEE_OTHER
         redirectLocation(result).value shouldBe liaisonOfficerNameEndpointFor(generatedId)
+        verify(mockUserAnswersRepository, never).set(any())
+      }
+    }
+
+    "redirect to the index when the maximum number of officers exists" in {
+      val uuidGenerator = mock[UuidGenerator]
+      when(uuidGenerator.generate()).thenReturn("new-id")
+      val application   = applicationBuilder(
+        effectiveAnswers = Answers(liaisonOfficers = Some(officersAtLimit))
+      )
+        .overrides(bind[UuidGenerator].toInstance(uuidGenerator))
+        .build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, liaisonOfficerNameEndpoint)).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
+        verify(uuidGenerator).generate()
         verify(mockUserAnswersRepository, never).set(any())
       }
     }
@@ -71,44 +96,56 @@ class LiaisonOfficerNameControllerSpec extends BaseUnitSpec {
         val result = route(application, FakeRequest(GET, liaisonOfficerNameEndpointFor(existingId))).value
         val doc    = Jsoup.parse(contentAsString(result))
 
-        status(result) shouldBe OK
-        doc.title() shouldBe
+        status(result)                        shouldBe OK
+        doc.title()                           shouldBe
           "What is the full name of the liaison officer? - Liaison officers - Manage ISAs - GOV.UK"
-        doc.text() should include("What is the full name of the liaison officer?")
-        doc.text() should include(
+        doc.text()                              should include("What is the full name of the liaison officer?")
+        doc.text()                              should include(
           "You must have at least 1 liaison officer to register your organisation as an ISA manager. " +
             "You can add up to 15 liaison officers."
         )
         doc.select(".govuk-caption-l").text() shouldBe "This section is Liaison officers"
-        doc.select("button").text() shouldBe "Continue"
+        doc.select("button").text()           shouldBe "Continue"
       }
     }
 
     "repopulate the name for the matching liaison officer id" in {
-      val otherOfficer = LiaisonOfficer("other-id", Some("Other Name"))
-      val application  = applicationBuilder(
-        effectiveAnswers = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(otherOfficer, existingOfficer))))
+      val application = applicationBuilder(
+        effectiveAnswers = Answers(liaisonOfficers = Some(officersAtLimit))
       ).build()
 
       running(application) {
         val result = route(application, FakeRequest(GET, liaisonOfficerNameEndpointFor(existingId))).value
         val doc    = Jsoup.parse(contentAsString(result))
 
-        status(result) shouldBe OK
+        status(result)                                shouldBe OK
         doc.select("input[name=value]").attr("value") shouldBe "Old Name"
+      }
+    }
+
+    "redirect to the index when a new id is supplied and the maximum number of officers exists" in {
+      val application = applicationBuilder(
+        effectiveAnswers = Answers(liaisonOfficers = Some(officersAtLimit))
+      ).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, liaisonOfficerNameEndpointFor("new-id"))).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
+        verify(mockUserAnswersRepository, never).set(any())
       }
     }
   }
 
   "LiaisonOfficerNameController.onSubmit" should {
 
-    "trim and save the identified officer while preserving other answers and officer details" in {
+    "trim and save the fifteenth officer while preserving other answers and officer details" in {
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
 
-      val otherOfficer    = LiaisonOfficer("other-id", Some("Other Name"))
       val existingUpdates = SessionUpdates(tradingName = Assign("Existing trading name"))
       val application     = applicationBuilder(
-        effectiveAnswers = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(otherOfficer, existingOfficer)))),
+        effectiveAnswers = Answers(liaisonOfficers = Some(officersAtLimit)),
         sessionAnswers = Some(UserAnswers(testSessionId, existingUpdates))
       ).build()
 
@@ -118,25 +155,33 @@ class LiaisonOfficerNameControllerSpec extends BaseUnitSpec {
           .withHeaders("Csrf-Token" -> "nocheck")
         val result  = route(application, request).value
 
-        status(result) shouldBe SEE_OTHER
+        status(result)                 shouldBe SEE_OTHER
         redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
 
         val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
         verify(mockUserAnswersRepository).set(captor.capture())
-        captor.getValue.id shouldBe testSessionId
+        captor.getValue.id      shouldBe testSessionId
         captor.getValue.updates shouldBe existingUpdates.copy(
           liaisonOfficers = Assign(
-            LiaisonOfficers(Seq(otherOfficer, existingOfficer.copy(fullName = Some("Updated Name"))))
+            officersAtLimit.copy(
+              liaisonOfficers = officersAtLimit.liaisonOfficers.map {
+                case officer if officer.id == existingId => officer.copy(fullName = Some("Updated Name"))
+                case officer                             => officer
+              }
+            )
           )
         )
       }
     }
 
-    "save a new officer when the generated id is not already present" in {
+    "save a fifteenth officer when the generated id is not already present" in {
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
 
-      val newId       = "new-id"
-      val application = applicationBuilder().build()
+      val newId              = "new-id"
+      val officersBelowLimit = LiaisonOfficers(otherOfficers)
+      val application        = applicationBuilder(
+        effectiveAnswers = Answers(liaisonOfficers = Some(officersBelowLimit))
+      ).build()
 
       running(application) {
         val request = FakeRequest(POST, liaisonOfficerNameEndpointFor(newId))
@@ -149,8 +194,25 @@ class LiaisonOfficerNameControllerSpec extends BaseUnitSpec {
         val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
         verify(mockUserAnswersRepository).set(captor.capture())
         captor.getValue.updates.liaisonOfficers shouldBe Assign(
-          LiaisonOfficers(Seq(LiaisonOfficer(newId, Some("New Name"))))
+          LiaisonOfficers(otherOfficers :+ LiaisonOfficer(newId, Some("New Name")))
         )
+      }
+    }
+
+    "redirect to the index without saving when a new id is submitted at the maximum" in {
+      val application = applicationBuilder(
+        effectiveAnswers = Answers(liaisonOfficers = Some(officersAtLimit))
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(POST, liaisonOfficerNameEndpointFor("new-id"))
+          .withFormUrlEncodedBody("value" -> "New Name")
+          .withHeaders("Csrf-Token" -> "nocheck")
+        val result  = route(application, request).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
+        verify(mockUserAnswersRepository, never).set(any())
       }
     }
 
@@ -163,7 +225,7 @@ class LiaisonOfficerNameControllerSpec extends BaseUnitSpec {
           .withHeaders("Csrf-Token" -> "nocheck")
         val result  = route(application, request).value
 
-        status(result) shouldBe BAD_REQUEST
+        status(result)        shouldBe BAD_REQUEST
         contentAsString(result) should include("Enter the full name of the liaison officer you’re adding")
         verify(mockUserAnswersRepository, never).set(any())
       }
@@ -178,7 +240,7 @@ class LiaisonOfficerNameControllerSpec extends BaseUnitSpec {
           .withHeaders("Csrf-Token" -> "nocheck")
         val result  = route(application, request).value
 
-        status(result) shouldBe BAD_REQUEST
+        status(result)        shouldBe BAD_REQUEST
         contentAsString(result) should include(
           "The full name must only include letters a to z, hyphens, spaces and apostrophes"
         )
