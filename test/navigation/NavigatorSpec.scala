@@ -74,7 +74,7 @@ class NavigatorSpec extends BaseUnitSpec {
     "go from FcaArticlesPage to change of circumstances" in {
       navigator.nextPage(FcaArticlesPage) shouldBe ChangeOfCircumstancesController.onPageLoad()
     }
-    
+
     "temporarily go from LiaisonOfficerNamePage to change of circumstances until the next page exists" in {
       navigator.nextPage(LiaisonOfficerNamePage("liaison-officer-1")) shouldBe
         ChangeOfCircumstancesController.onPageLoad()

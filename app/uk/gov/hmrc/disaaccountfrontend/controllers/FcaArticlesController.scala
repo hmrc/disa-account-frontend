@@ -42,7 +42,7 @@ class FcaArticlesController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: FcaArticlesView
 )(implicit ec: ExecutionContext)
-    extends PageController(FcaArticlesPage, navigator)
+    extends PageController(navigator)
     with FrontendBaseController
     with I18nSupport {
 
@@ -60,11 +60,11 @@ class FcaArticlesController @Inject() (
       .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
         answer => {
-          val sessionUpdates = getSessionUpdates(answer)
+          val sessionUpdates = getSessionUpdates(FcaArticlesPage, answer)
 
           userAnswersRepository
             .set(UserAnswers(id = request.sessionId, updates = sessionUpdates))
-            .map(_ => Redirect(nextPage(sessionUpdates)))
+            .map(_ => Redirect(nextPage(FcaArticlesPage, sessionUpdates)))
         }
       )
   }
