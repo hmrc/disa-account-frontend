@@ -18,14 +18,10 @@ package uk.gov.hmrc.disaaccountfrontend.models.pages
 
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
 import uk.gov.hmrc.disaaccountfrontend.models.articles.FcaArticles
-import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates}
+import uk.gov.hmrc.disaaccountfrontend.models.SessionUpdates
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
 
 case object FcaArticlesPage extends PageWithAnswers[Set[FcaArticles]] {
-
-  def canBeAccessedWith(answers: Answers): Boolean = answers.fcaArticles.exists(
-    _.contains(FcaArticles)
-  )
 
   def saveAnswerAndHandleDependents(request: DataRequest[_], newAnswer: Set[FcaArticles]): SessionUpdates = {
     val existingUpdates = request.sessionAnswers.fold(SessionUpdates())(_.updates)

@@ -29,7 +29,7 @@
 
 @(form: Form[_])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = Some(title(form, "FcaArticles.title", Some("sectionTitle.isaProducts")))) {
+@layout(pageTitle = Some(title(form, "FcaArticles.title", Some("sectionTitle.FcaArticles")))) {
 
   @formHelper(action = FcaArticlesController.onSubmit(), Symbol("autoComplete") -> "off") {
 
