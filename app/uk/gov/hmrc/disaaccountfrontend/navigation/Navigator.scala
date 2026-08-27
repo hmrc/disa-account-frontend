@@ -17,7 +17,7 @@
 package uk.gov.hmrc.disaaccountfrontend.navigation
 
 import play.api.mvc.Call
-import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.LiaisonOfficerEmailController
+import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.{LiaisonOfficerEmailController, LiaisonOfficerPhoneNumberController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.{OrganisationTelephoneNumberController, TradingNameController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.routes.EmailVerificationCodeController
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, PeerToPeerPlatformController}
@@ -47,7 +47,8 @@ class Navigator @Inject() () {
     // TODO: replace with the add-another-signatory / signatories check-your-answers page once it exists.
     case SignatoryJobTitlePage(_)         => ChangeOfCircumstancesController.onPageLoad()
     case LiaisonOfficerNamePage(id)       => liaisonOfficerNameNextPage(id, mode)
-    case LiaisonOfficerEmailPage(_)       => liaisonOfficerEmailNextPage(mode)
+    case LiaisonOfficerEmailPage(id)      => liaisonOfficerEmailNextPage(id, mode)
+    case LiaisonOfficerPhoneNumberPage(_) => liaisonOfficerPhoneNumberNextPage(mode)
     case unsupportedPage                  =>
       throw new IllegalArgumentException(s"No navigation defined for page: $unsupportedPage")
   }
@@ -83,9 +84,16 @@ class Navigator @Inject() () {
       case CheckMode  => ChangeOfCircumstancesController.onPageLoad()
     }
 
-  private def liaisonOfficerEmailNextPage(mode: Mode): Call =
+  private def liaisonOfficerEmailNextPage(id: String, mode: Mode): Call =
     mode match {
-      // TODO: Replace this fallback with the liaison officer phone number page once it is implemented.
+      case NormalMode => LiaisonOfficerPhoneNumberController.onPageLoad(id, NormalMode)
+      // TODO: Replace this fallback with the liaison officer check-your-answers page once it is implemented.
+      case CheckMode  => ChangeOfCircumstancesController.onPageLoad()
+    }
+
+  private def liaisonOfficerPhoneNumberNextPage(mode: Mode): Call =
+    mode match {
+      // TODO: Replace this fallback with the liaison officer communication page once it is implemented.
       case NormalMode => ChangeOfCircumstancesController.onPageLoad()
       // TODO: Replace this fallback with the liaison officer check-your-answers page once it is implemented.
       case CheckMode  => ChangeOfCircumstancesController.onPageLoad()

@@ -16,7 +16,7 @@
 
 package navigation
 
-import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.LiaisonOfficerEmailController
+import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.{LiaisonOfficerEmailController, LiaisonOfficerPhoneNumberController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, PeerToPeerPlatformController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.OrganisationTelephoneNumberController
 import uk.gov.hmrc.disaaccountfrontend.controllers.signatories.routes.SignatoryJobTitleController
@@ -96,13 +96,23 @@ class NavigatorSpec extends BaseUnitSpec {
         ChangeOfCircumstancesController.onPageLoad()
     }
 
-    "temporarily go from LiaisonOfficerEmailPage to change of circumstances in normal mode" in {
+    "go from LiaisonOfficerEmailPage to the phone number page in normal mode" in {
       navigator.nextPage(LiaisonOfficerEmailPage("liaison-officer-1"), mode = NormalMode) shouldBe
-        ChangeOfCircumstancesController.onPageLoad()
+        LiaisonOfficerPhoneNumberController.onPageLoad("liaison-officer-1", NormalMode)
     }
 
     "temporarily go from LiaisonOfficerEmailPage to change of circumstances in check mode" in {
       navigator.nextPage(LiaisonOfficerEmailPage("liaison-officer-1"), mode = CheckMode) shouldBe
+        ChangeOfCircumstancesController.onPageLoad()
+    }
+
+    "temporarily go from LiaisonOfficerPhoneNumberPage to change of circumstances in normal mode" in {
+      navigator.nextPage(LiaisonOfficerPhoneNumberPage("liaison-officer-1"), mode = NormalMode) shouldBe
+        ChangeOfCircumstancesController.onPageLoad()
+    }
+
+    "temporarily go from LiaisonOfficerPhoneNumberPage to change of circumstances in check mode" in {
+      navigator.nextPage(LiaisonOfficerPhoneNumberPage("liaison-officer-1"), mode = CheckMode) shouldBe
         ChangeOfCircumstancesController.onPageLoad()
     }
 
