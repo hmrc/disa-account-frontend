@@ -17,21 +17,15 @@
 package controllers
 
 import org.jsoup.Jsoup
-import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import play.api.test.Helpers.*
 import play.api.test.*
-import play.api.test.FakeRequest
-import play.api.test.Helpers.{GET, POST, contentAsString, redirectLocation, route, running, status}
-import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
 import uk.gov.hmrc.disaaccountfrontend.models.articles.FcaArticles
-import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates, UserAnswers}
-import uk.gov.hmrc.disaaccountfrontend.models.articles.FcaArticles.FcaArticle14
+import uk.gov.hmrc.disaaccountfrontend.models.{Answers, UserAnswers}
 import utils.BaseUnitSpec
 
 import scala.concurrent.Future
-import scala.reflect.runtime.universe.Assign
 
 class FcaArticlesControllerSpec extends BaseUnitSpec {
   private def checkboxIsChecked(html: String, product: String): Boolean =
