@@ -21,10 +21,11 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.disaaccountfrontend.config.AppConfig
 import uk.gov.hmrc.disaaccountfrontend.controllers.PageController
+import uk.gov.hmrc.disaaccountfrontend.controllers.routes.ChangeOfCircumstancesController
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction, PageGuardAction}
 import uk.gov.hmrc.disaaccountfrontend.forms.LiaisonOfficerNameFormProvider
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficers.findLiaisonOfficer
-import uk.gov.hmrc.disaaccountfrontend.models.{Mode, UserAnswers}
+import uk.gov.hmrc.disaaccountfrontend.models.{Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.disaaccountfrontend.models.pages.LiaisonOfficerNamePage
 import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
@@ -65,13 +66,14 @@ class LiaisonOfficerNameController @Inject() (
 
     pageAction(currentPage) { implicit request =>
       id match {
-        case None             =>
+        case None if mode == NormalMode =>
           Redirect(routes.LiaisonOfficerNameController.onPageLoad(Some(currentPage.id), mode))
-        case Some(existingId) =>
+        case Some(existingId)           =>
           val savedName    = findLiaisonOfficer(existingId).flatMap(_.fullName)
           val preparedForm = savedName.fold(form)(form.fill)
 
           Ok(view(existingId, mode, preparedForm))
+        case _                          => Redirect(ChangeOfCircumstancesController.onPageLoad())
       }
     }
   }

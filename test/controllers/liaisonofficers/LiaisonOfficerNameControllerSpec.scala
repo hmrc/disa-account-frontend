@@ -70,7 +70,7 @@ class LiaisonOfficerNameControllerSpec extends BaseUnitSpec {
       }
     }
 
-    "preserve check mode when generating an id for the canonical URL" in {
+    "stop check-mode from generating a new LO" in {
       val generatedId   = "generated-id"
       val uuidGenerator = mock[UuidGenerator]
       when(uuidGenerator.generate()).thenReturn(generatedId)
@@ -83,7 +83,7 @@ class LiaisonOfficerNameControllerSpec extends BaseUnitSpec {
         val result = route(application, FakeRequest(GET, changeLiaisonOfficerNameEndpoint)).value
 
         status(result)                 shouldBe SEE_OTHER
-        redirectLocation(result).value shouldBe changeLiaisonOfficerNameEndpointFor(generatedId)
+        redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
       }
     }
 

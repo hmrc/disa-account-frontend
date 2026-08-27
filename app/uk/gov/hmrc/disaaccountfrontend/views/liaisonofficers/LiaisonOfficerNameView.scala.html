@@ -31,7 +31,7 @@
 
 @(id: String, mode: Mode, form: Form[_])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = Some(title(form, "liaisonOfficerName.title", Some("sectionTitle.liaisonOfficers")))) {
+@layout(pageTitle = Some(title(form, "liaisonOfficerName.title"))) {
 
     @formHelper(action = LiaisonOfficerNameController.onSubmit(id, mode)) {
 
@@ -44,7 +44,6 @@
                 field = form("value"),
                 label = HmrcPageHeadingLabel.apply(
                     content = Text(messages("liaisonOfficerName.heading")),
-                    caption = HmrcSectionCaption(messages("sectionTitle.liaisonOfficers")),
                     classes = "govuk-label--l"
                 )
             )
