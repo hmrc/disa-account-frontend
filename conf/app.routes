@@ -33,8 +33,15 @@ GET        /change-of-circumstances            uk.gov.hmrc.disaaccountfrontend.c
 
 ## Liaison officers
 
-GET        /liaison-officer-name               uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerNameController.onPageLoad(id: Option[String])
-POST       /liaison-officer-name               uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerNameController.onSubmit(id: String)
+GET        /liaison-officer-name               uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerNameController.onPageLoad(id: Option[String], mode: Mode = NormalMode)
+POST       /liaison-officer-name               uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerNameController.onSubmit(id: String, mode: Mode = NormalMode)
+GET        /change-liaison-officer-name        uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerNameController.onPageLoad(id: Option[String], mode: Mode = CheckMode)
+POST       /change-liaison-officer-name        uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerNameController.onSubmit(id: String, mode: Mode = CheckMode)
+
+GET        /liaison-officer-email              uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerEmailController.onPageLoad(id: String, mode: Mode = NormalMode)
+POST       /liaison-officer-email              uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerEmailController.onSubmit(id: String, mode: Mode = NormalMode)
+GET        /change-liaison-officer-email       uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerEmailController.onPageLoad(id: String, mode: Mode = CheckMode)
+POST       /change-liaison-officer-email       uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerEmailController.onSubmit(id: String, mode: Mode = CheckMode)
 
 ## Organisation Email
 

@@ -53,5 +53,20 @@ class LiaisonOfficersSpec extends BaseUnitSpec {
         Seq(existingOfficer, LiaisonOfficer("new-id", Some("New Name")))
       )
     }
+
+    "update the matching email without losing other details, officers or ordering" in {
+      val other    = LiaisonOfficer("other-id", Some("Other Name"), email = Some("other@example.com"))
+      val officers = LiaisonOfficers(Seq(other, existingOfficer))
+
+      officers.updateEmail(existingOfficer.id, "updated@example.com") shouldBe LiaisonOfficers(
+        Seq(other, existingOfficer.copy(email = Some("updated@example.com")))
+      )
+    }
+
+    "leave the officers unchanged when updating an unknown id" in {
+      val officers = LiaisonOfficers(Seq(existingOfficer))
+
+      officers.updateEmail("unknown-id", "updated@example.com") shouldBe officers
+    }
   }
 }

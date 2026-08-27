@@ -19,60 +19,51 @@ package uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.disaaccountfrontend.config.AppConfig
 import uk.gov.hmrc.disaaccountfrontend.controllers.PageController
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction, PageGuardAction}
-import uk.gov.hmrc.disaaccountfrontend.forms.LiaisonOfficerNameFormProvider
+import uk.gov.hmrc.disaaccountfrontend.forms.LiaisonOfficerEmailFormProvider
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficers.findLiaisonOfficer
+import uk.gov.hmrc.disaaccountfrontend.models.pages.LiaisonOfficerEmailPage
 import uk.gov.hmrc.disaaccountfrontend.models.{Mode, UserAnswers}
-import uk.gov.hmrc.disaaccountfrontend.models.pages.LiaisonOfficerNamePage
 import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
-import uk.gov.hmrc.disaaccountfrontend.utils.UuidGenerator
-import uk.gov.hmrc.disaaccountfrontend.views.html.liaisonofficers.LiaisonOfficerNameView
+import uk.gov.hmrc.disaaccountfrontend.views.html.liaisonofficers.LiaisonOfficerEmailView
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class LiaisonOfficerNameController @Inject() (
+class LiaisonOfficerEmailController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   guardPage: PageGuardAction,
   userAnswersRepository: UserAnswersRepository,
-  appConfig: AppConfig,
   navigator: Navigator,
-  uuidGenerator: UuidGenerator,
-  formProvider: LiaisonOfficerNameFormProvider,
+  formProvider: LiaisonOfficerEmailFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: LiaisonOfficerNameView
+  view: LiaisonOfficerEmailView
 )(implicit ec: ExecutionContext)
     extends PageController(navigator)
     with FrontendBaseController
     with I18nSupport {
 
-  val form: Form[String] = formProvider()
+  private val form: Form[String] = formProvider()
 
-  private def page(id: String): LiaisonOfficerNamePage =
-    LiaisonOfficerNamePage(id)
+  private def page(id: String): LiaisonOfficerEmailPage =
+    LiaisonOfficerEmailPage(id)
 
-  private def pageAction(page: LiaisonOfficerNamePage) =
-    identify andThen getData andThen guardPage(page, appConfig)
+  private def pageAction(currentPage: LiaisonOfficerEmailPage) =
+    identify andThen getData andThen guardPage(currentPage)
 
-  def onPageLoad(id: Option[String], mode: Mode): Action[AnyContent] = {
-    val currentPage = page(id.getOrElse(uuidGenerator.generate()))
+  def onPageLoad(id: String, mode: Mode): Action[AnyContent] = {
+    val currentPage = page(id)
 
     pageAction(currentPage) { implicit request =>
-      id match {
-        case None             =>
-          Redirect(routes.LiaisonOfficerNameController.onPageLoad(Some(currentPage.id), mode))
-        case Some(existingId) =>
-          val savedName    = findLiaisonOfficer(existingId).flatMap(_.fullName)
-          val preparedForm = savedName.fold(form)(form.fill)
+      val liaisonOfficer = findLiaisonOfficer(id)
+      val preparedForm   = liaisonOfficer.flatMap(_.email).fold(form)(form.fill)
 
-          Ok(view(existingId, mode, preparedForm))
-      }
+      Ok(view(id, liaisonOfficer.flatMap(_.fullName).getOrElse(""), mode, preparedForm))
     }
   }
 
@@ -80,10 +71,12 @@ class LiaisonOfficerNameController @Inject() (
     val currentPage = page(id)
 
     pageAction(currentPage).async { implicit request =>
+      val name = findLiaisonOfficer(id).flatMap(_.fullName).getOrElse("")
+
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(id, mode, formWithErrors))),
+          formWithErrors => Future.successful(BadRequest(view(id, name, mode, formWithErrors))),
           answer => {
             val sessionUpdates = getSessionUpdates(currentPage, answer)
 

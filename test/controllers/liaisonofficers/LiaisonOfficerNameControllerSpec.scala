@@ -70,6 +70,23 @@ class LiaisonOfficerNameControllerSpec extends BaseUnitSpec {
       }
     }
 
+    "preserve check mode when generating an id for the canonical URL" in {
+      val generatedId   = "generated-id"
+      val uuidGenerator = mock[UuidGenerator]
+      when(uuidGenerator.generate()).thenReturn(generatedId)
+
+      val application = applicationBuilder()
+        .overrides(bind[UuidGenerator].toInstance(uuidGenerator))
+        .build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, changeLiaisonOfficerNameEndpoint)).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe changeLiaisonOfficerNameEndpointFor(generatedId)
+      }
+    }
+
     "redirect to the index when the maximum number of officers exists" in {
       val uuidGenerator = mock[UuidGenerator]
       when(uuidGenerator.generate()).thenReturn("new-id")
@@ -123,6 +140,20 @@ class LiaisonOfficerNameControllerSpec extends BaseUnitSpec {
       }
     }
 
+    "use the check-mode form action when arriving from check your answers" in {
+      val application = applicationBuilder(
+        effectiveAnswers = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(existingOfficer))))
+      ).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, changeLiaisonOfficerNameEndpointFor(existingId))).value
+        val doc    = Jsoup.parse(contentAsString(result))
+
+        status(result)                    shouldBe OK
+        doc.select("form").attr("action") shouldBe changeLiaisonOfficerNameEndpointFor(existingId)
+      }
+    }
+
     "redirect to the index when a new id is supplied and the maximum number of officers exists" in {
       val application = applicationBuilder(
         effectiveAnswers = Answers(liaisonOfficers = Some(officersAtLimit))
@@ -156,7 +187,7 @@ class LiaisonOfficerNameControllerSpec extends BaseUnitSpec {
         val result  = route(application, request).value
 
         status(result)                 shouldBe SEE_OTHER
-        redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
+        redirectLocation(result).value shouldBe liaisonOfficerEmailEndpointFor(existingId)
 
         val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
         verify(mockUserAnswersRepository).set(captor.capture())
@@ -189,13 +220,33 @@ class LiaisonOfficerNameControllerSpec extends BaseUnitSpec {
           .withHeaders("Csrf-Token" -> "nocheck")
         val result  = route(application, request).value
 
-        status(result) shouldBe SEE_OTHER
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe liaisonOfficerEmailEndpointFor(newId)
 
         val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
         verify(mockUserAnswersRepository).set(captor.capture())
         captor.getValue.updates.liaisonOfficers shouldBe Assign(
           LiaisonOfficers(otherOfficers :+ LiaisonOfficer(newId, Some("New Name")))
         )
+      }
+    }
+
+    "return to the check-your-answers fallback when a name is changed in check mode" in {
+      when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
+
+      val application = applicationBuilder(
+        effectiveAnswers = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(existingOfficer))))
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(POST, changeLiaisonOfficerNameEndpointFor(existingId))
+          .withFormUrlEncodedBody("value" -> "Updated Name")
+          .withHeaders("Csrf-Token" -> "nocheck")
+        val result  = route(application, request).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
+        verify(mockUserAnswersRepository).set(any())
       }
     }
 

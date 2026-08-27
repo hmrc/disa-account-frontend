@@ -16,13 +16,14 @@
 
 @import uk.gov.hmrc.disaaccountfrontend.config.AppConfig
 @import uk.gov.hmrc.disaaccountfrontend.controllers.auth.{routes => authRoutes}
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcStandardPage, HmrcTimeoutDialogHelper}
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcReportTechnicalIssueHelper, HmrcStandardPage, HmrcTimeoutDialogHelper}
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.{HmrcStandardPageParams, ServiceURLs, TemplateOverrides}
 
 @this(
   appConfig: AppConfig,
   hmrcStandardPage: HmrcStandardPage,
-  hmrcTimeoutDialogHelper: HmrcTimeoutDialogHelper
+  hmrcTimeoutDialogHelper: HmrcTimeoutDialogHelper,
+  hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper
 )
 
 @(pageTitle: Option[String] = None, showBackLink: Boolean = true, timeout: Boolean = true, showSignOut: Boolean = true)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
@@ -42,6 +43,13 @@
   }
 }
 
+@content = {
+  @contentBlock
+  <p class="govuk-body">
+    @hmrcReportTechnicalIssueHelper()
+  </p>
+}
+
 @hmrcStandardPage(
   HmrcStandardPageParams(
     pageTitle = pageTitle,
@@ -52,7 +60,7 @@
       signOutUrl = if (showSignOut) Some(authRoutes.AuthController.signOut().url) else None
     )
   )
-)(contentBlock)
+)(content)
 
 @{
     //$COVERAGE-OFF$
