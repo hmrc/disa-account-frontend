@@ -21,7 +21,7 @@ import uk.gov.hmrc.disaaccountfrontend.models.articles.FcaArticles
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates}
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
 
-case object FcaArticlesPage extends GuardedPage with PageWithAnswers[Set[FcaArticles]] {
+case object FcaArticlesPage extends PageWithAnswers[Set[FcaArticles]] {
 
   def canBeAccessedWith(answers: Answers): Boolean = answers.fcaArticles.exists(
     _.contains(FcaArticles)

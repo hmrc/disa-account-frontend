@@ -88,7 +88,7 @@ FcaArticles.article51ZE = Article 51ZE
 FcaArticles.article53 = Article 53
 FcaArticles.article64 = Article 64
 FcaArticles.checkYourAnswersLabel = Articles selected
-FcaArticles.error.required = You need to select which of the Articles apply to your organisation. Select from the options
+FcaArticles.error.required = Select which of the Articles apply to your organisation
 FcaArticles.change.hidden = articles selected
 
 organisationEmailAddress.title = What is the email address of your organisation?

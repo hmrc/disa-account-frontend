@@ -22,6 +22,7 @@ import org.mockito.Mockito.*
 import play.api.test.Helpers.*
 import play.api.test.*
 import uk.gov.hmrc.disaaccountfrontend.models.articles.FcaArticles
+import uk.gov.hmrc.disaaccountfrontend.models.articles.FcaArticles.{FcaArticle14, FcaArticle64}
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, UserAnswers}
 import utils.BaseUnitSpec
 
@@ -30,6 +31,10 @@ import scala.concurrent.Future
 class FcaArticlesControllerSpec extends BaseUnitSpec {
   private def checkboxIsChecked(html: String, product: String): Boolean =
     Jsoup.parse(html).select(s"input.govuk-checkboxes__input[value=$product]").hasAttr("checked")
+
+  private val enrolledEffectiveAnswers = Answers(
+    fcaArticles = Some(testFcaArticlesCheckedBoxes)
+  )
 
   "FcaArticlesController.onPageLoad" should {
     "render an empty page when Financial Articles were newly added in the session" in {
@@ -48,6 +53,22 @@ class FcaArticlesControllerSpec extends BaseUnitSpec {
         }
       }
     }
+
+    "render and prefill the page from effective answers when Fca Articles are already offered" in {
+      val application = applicationBuilder(
+        effectiveAnswers = enrolledEffectiveAnswers
+      ).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, fcaArticlesEndpoint)).value
+        val html   = contentAsString(result)
+
+        status(result)                                 shouldBe OK
+        html                                             should include("FCA Articles that apply to your organisation")
+        checkboxIsChecked(html, FcaArticle14.toString) shouldBe true
+        checkboxIsChecked(html, FcaArticle64.toString) shouldBe true
+      }
+    }
   }
   "FcaArticlesController.onSubmit"   should {
     "return Bad Request with the exact inline error when no product is selected" in {
@@ -61,7 +82,7 @@ class FcaArticlesControllerSpec extends BaseUnitSpec {
 
         status(result)                                    shouldBe BAD_REQUEST
         doc.select(".govuk-error-message").text()           should include(
-          "You need to select which of the Articles apply to your organisation. Select from the options"
+          "Select which of the Articles apply to your organisation"
         )
         doc.select(".govuk-error-summary a").attr("href") shouldBe "#value_0"
         doc.title()                                         should startWith("Error:")

@@ -36,7 +36,7 @@ class Navigator @Inject() () {
     case TradingNamePage                  => TradingNameController.onPageLoad()
     case InnovativeFinancialProductsPage  => innovativeFinancialProductsNextPage(answers)
     case PeerToPeerPlatformPage           => peerToPeerPlatformNextPage(answers)
-    case FcaArticlesPage                  => fcaArticlesNextPage(answers)
+    case FcaArticlesPage                  => fcaArticlesNextPage()
     case OrganisationEmailAddressPage     => EmailVerificationCodeController.onPageLoad()
     case EmailVerificationCodePage        => ChangeOfCircumstancesController.onPageLoad()
     // TODO: replace with the organisation email check-your-answers page once it exists.
@@ -66,12 +66,6 @@ class Navigator @Inject() () {
     // TODO: Replace this fallback with the FCA/FRN question (NOT FCA Articles!) when that page is implemented.
     ChangeOfCircumstancesController.onPageLoad()
 
-  private def fcaArticlesNextPage(answers: Answers): Call =
-    answers.fcaArticles match {
-      case Some(_) => ChangeOfCircumstancesController.onPageLoad()
-      case None    => fcaArticlesQuestionPage
-    }
-
-  private def fcaArticlesQuestionPage: Call =
+  private def fcaArticlesNextPage(): Call =
     ChangeOfCircumstancesController.onPageLoad()
 }
