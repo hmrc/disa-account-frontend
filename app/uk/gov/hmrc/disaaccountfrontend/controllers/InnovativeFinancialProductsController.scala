@@ -41,12 +41,12 @@ class InnovativeFinancialProductsController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: InnovativeFinancialProductsView
 )(implicit ec: ExecutionContext)
-    extends PageController(InnovativeFinancialProductsPage, navigator)
+    extends PageController(navigator)
     with FrontendBaseController
     with I18nSupport {
 
   private val form       = formProvider()
-  private val pageAction = identify andThen getData andThen guardPage(page)
+  private val pageAction = identify andThen getData andThen guardPage(InnovativeFinancialProductsPage)
 
   def onPageLoad(): Action[AnyContent] = pageAction { implicit request =>
     val preparedForm = request.effectiveAnswers.innovativeFinancialProducts
@@ -61,11 +61,11 @@ class InnovativeFinancialProductsController @Inject() (
       .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
         answer => {
-          val sessionUpdates = getSessionUpdates(answer)
+          val sessionUpdates = getSessionUpdates(InnovativeFinancialProductsPage, answer)
 
           userAnswersRepository
             .set(UserAnswers(id = request.sessionId, updates = sessionUpdates))
-            .map(_ => Redirect(nextPage(sessionUpdates)))
+            .map(_ => Redirect(nextPage(InnovativeFinancialProductsPage, sessionUpdates)))
         }
       )
   }

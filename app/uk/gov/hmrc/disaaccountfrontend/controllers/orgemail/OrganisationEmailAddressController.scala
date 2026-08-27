@@ -47,7 +47,7 @@ class OrganisationEmailAddressController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: OrganisationEmailAddressView
 )(implicit ec: ExecutionContext)
-    extends PageController(OrganisationEmailAddressPage, navigator)
+    extends PageController(navigator)
     with FrontendBaseController
     with I18nSupport
     with Logging {
@@ -69,11 +69,11 @@ class OrganisationEmailAddressController @Inject() (
           emailVerificationConnector
             .sendCode(answer)
             .flatMap { _ =>
-              val sessionUpdates = getSessionUpdates(answer)
+              val sessionUpdates = getSessionUpdates(OrganisationEmailAddressPage, answer)
 
               userAnswersRepository
                 .set(UserAnswers(id = request.sessionId, updates = sessionUpdates))
-                .map(_ => Redirect(nextPage(sessionUpdates)))
+                .map(_ => Redirect(nextPage(OrganisationEmailAddressPage, sessionUpdates)))
             }
             .recoverWith { case NonFatal(e) =>
               logger.error(
