@@ -19,6 +19,7 @@ package uk.gov.hmrc.disaaccountfrontend.models
 import uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority.FinancialOrganisation
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.{InnovativeFinancialProduct, IsaProduct}
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficers
+import uk.gov.hmrc.disaaccountfrontend.models.signatories.Signatories
 
 case class Answers(
   correspondenceAddress: Option[CorrespondenceAddress] = None,
@@ -31,5 +32,6 @@ case class Answers(
   organisationEmailAddress: Option[String] = None,
   organisationEmailVerified: Option[Boolean] = None,
   financialOrganisation: Option[Seq[FinancialOrganisation]] = None,
-  liaisonOfficers: Option[LiaisonOfficers] = None
+  liaisonOfficers: Option[LiaisonOfficers] = None,
+  signatories: Option[Signatories] = None
 )
