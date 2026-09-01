@@ -21,7 +21,7 @@ import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.Organisatio
 import uk.gov.hmrc.disaaccountfrontend.controllers.signatories.routes.SignatoryJobTitleController
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.{CrowdFundedDebentures, PeertopeerLoansUsingAPlatformWith36hPermissions}
-import uk.gov.hmrc.disaaccountfrontend.models.pages.{EnterYourOrganisationAddressPage, FinancialOrganisationPage, InnovativeFinancialProductsPage, LiaisonOfficerNamePage, OrganisationTelephoneNumberPage, PageWithAnswers, PeerToPeerPlatformPage, SignatoryJobTitlePage, SignatoryNamePage}
+import uk.gov.hmrc.disaaccountfrontend.models.pages.*
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
 import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator
 import utils.BaseUnitSpec
@@ -79,6 +79,10 @@ class NavigatorSpec extends BaseUnitSpec {
 
     "temporarily go from SignatoryJobTitlePage to change of circumstances until the next page in the journey exists" in {
       navigator.nextPage(SignatoryJobTitlePage(testSignatoryId)) shouldBe ChangeOfCircumstancesController.onPageLoad()
+    }
+
+    "go from FcaArticlesPage to change of circumstances" in {
+      navigator.nextPage(FcaArticlesPage) shouldBe ChangeOfCircumstancesController.onPageLoad()
     }
 
     "temporarily go from LiaisonOfficerNamePage to change of circumstances until the next page exists" in {
