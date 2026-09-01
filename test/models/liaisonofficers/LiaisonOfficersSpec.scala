@@ -17,7 +17,7 @@
 package models.liaisonofficers
 
 import play.api.libs.json.{JsSuccess, Json}
-import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficerCommunication.{ByEmail, ByPhone}
+import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficerCommunication.{ByEmail, ByPhone, ByPost}
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
 import utils.BaseUnitSpec
 
@@ -82,6 +82,21 @@ class LiaisonOfficersSpec extends BaseUnitSpec {
       val officers = LiaisonOfficers(Seq(existingOfficer))
 
       officers.updatePhoneNumber("unknown-id", "07123456789") shouldBe officers
+    }
+
+    "update the matching communication options without losing other details, officers or ordering" in {
+      val other    = LiaisonOfficer("other-id", Some("Other Name"), communication = Set(ByPost))
+      val officers = LiaisonOfficers(Seq(other, existingOfficer))
+
+      officers.updateCommunication(existingOfficer.id, Set(ByPhone, ByPost)) shouldBe LiaisonOfficers(
+        Seq(other, existingOfficer.copy(communication = Set(ByPhone, ByPost)))
+      )
+    }
+
+    "leave the officers unchanged when updating communication options for an unknown id" in {
+      val officers = LiaisonOfficers(Seq(existingOfficer))
+
+      officers.updateCommunication("unknown-id", Set(ByPost)) shouldBe officers
     }
   }
 }

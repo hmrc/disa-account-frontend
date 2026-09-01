@@ -16,7 +16,11 @@
 
 package uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers
 
+import play.api.i18n.Messages
 import uk.gov.hmrc.disaaccountfrontend.models.{Enumerable, WithName}
+import uk.gov.hmrc.disaaccountfrontend.viewmodels.govuk.checkbox.*
+import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 
 sealed trait LiaisonOfficerCommunication
 
@@ -31,6 +35,16 @@ object LiaisonOfficerCommunication extends Enumerable.Implicits {
     ByPhone,
     ByPost
   )
+
+  def checkboxItems(implicit messages: Messages): Seq[CheckboxItem] =
+    values.zipWithIndex.map { case (value, index) =>
+      CheckboxItemViewModel(
+        content = Text(messages(s"liaisonOfficerCommunication.${value.toString}")),
+        fieldId = "value",
+        index = index,
+        value = value.toString
+      )
+    }
 
   implicit val enumerable: Enumerable[LiaisonOfficerCommunication] =
     Enumerable(values.map(value => value.toString -> value): _*)
