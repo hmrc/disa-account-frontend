@@ -18,6 +18,7 @@ package navigation
 
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, PeerToPeerPlatformController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.OrganisationTelephoneNumberController
+import uk.gov.hmrc.disaaccountfrontend.controllers.signatories.routes.SignatoryJobTitleController
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.{CrowdFundedDebentures, PeertopeerLoansUsingAPlatformWith36hPermissions}
 import uk.gov.hmrc.disaaccountfrontend.models.pages.*
@@ -69,6 +70,15 @@ class NavigatorSpec extends BaseUnitSpec {
 
     "go from FinancialOrganisationPage to change of circumstances" in {
       navigator.nextPage(FinancialOrganisationPage) shouldBe ChangeOfCircumstancesController.onPageLoad()
+    }
+
+    "go from SignatoryNamePage to the signatory job title page" in {
+      navigator.nextPage(SignatoryNamePage(testSignatoryId)) shouldBe
+        SignatoryJobTitleController.onPageLoad(testSignatoryId)
+    }
+
+    "temporarily go from SignatoryJobTitlePage to change of circumstances until the next page in the journey exists" in {
+      navigator.nextPage(SignatoryJobTitlePage(testSignatoryId)) shouldBe ChangeOfCircumstancesController.onPageLoad()
     }
 
     "go from FcaArticlesPage to change of circumstances" in {

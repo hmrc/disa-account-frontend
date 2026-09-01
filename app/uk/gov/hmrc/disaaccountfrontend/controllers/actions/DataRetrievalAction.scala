@@ -84,6 +84,7 @@ class DataRetrievalActionImpl @Inject() (
       p2pPlatformNumber = registrationDetails.flatMap(_.p2pPlatformNumber),
       organisationEmailAddress = registrationDetails.flatMap(_.organisationEmailAddress),
       financialOrganisation = registrationDetails.flatMap(_.financialOrganisation),
+      signatories = registrationDetails.flatMap(_.signatoriesList),
       liaisonOfficers = registrationDetails.flatMap(_.liaisonOfficers)
     )
 

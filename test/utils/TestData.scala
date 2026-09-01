@@ -29,6 +29,7 @@ import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.{InnovativeFinancialPr
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficerCommunication.ByEmail
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
 import uk.gov.hmrc.disaaccountfrontend.models.registration.{OrganisationDetails, OrganisationEmail, RegistrationDetails}
+import uk.gov.hmrc.disaaccountfrontend.models.signatories.{Signatories, Signatory}
 
 trait TestData {
   val testZref: String         = "Z1234"
@@ -102,6 +103,17 @@ trait TestData {
         CertificatesOfAuthority(financialOrganisation = Some(testFinancialOrganisationSelections))
       ),
       liaisonOfficers = Some(testLiaisonOfficers)
+    )
+
+  val testSignatoryId: String       = "signatory-1"
+  val testSignatoryName: String     = "Jane Smith"
+  val testSignatoryJobTitle: String = "Director"
+
+  val testSignatories: Seq[Signatory] = Seq(Signatory(testSignatoryId, fullName = Some(testSignatoryName)))
+
+  val testRegistrationDetailsWithSignatories: RegistrationDetails =
+    testRegistrationDetailsWithFinancialOrganisation.copy(
+      signatories = Some(Signatories(testSignatories))
     )
 
   val testFcaArticlesCheckedBoxes: Seq[FcaArticles] = Seq(FcaArticle14, FcaArticle64)
