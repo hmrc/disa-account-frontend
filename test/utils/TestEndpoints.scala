@@ -35,6 +35,9 @@ trait TestEndpoints {
   val signatoryNameEndpoint: String                = s"$accountFrontendRoutePrefix/signatory-name"
   val signatoryJobTitleEndpoint: String            = s"$accountFrontendRoutePrefix/signatory-job-title"
   val liaisonOfficerNameEndpoint: String           = s"$accountFrontendRoutePrefix/liaison-officer-name"
+  val changeLiaisonOfficerNameEndpoint: String     = s"$accountFrontendRoutePrefix/change-liaison-officer-name"
+  val liaisonOfficerEmailEndpoint: String          = s"$accountFrontendRoutePrefix/liaison-officer-email"
+  val changeLiaisonOfficerEmailEndpoint: String    = s"$accountFrontendRoutePrefix/change-liaison-officer-email"
   val changeOfCircumstancesEndpoint: String        = s"$accountFrontendRoutePrefix/change-of-circumstances"
   val fcaArticlesEndpoint: String                  = s"$accountFrontendRoutePrefix/fca-articles"
   val keepAliveEndpoint: String                    = s"$accountFrontendRoutePrefix/refresh-session"
@@ -59,4 +62,10 @@ trait TestEndpoints {
     s"$emailVerificationBaseUrl/email-verification/v2/verify-code"
 
   def liaisonOfficerNameEndpointFor(id: String): String = s"$liaisonOfficerNameEndpoint?id=$id"
+
+  def changeLiaisonOfficerNameEndpointFor(id: String): String = s"$changeLiaisonOfficerNameEndpoint?id=$id"
+
+  def liaisonOfficerEmailEndpointFor(id: String): String = s"$liaisonOfficerEmailEndpoint?id=$id"
+
+  def changeLiaisonOfficerEmailEndpointFor(id: String): String = s"$changeLiaisonOfficerEmailEndpoint?id=$id"
 }

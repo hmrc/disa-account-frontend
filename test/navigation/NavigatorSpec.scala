@@ -16,10 +16,11 @@
 
 package navigation
 
+import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.LiaisonOfficerEmailController
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, PeerToPeerPlatformController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.OrganisationTelephoneNumberController
 import uk.gov.hmrc.disaaccountfrontend.controllers.signatories.routes.SignatoryJobTitleController
-import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates}
+import uk.gov.hmrc.disaaccountfrontend.models.{Answers, CheckMode, NormalMode, SessionUpdates}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.{CrowdFundedDebentures, PeertopeerLoansUsingAPlatformWith36hPermissions}
 import uk.gov.hmrc.disaaccountfrontend.models.pages.*
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
@@ -85,8 +86,23 @@ class NavigatorSpec extends BaseUnitSpec {
       navigator.nextPage(FcaArticlesPage) shouldBe ChangeOfCircumstancesController.onPageLoad()
     }
 
-    "temporarily go from LiaisonOfficerNamePage to change of circumstances until the next page exists" in {
-      navigator.nextPage(LiaisonOfficerNamePage("liaison-officer-1")) shouldBe
+    "go from LiaisonOfficerNamePage to the email page in normal mode" in {
+      navigator.nextPage(LiaisonOfficerNamePage("liaison-officer-1"), mode = NormalMode) shouldBe
+        LiaisonOfficerEmailController.onPageLoad("liaison-officer-1", NormalMode)
+    }
+
+    "temporarily go from LiaisonOfficerNamePage to change of circumstances in check mode" in {
+      navigator.nextPage(LiaisonOfficerNamePage("liaison-officer-1"), mode = CheckMode) shouldBe
+        ChangeOfCircumstancesController.onPageLoad()
+    }
+
+    "temporarily go from LiaisonOfficerEmailPage to change of circumstances in normal mode" in {
+      navigator.nextPage(LiaisonOfficerEmailPage("liaison-officer-1"), mode = NormalMode) shouldBe
+        ChangeOfCircumstancesController.onPageLoad()
+    }
+
+    "temporarily go from LiaisonOfficerEmailPage to change of circumstances in check mode" in {
+      navigator.nextPage(LiaisonOfficerEmailPage("liaison-officer-1"), mode = CheckMode) shouldBe
         ChangeOfCircumstancesController.onPageLoad()
     }
 

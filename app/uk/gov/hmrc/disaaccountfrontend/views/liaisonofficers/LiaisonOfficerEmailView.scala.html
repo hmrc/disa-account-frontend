@@ -14,14 +14,12 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.LiaisonOfficerNameController
-@import uk.gov.hmrc.disaaccountfrontend.config.AppConfig
+@import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.LiaisonOfficerEmailController
 @import uk.gov.hmrc.disaaccountfrontend.models.Mode
 @import uk.gov.hmrc.disaaccountfrontend.viewmodels.InputWidth._
 @import uk.gov.hmrc.disaaccountfrontend.views.html.Layout
 
 @this(
-    appConfig: AppConfig,
     layout: Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
@@ -29,11 +27,11 @@
     govukButton: GovukButton
 )
 
-@(id: String, mode: Mode, form: Form[_])(implicit request: Request[_], messages: Messages)
+@(id: String, name: String, mode: Mode, form: Form[_])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = Some(title(form, "liaisonOfficerName.title"))) {
+@layout(pageTitle = Some(title(form, messages("liaisonOfficerEmail.title", name)))) {
 
-    @formHelper(action = LiaisonOfficerNameController.onSubmit(id, mode)) {
+    @formHelper(action = LiaisonOfficerEmailController.onSubmit(id, mode)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -43,12 +41,12 @@
             InputViewModel(
                 field = form("value"),
                 label = HmrcPageHeadingLabel.apply(
-                    content = Text(messages("liaisonOfficerName.heading")),
+                    content = Text(messages("liaisonOfficerEmail.heading", name)),
                     classes = "govuk-label--l"
                 )
             )
             .withWidth(Full)
-            .withHint(HintViewModel(messages("liaisonOfficerName.hint", appConfig.maxLiaisonOfficers)))
+            .withHint(HintViewModel(messages("liaisonOfficerEmail.hint")))
         )
 
         @govukButton(

@@ -17,11 +17,12 @@
 package uk.gov.hmrc.disaaccountfrontend.navigation
 
 import play.api.mvc.Call
+import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.LiaisonOfficerEmailController
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.{OrganisationTelephoneNumberController, TradingNameController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.routes.EmailVerificationCodeController
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, PeerToPeerPlatformController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.signatories.routes.SignatoryJobTitleController
-import uk.gov.hmrc.disaaccountfrontend.models.Answers
+import uk.gov.hmrc.disaaccountfrontend.models.{Answers, CheckMode, Mode, NormalMode}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
 import uk.gov.hmrc.disaaccountfrontend.models.pages.*
 
@@ -30,7 +31,7 @@ import javax.inject.{Inject, Singleton}
 @Singleton
 class Navigator @Inject() () {
 
-  def nextPage(page: Page, answers: Answers = Answers()): Call = page match {
+  def nextPage(page: Page, answers: Answers = Answers(), mode: Mode = NormalMode): Call = page match {
     case EnterYourOrganisationAddressPage => OrganisationTelephoneNumberController.onPageLoad()
     // TODO: replace with the next page in the journey once it exists.
     case OrganisationTelephoneNumberPage  => OrganisationTelephoneNumberController.onPageLoad()
@@ -45,8 +46,8 @@ class Navigator @Inject() () {
     case SignatoryNamePage(id)            => SignatoryJobTitleController.onPageLoad(id)
     // TODO: replace with the add-another-signatory / signatories check-your-answers page once it exists.
     case SignatoryJobTitlePage(_)         => ChangeOfCircumstancesController.onPageLoad()
-    // TODO: replace with the next liaison officer page once it exists.
-    case LiaisonOfficerNamePage(_)        => ChangeOfCircumstancesController.onPageLoad()
+    case LiaisonOfficerNamePage(id)       => liaisonOfficerNameNextPage(id, mode)
+    case LiaisonOfficerEmailPage(_)       => liaisonOfficerEmailNextPage(mode)
     case unsupportedPage                  =>
       throw new IllegalArgumentException(s"No navigation defined for page: $unsupportedPage")
   }
@@ -74,4 +75,19 @@ class Navigator @Inject() () {
 
   private def fcaArticlesNextPage(): Call =
     ChangeOfCircumstancesController.onPageLoad()
+
+  private def liaisonOfficerNameNextPage(id: String, mode: Mode): Call =
+    mode match {
+      case NormalMode => LiaisonOfficerEmailController.onPageLoad(id, NormalMode)
+      // TODO: Replace this fallback with the liaison officer check-your-answers page once it is implemented.
+      case CheckMode  => ChangeOfCircumstancesController.onPageLoad()
+    }
+
+  private def liaisonOfficerEmailNextPage(mode: Mode): Call =
+    mode match {
+      // TODO: Replace this fallback with the liaison officer phone number page once it is implemented.
+      case NormalMode => ChangeOfCircumstancesController.onPageLoad()
+      // TODO: Replace this fallback with the liaison officer check-your-answers page once it is implemented.
+      case CheckMode  => ChangeOfCircumstancesController.onPageLoad()
+    }
 }

@@ -150,6 +150,12 @@ liaisonOfficerName.hint = You must have at least 1 liaison officer to register y
 liaisonOfficerName.error.required = Enter the full name of the liaison officer you’re adding
 liaisonOfficerName.error.invalid = The full name must only include letters a to z, hyphens, spaces and apostrophes
 
+liaisonOfficerEmail.title = What is the email address of {0}?
+liaisonOfficerEmail.heading = What is the email address of {0}?
+liaisonOfficerEmail.hint = This is the email address that HMRC will use to contact the liaison officer
+liaisonOfficerEmail.error.required = Enter the email address of the liaison officer you’re adding. Use a name, @ symbol and a domain name, like yourname@example.com
+liaisonOfficerEmail.error.invalid = Enter an email address in the correct format. Use a name, @ symbol and a domain name, like yourname@example.com
+
 unauthorised.title = You cannot access this service
 unauthorised.heading = You cannot access this service
 unauthorised.body = You need to be signed in with an organisation that is enrolled to manage ISAs to use this service.
