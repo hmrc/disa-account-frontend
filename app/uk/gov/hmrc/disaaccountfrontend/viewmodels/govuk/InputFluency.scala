@@ -54,5 +54,12 @@ trait InputFluency {
 
     def withHint(hint: Hint): Input =
       input.copy(hint = Some(hint))
+
+    def withInputMode(inputMode: String): Input =
+      input.copy(inputmode = Some(inputMode))
+
+    def asNumeric(): Input =
+      input
+        .withInputMode("numeric")
   }
 }

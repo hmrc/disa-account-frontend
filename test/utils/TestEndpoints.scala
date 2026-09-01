@@ -20,30 +20,34 @@ trait TestEndpoints {
 
   val accountFrontendRoutePrefix: String = "/obligations/account/isa"
 
-  val enterYourOrganisationAddressEndpoint: String =
+  val enterYourOrganisationAddressEndpoint: String    =
     s"$accountFrontendRoutePrefix/enter-your-organisation-address"
-  val organisationTelephoneNumberEndpoint: String  =
+  val organisationTelephoneNumberEndpoint: String     =
     s"$accountFrontendRoutePrefix/organisation-telephone-number"
-  val tradingNameEndpoint: String                  = s"$accountFrontendRoutePrefix/trading-name"
-  val innovativeFinancialProductsEndpoint: String  =
+  val tradingNameEndpoint: String                     = s"$accountFrontendRoutePrefix/trading-name"
+  val innovativeFinancialProductsEndpoint: String     =
     s"$accountFrontendRoutePrefix/innovative-financial-products"
-  val peerToPeerPlatformEndpoint: String           = s"$accountFrontendRoutePrefix/peer-to-peer-loans"
-  val organisationEmailAddressEndpoint: String     = s"$accountFrontendRoutePrefix/organisation-email-address"
-  val emailVerificationCodeEndpoint: String        = s"$accountFrontendRoutePrefix/email-verification-code"
-  val requestNewCodeEndpoint: String               = s"$accountFrontendRoutePrefix/request-new-code"
-  val financialOrganisationEndpoint: String        = s"$accountFrontendRoutePrefix/financial-organisation"
-  val signatoryNameEndpoint: String                = s"$accountFrontendRoutePrefix/signatory-name"
-  val signatoryJobTitleEndpoint: String            = s"$accountFrontendRoutePrefix/signatory-job-title"
-  val liaisonOfficerNameEndpoint: String           = s"$accountFrontendRoutePrefix/liaison-officer-name"
-  val changeLiaisonOfficerNameEndpoint: String     = s"$accountFrontendRoutePrefix/change-liaison-officer-name"
-  val liaisonOfficerEmailEndpoint: String          = s"$accountFrontendRoutePrefix/liaison-officer-email"
-  val changeLiaisonOfficerEmailEndpoint: String    = s"$accountFrontendRoutePrefix/change-liaison-officer-email"
-  val changeOfCircumstancesEndpoint: String        = s"$accountFrontendRoutePrefix/change-of-circumstances"
-  val fcaArticlesEndpoint: String                  = s"$accountFrontendRoutePrefix/fca-articles"
-  val keepAliveEndpoint: String                    = s"$accountFrontendRoutePrefix/refresh-session"
-  val signOutEndpoint: String                      = s"$accountFrontendRoutePrefix/sign-out"
-  val signedOutEndpoint: String                    = s"$accountFrontendRoutePrefix/signed-out"
-  val customRedirectEndpoint: String               = "/custom-redirect"
+  val peerToPeerPlatformEndpoint: String              = s"$accountFrontendRoutePrefix/peer-to-peer-loans"
+  val organisationEmailAddressEndpoint: String        = s"$accountFrontendRoutePrefix/organisation-email-address"
+  val emailVerificationCodeEndpoint: String           = s"$accountFrontendRoutePrefix/email-verification-code"
+  val requestNewCodeEndpoint: String                  = s"$accountFrontendRoutePrefix/request-new-code"
+  val financialOrganisationEndpoint: String           = s"$accountFrontendRoutePrefix/financial-organisation"
+  val signatoryNameEndpoint: String                   = s"$accountFrontendRoutePrefix/signatory-name"
+  val signatoryJobTitleEndpoint: String               = s"$accountFrontendRoutePrefix/signatory-job-title"
+  val liaisonOfficerNameEndpoint: String              = s"$accountFrontendRoutePrefix/liaison-officer-name"
+  val changeLiaisonOfficerNameEndpoint: String        = s"$accountFrontendRoutePrefix/change-liaison-officer-name"
+  val liaisonOfficerEmailEndpoint: String             = s"$accountFrontendRoutePrefix/liaison-officer-email"
+  val changeLiaisonOfficerEmailEndpoint: String       = s"$accountFrontendRoutePrefix/change-liaison-officer-email"
+  val liaisonOfficerPhoneNumberEndpoint: String       =
+    s"$accountFrontendRoutePrefix/liaison-officer-phone-number"
+  val changeLiaisonOfficerPhoneNumberEndpoint: String =
+    s"$accountFrontendRoutePrefix/change-liaison-officer-phone-number"
+  val changeOfCircumstancesEndpoint: String           = s"$accountFrontendRoutePrefix/change-of-circumstances"
+  val fcaArticlesEndpoint: String                     = s"$accountFrontendRoutePrefix/fca-articles"
+  val keepAliveEndpoint: String                       = s"$accountFrontendRoutePrefix/refresh-session"
+  val signOutEndpoint: String                         = s"$accountFrontendRoutePrefix/sign-out"
+  val signedOutEndpoint: String                       = s"$accountFrontendRoutePrefix/signed-out"
+  val customRedirectEndpoint: String                  = "/custom-redirect"
 
   val authLoginStubSignInEndpoint: String = "http://localhost:9949/auth-login-stub/gg-sign-in"
   val loginContinueEndpoint: String       =
@@ -68,4 +72,9 @@ trait TestEndpoints {
   def liaisonOfficerEmailEndpointFor(id: String): String = s"$liaisonOfficerEmailEndpoint?id=$id"
 
   def changeLiaisonOfficerEmailEndpointFor(id: String): String = s"$changeLiaisonOfficerEmailEndpoint?id=$id"
+
+  def liaisonOfficerPhoneNumberEndpointFor(id: String): String = s"$liaisonOfficerPhoneNumberEndpoint?id=$id"
+
+  def changeLiaisonOfficerPhoneNumberEndpointFor(id: String): String =
+    s"$changeLiaisonOfficerPhoneNumberEndpoint?id=$id"
 }

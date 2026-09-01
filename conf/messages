@@ -156,6 +156,15 @@ liaisonOfficerEmail.hint = This is the email address that HMRC will use to conta
 liaisonOfficerEmail.error.required = Enter the email address of the liaison officer you’re adding. Use a name, @ symbol and a domain name, like yourname@example.com
 liaisonOfficerEmail.error.invalid = Enter an email address in the correct format. Use a name, @ symbol and a domain name, like yourname@example.com
 
+liaisonOfficerPhoneNumber.title = What is {0}’s phone number?
+liaisonOfficerPhoneNumber.heading = What is {0}’s phone number?
+liaisonOfficerPhoneNumber.p1 = This is the phone number that HMRC will use if there is a need to contact the liaison officer.
+liaisonOfficerPhoneNumber.hint = This can be either a UK mobile or landline number
+liaisonOfficerPhoneNumber.error.required = Enter the phone number of the liaison officer you’re adding. Use a UK phone number, like 01642 123 456 or 07777 777 777
+liaisonOfficerPhoneNumber.error.invalid = The phone number must not include letters a to z, hyphens or apostrophes and must be a UK phone number, like 01642 123 456 or 07777 777 777
+liaisonOfficerPhoneNumber.error.tooLong = The phone number you have entered is too long. Enter a UK phone number, like 01642 123 456 or 07777 777 777
+liaisonOfficerPhoneNumber.error.tooShort = The phone number you have entered is too short. Enter a UK phone number, like 01642 123 456 or 07777 777 777
+
 unauthorised.title = You cannot access this service
 unauthorised.heading = You cannot access this service
 unauthorised.body = You need to be signed in with an organisation that is enrolled to manage ISAs to use this service.
