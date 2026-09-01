@@ -61,18 +61,26 @@ class LiaisonOfficerPhoneNumberControllerSpec extends BaseUnitSpec {
         val result = route(application, FakeRequest(GET, liaisonOfficerPhoneNumberEndpointFor(existingId))).value
         val doc    = Jsoup.parse(contentAsString(result))
 
-        status(result)                                    shouldBe OK
-        doc.title()                                       shouldBe "What is Joe Bloggs’s phone number? - Manage ISAs - GOV.UK"
-        doc.select("h1").text()                             should include("What is Joe Bloggs’s phone number?")
-        doc.text()                                          should include(
+        status(result)        shouldBe OK
+        doc.title()           shouldBe "What is Joe Bloggs’s phone number? - Manage ISAs - GOV.UK"
+        doc.select("h1").text() should include("What is Joe Bloggs’s phone number?")
+        doc.text()              should include(
           "This is the phone number that HMRC will use if there is a need to contact the liaison officer."
         )
-        doc.text()                                          should include("This can be either a UK mobile or landline number")
-        doc.text()                                          should not include "Liaison officers"
-        doc.select("form").attr("action")                 shouldBe liaisonOfficerPhoneNumberEndpointFor(existingId)
-        doc.select("input[name=value]").attr("inputmode") shouldBe "numeric"
-        doc.select("input[name=value]").attr("pattern")   shouldBe "[0-9]*"
-        doc.select("button").text()                       shouldBe "Continue"
+        doc.text()              should include("This can be either a UK mobile or landline number")
+        doc.text()              should not include "Liaison officers"
+        val formGroup = doc.select(".govuk-form-group").first()
+        formGroup.child(0).select("label").text()                shouldBe "What is Joe Bloggs’s phone number?"
+        formGroup.child(1).tagName()                             shouldBe "p"
+        formGroup.child(1).text()                                shouldBe
+          "This is the phone number that HMRC will use if there is a need to contact the liaison officer."
+        formGroup.child(2).id()                                  shouldBe "value-hint"
+        formGroup.child(2).text()                                shouldBe "This can be either a UK mobile or landline number"
+        formGroup.child(3).tagName()                             shouldBe "input"
+        doc.select("form").attr("action")                        shouldBe liaisonOfficerPhoneNumberEndpointFor(existingId)
+        doc.select("input[name=value]").attr("inputmode")        shouldBe "numeric"
+        doc.select("input[name=value]").attr("aria-describedby") shouldBe "value-hint"
+        doc.select("button").text()                              shouldBe "Continue"
       }
     }
 
@@ -211,6 +219,33 @@ class LiaisonOfficerPhoneNumberControllerSpec extends BaseUnitSpec {
           contentAsString(result) should include(expectedError)
           verify(mockUserAnswersRepository, never).set(any())
         }
+      }
+    }
+
+    "render the paragraph, hint and error in an accessible order" in {
+      val application = applicationBuilder(effectiveAnswers = answers).build()
+
+      running(application) {
+        val request = FakeRequest(POST, liaisonOfficerPhoneNumberEndpointFor(existingId))
+          .withFormUrlEncodedBody("value" -> "")
+          .withHeaders("Csrf-Token" -> "nocheck")
+        val result  = route(application, request).value
+        val doc     = Jsoup.parse(contentAsString(result))
+
+        status(result) shouldBe BAD_REQUEST
+
+        val formGroup = doc.select(".govuk-form-group").first()
+        formGroup.hasClass("govuk-form-group--error") shouldBe true
+        formGroup.child(0).select("label").text()     shouldBe "What is Joe Bloggs’s phone number?"
+        formGroup.child(1).tagName()                  shouldBe "p"
+        formGroup.child(2).id()                       shouldBe "value-hint"
+        formGroup.child(3).id()                       shouldBe "value-error"
+        formGroup.child(4).tagName()                  shouldBe "input"
+
+        val input = formGroup.select("input[name=value]")
+        input.hasClass("govuk-input--error") shouldBe true
+        input.attr("aria-describedby")       shouldBe "value-hint value-error"
+        verify(mockUserAnswersRepository, never).set(any())
       }
     }
 
