@@ -19,6 +19,8 @@ package utils
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments}
 import uk.gov.hmrc.disaaccountfrontend.models.CorrespondenceAddress
+import uk.gov.hmrc.disaaccountfrontend.models.articles.FcaArticles
+import uk.gov.hmrc.disaaccountfrontend.models.articles.FcaArticles.{FcaArticle14, FcaArticle64}
 import uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority.FinancialOrganisation.{BuildingSociety, InsuranceCompany}
 import uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority.{CertificatesOfAuthority, FinancialOrganisation}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.{CrowdFundedDebentures, PeertopeerLoansAndHave36hPermissions}
@@ -101,4 +103,6 @@ trait TestData {
       ),
       liaisonOfficers = Some(testLiaisonOfficers)
     )
+
+  val testFcaArticlesCheckedBoxes: Seq[FcaArticles] = Seq(FcaArticle14, FcaArticle64)
 }
