@@ -11,15 +11,6 @@ error.prefix = Error
 error.title.prefix = Error:
 error.summary.title = There is a problem
 
-## Section Titles
-sectionTitle.orgDetails = Organisation details
-sectionTitle.organisationEmail = Organisation email
-sectionTitle.signatories = Signatories
-sectionTitle.liaisonOfficers = Liaison officers
-sectionTitle.isaProducts = ISA products
-sectionTitle.certificatesOfAuthority = Certificates of authority
-sectionTitle.thirdParty = Third-party organisations
-
 enterYourOrganisationAddress.title = Enter your organisation’s address
 enterYourOrganisationAddress.heading = Enter your organisation’s address
 enterYourOrganisationAddress.addressLine1 = Address line 1

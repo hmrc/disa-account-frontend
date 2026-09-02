@@ -34,7 +34,7 @@
     )
 }
 
-@layout(pageTitle = Some(title(form, "emailVerificationCode.title", Some("sectionTitle.organisationEmail")))) {
+@layout(pageTitle = Some(title(form, "emailVerificationCode.title"))) {
 
     @formHelper(action = EmailVerificationCodeController.onSubmit()) {
 
@@ -42,7 +42,6 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        <span class="govuk-caption-l">@messages("sectionTitle.organisationEmail")</span>
         <h1 class="govuk-heading-l">@messages("emailVerificationCode.heading")</h1>
 
         <p class="govuk-body">@HtmlFormat.raw(messages("emailVerificationCode.p1", email))</p>

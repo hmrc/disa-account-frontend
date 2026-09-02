@@ -29,7 +29,7 @@
 
 @(id: String, name: String, mode: Mode, form: Form[_])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = Some(title(form, messages("signatoryJobTitle.title", name), Some("sectionTitle.signatories")))) {
+@layout(pageTitle = Some(title(form, messages("signatoryJobTitle.title", name)))) {
 
     @formHelper(action = SignatoryJobTitleController.onSubmit(id, mode)) {
 
@@ -42,7 +42,6 @@
                   field = form("value"),
                   label = HmrcPageHeadingLabel.apply(
                     content = Text(messages("signatoryJobTitle.heading", name)),
-                    caption = HmrcSectionCaption(messages("sectionTitle.signatories")),
                     classes = "govuk-label--l govuk-!-margin-bottom-4",
                     attributes = Map("for" -> "value")
                   )

@@ -29,7 +29,7 @@
 
 @(form: Form[_])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = Some(title(form, "FcaArticles.title", Some("sectionTitle.FcaArticles")))) {
+@layout(pageTitle = Some(title(form, "FcaArticles.title"))) {
 
   @formHelper(action = FcaArticlesController.onSubmit(), Symbol("autoComplete") -> "off") {
 
@@ -45,8 +45,7 @@
     @hmrcPageHeading(PageHeading(
       text = messages("FcaArticles.heading"),
       section = None,
-      headingClasses = Some("govuk-heading-l"),
-      captionClasses = Some("govuk-caption-l")
+      headingClasses = Some("govuk-heading-l")
     ))
 
     <p class="govuk-body">@messages("FcaArticles.p1")</p>
