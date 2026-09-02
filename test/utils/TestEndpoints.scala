@@ -33,7 +33,11 @@ trait TestEndpoints {
   val requestNewCodeEndpoint: String                    = s"$accountFrontendRoutePrefix/request-new-code"
   val financialOrganisationEndpoint: String             = s"$accountFrontendRoutePrefix/financial-organisation"
   val signatoryNameEndpoint: String                     = s"$accountFrontendRoutePrefix/signatory-name"
+  val changeSignatoryNameEndpoint: String               = s"$accountFrontendRoutePrefix/change-signatory-name"
   val signatoryJobTitleEndpoint: String                 = s"$accountFrontendRoutePrefix/signatory-job-title"
+  val changeSignatoryJobTitleEndpoint: String           =
+    s"$accountFrontendRoutePrefix/change-signatory-job-title"
+  val checkSignatoryDetailsEndpoint: String             = s"$accountFrontendRoutePrefix/check-signatory-details"
   val liaisonOfficerNameEndpoint: String                = s"$accountFrontendRoutePrefix/liaison-officer-name"
   val changeLiaisonOfficerNameEndpoint: String          = s"$accountFrontendRoutePrefix/change-liaison-officer-name"
   val liaisonOfficerEmailEndpoint: String               = s"$accountFrontendRoutePrefix/liaison-officer-email"

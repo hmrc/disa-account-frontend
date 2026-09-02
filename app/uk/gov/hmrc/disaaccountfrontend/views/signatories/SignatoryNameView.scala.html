@@ -27,11 +27,11 @@
     govukButton: GovukButton
 )
 
-@(id: String, form: Form[_])(implicit request: Request[_], messages: Messages)
+@(id: String, mode: Mode, form: Form[_])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = Some(title(form, "signatoryName.title"))) {
 
-    @formHelper(action = SignatoryNameController.onSubmit(id)) {
+    @formHelper(action = SignatoryNameController.onSubmit(id, mode)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

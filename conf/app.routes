@@ -21,11 +21,17 @@ POST       /peer-to-peer-loans                 uk.gov.hmrc.disaaccountfrontend.c
 GET        /financial-organisation              uk.gov.hmrc.disaaccountfrontend.controllers.FinancialOrganisationController.onPageLoad()
 POST       /financial-organisation              uk.gov.hmrc.disaaccountfrontend.controllers.FinancialOrganisationController.onSubmit()
 
-GET        /signatory-name                      uk.gov.hmrc.disaaccountfrontend.controllers.signatories.SignatoryNameController.onPageLoad(id: Option[String])
-POST       /signatory-name                      uk.gov.hmrc.disaaccountfrontend.controllers.signatories.SignatoryNameController.onSubmit(id: String)
+GET        /signatory-name                      uk.gov.hmrc.disaaccountfrontend.controllers.signatories.SignatoryNameController.onPageLoad(id: Option[String], mode: Mode = NormalMode)
+POST       /signatory-name                      uk.gov.hmrc.disaaccountfrontend.controllers.signatories.SignatoryNameController.onSubmit(id: String, mode: Mode = NormalMode)
+GET        /change-signatory-name               uk.gov.hmrc.disaaccountfrontend.controllers.signatories.SignatoryNameController.onPageLoad(id: Option[String], mode: Mode = CheckMode)
+POST       /change-signatory-name               uk.gov.hmrc.disaaccountfrontend.controllers.signatories.SignatoryNameController.onSubmit(id: String, mode: Mode = CheckMode)
 
-GET        /signatory-job-title                 uk.gov.hmrc.disaaccountfrontend.controllers.signatories.SignatoryJobTitleController.onPageLoad(id: String)
-POST       /signatory-job-title                 uk.gov.hmrc.disaaccountfrontend.controllers.signatories.SignatoryJobTitleController.onSubmit(id: String)
+GET        /signatory-job-title                 uk.gov.hmrc.disaaccountfrontend.controllers.signatories.SignatoryJobTitleController.onPageLoad(id: String, mode: Mode = NormalMode)
+POST       /signatory-job-title                 uk.gov.hmrc.disaaccountfrontend.controllers.signatories.SignatoryJobTitleController.onSubmit(id: String, mode: Mode = NormalMode)
+GET        /change-signatory-job-title          uk.gov.hmrc.disaaccountfrontend.controllers.signatories.SignatoryJobTitleController.onPageLoad(id: String, mode: Mode = CheckMode)
+POST       /change-signatory-job-title          uk.gov.hmrc.disaaccountfrontend.controllers.signatories.SignatoryJobTitleController.onSubmit(id: String, mode: Mode = CheckMode)
+
+GET        /check-signatory-details             uk.gov.hmrc.disaaccountfrontend.controllers.signatories.SignatoryCheckYourAnswersController.onPageLoad(id: String)
 
 GET        /unauthorised                       uk.gov.hmrc.disaaccountfrontend.controllers.UnauthorisedController.onPageLoad()
 

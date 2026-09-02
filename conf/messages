@@ -2,6 +2,7 @@ service.name = Manage ISAs
 service.text = This is your new service
 
 site.continue = Continue
+site.change = Change
 site.govuk = GOV.UK
 site.signIn = Sign in
 site.signOut = Sign out
@@ -143,6 +144,9 @@ signatoryJobTitle.error.required = Enter the job title of the signatory you’re
 signatoryJobTitle.error.invalid = The job title must only include letters a to z, hyphens, spaces and apostrophes
 signatoryJobTitle.checkYourAnswersLabel = Job title within organisation
 signatoryJobTitle.change.hidden = job title
+
+signatoryCheckYourAnswers.title = Check signatory details
+signatoryCheckYourAnswers.heading = Check signatory details
 
 liaisonOfficerName.title = What is the full name of the liaison officer?
 liaisonOfficerName.heading = What is the full name of the liaison officer?

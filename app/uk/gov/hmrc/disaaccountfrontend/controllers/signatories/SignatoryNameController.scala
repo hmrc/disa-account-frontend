@@ -24,7 +24,8 @@ import uk.gov.hmrc.disaaccountfrontend.config.AppConfig
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction}
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes.ChangeOfCircumstancesController
 import uk.gov.hmrc.disaaccountfrontend.forms.SignatoryNameFormProvider
-import uk.gov.hmrc.disaaccountfrontend.models.UserAnswers
+import uk.gov.hmrc.disaaccountfrontend.models.signatories.Signatory
+import uk.gov.hmrc.disaaccountfrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.disaaccountfrontend.models.pages.SignatoryNamePage
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
 import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator
@@ -53,35 +54,39 @@ class SignatoryNameController @Inject() (
 
   val form: Form[String] = formProvider()
 
-  def onPageLoad(id: Option[String]): Action[AnyContent] = (identify andThen getData) { implicit request =>
-    id match {
-      case None             =>
+  def onPageLoad(id: Option[String], mode: Mode): Action[AnyContent] = (identify andThen getData) { implicit request =>
+    def renderPage(id: String, signatory: Option[Signatory]) = {
+      val preparedForm = signatory.flatMap(_.fullName).fold(form)(form.fill)
+      Ok(view(id, mode, preparedForm))
+    }
+
+    (mode, id, findSignatory(id, request)) match {
+      case (NormalMode, None, None)                        =>
         if (signatoryCount(request) >= appConfig.maxSignatories) {
           Redirect(ChangeOfCircumstancesController.onPageLoad())
         } else {
-          Redirect(routes.SignatoryNameController.onPageLoad(Some(UUID.randomUUID().toString)))
+          Redirect(routes.SignatoryNameController.onPageLoad(Some(UUID.randomUUID().toString), mode))
         }
-      case Some(existingId) =>
-        val preparedForm =
-          (for {
-            signatories <- request.effectiveAnswers.signatories
-            signatory   <- signatories.find(_.id == existingId)
-            name        <- signatory.fullName
-          } yield form.fill(name)).getOrElse(form)
-
-        Ok(view(existingId, preparedForm))
+      case (NormalMode, Some(existingId), Some(signatory)) =>
+        renderPage(existingId, Some(signatory))
+      case (NormalMode, Some(newId), None)                 =>
+        renderPage(newId, None)
+      case (CheckMode, Some(existingId), Some(signatory))  =>
+        renderPage(existingId, Some(signatory))
+      case _                                               =>
+        Redirect(ChangeOfCircumstancesController.onPageLoad())
     }
   }
 
-  def onSubmit(id: String): Action[AnyContent] = (identify andThen getData).async { implicit request =>
+  def onSubmit(id: String, mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
     form
       .bindFromRequest()
       .fold(
-        formWithErrors => Future.successful(BadRequest(view(id, formWithErrors))),
+        formWithErrors => Future.successful(BadRequest(view(id, mode, formWithErrors))),
         answer => {
-          val isNewSignatory = !request.effectiveAnswers.signatories.exists(_.exists(_.id == id))
+          val isNewSignatory = findSignatory(Some(id), request).isEmpty
 
-          if (isNewSignatory && signatoryCount(request) >= appConfig.maxSignatories) {
+          if (isNewSignatory && (mode != NormalMode || signatoryCount(request) >= appConfig.maxSignatories)) {
             Future.successful(Redirect(ChangeOfCircumstancesController.onPageLoad()))
           } else {
             val sessionUpdates = SignatoryNamePage(id).saveAnswerAndHandleDependents(request, answer)
@@ -92,7 +97,8 @@ class SignatoryNameController @Inject() (
                 Redirect(
                   navigator.nextPage(
                     SignatoryNamePage(id),
-                    sessionUpdates.getUpdatedEffectiveAnswers(request.effectiveAnswers)
+                    sessionUpdates.getUpdatedEffectiveAnswers(request.effectiveAnswers),
+                    mode
                   )
                 )
               }
@@ -103,4 +109,11 @@ class SignatoryNameController @Inject() (
 
   private def signatoryCount(request: DataRequest[_]): Int =
     request.effectiveAnswers.signatories.map(_.size).getOrElse(0)
+
+  private def findSignatory(id: Option[String], request: DataRequest[_]): Option[Signatory] =
+    for {
+      existingId  <- id
+      signatories <- request.effectiveAnswers.signatories
+      signatory   <- signatories.find(_.id == existingId)
+    } yield signatory
 }

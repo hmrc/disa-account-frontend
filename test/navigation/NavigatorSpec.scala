@@ -19,7 +19,7 @@ package navigation
 import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.{LiaisonOfficerCommunicationController, LiaisonOfficerEmailController, LiaisonOfficerPhoneNumberController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, PeerToPeerPlatformController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.OrganisationTelephoneNumberController
-import uk.gov.hmrc.disaaccountfrontend.controllers.signatories.routes.SignatoryJobTitleController
+import uk.gov.hmrc.disaaccountfrontend.controllers.signatories.routes.{SignatoryCheckYourAnswersController, SignatoryJobTitleController}
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, CheckMode, NormalMode, SessionUpdates}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.{CrowdFundedDebentures, PeertopeerLoansUsingAPlatformWith36hPermissions}
 import uk.gov.hmrc.disaaccountfrontend.models.pages.*
@@ -75,11 +75,22 @@ class NavigatorSpec extends BaseUnitSpec {
 
     "go from SignatoryNamePage to the signatory job title page" in {
       navigator.nextPage(SignatoryNamePage(testSignatoryId)) shouldBe
-        SignatoryJobTitleController.onPageLoad(testSignatoryId)
+        SignatoryJobTitleController.onPageLoad(testSignatoryId, NormalMode)
     }
 
-    "temporarily go from SignatoryJobTitlePage to change of circumstances until the next page in the journey exists" in {
-      navigator.nextPage(SignatoryJobTitlePage(testSignatoryId)) shouldBe ChangeOfCircumstancesController.onPageLoad()
+    "go from SignatoryNamePage to check signatory details in check mode" in {
+      navigator.nextPage(SignatoryNamePage(testSignatoryId), mode = CheckMode) shouldBe
+        SignatoryCheckYourAnswersController.onPageLoad(testSignatoryId)
+    }
+
+    "go from SignatoryJobTitlePage to check signatory details in normal mode" in {
+      navigator.nextPage(SignatoryJobTitlePage(testSignatoryId)) shouldBe
+        SignatoryCheckYourAnswersController.onPageLoad(testSignatoryId)
+    }
+
+    "go from SignatoryJobTitlePage to check signatory details in check mode" in {
+      navigator.nextPage(SignatoryJobTitlePage(testSignatoryId), mode = CheckMode) shouldBe
+        SignatoryCheckYourAnswersController.onPageLoad(testSignatoryId)
     }
 
     "go from FcaArticlesPage to change of circumstances" in {
