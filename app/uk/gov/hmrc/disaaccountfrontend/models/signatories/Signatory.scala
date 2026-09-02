@@ -17,6 +17,7 @@
 package uk.gov.hmrc.disaaccountfrontend.models.signatories
 
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
 
 case class Signatory(
   id: String,
@@ -28,6 +29,13 @@ case class Signatory(
 
   def inProgress: Boolean =
     !isComplete
+
+  def updatedSectionWithSignatoryRemoved(id: String)(implicit request: DataRequest[_]): Option[Signatories] =
+    request.effectiveAnswers.signatories.map(signatories =>
+      signatories.copy(
+        signatories = signatories.signatories.filterNot(_.id == id)
+      )
+    )
 }
 
 object Signatory {

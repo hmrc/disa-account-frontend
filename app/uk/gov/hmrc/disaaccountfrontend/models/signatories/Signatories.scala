@@ -19,7 +19,17 @@ package uk.gov.hmrc.disaaccountfrontend.models.signatories
 import play.api.libs.json.{Json, OFormat}
 
 case class Signatories(signatories: Seq[Signatory] = Seq.empty[Signatory]) {
-  def sectionName: String = Signatories.sectionName
+  def upsertName(id: String, fullName: String): Signatories =
+    if (signatories.exists(_.id == id)) {
+      copy(
+        signatories = signatories.map {
+          case officer if officer.id == id => officer.copy(fullName = Some(fullName))
+          case officer                     => officer
+        }
+      )
+    } else {
+      copy(signatories = signatories :+ Signatory(id = id, fullName = Some(fullName)))
+    }
 }
 
 object Signatories {

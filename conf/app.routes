@@ -35,6 +35,11 @@ POST       /liaison-officer-name               uk.gov.hmrc.disaaccountfrontend.c
 GET        /organisation-email-address         uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.OrganisationEmailAddressController.onPageLoad()
 POST       /organisation-email-address         uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.OrganisationEmailAddressController.onSubmit()
 
+## Signatories
+
+GET        /remove-signatory                   uk.gov.hmrc.disaaccountfrontend.controllers.signatories.RemoveSignatoryController.onPageLoad(id: String)
+POST       /remove-signatory                   uk.gov.hmrc.disaaccountfrontend.controllers.signatories.RemoveSignatoryController.onSubmit(id: String)
+
 GET        /email-verification-code            uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.EmailVerificationCodeController.onPageLoad()
 POST       /email-verification-code            uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.EmailVerificationCodeController.onSubmit()
 POST       /request-new-code                   uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.EmailVerificationCodeController.requestNewCode()
