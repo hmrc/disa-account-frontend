@@ -18,14 +18,14 @@ package models.pages
 
 import play.api.test.FakeRequest
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
-import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficerCommunication.{ByEmail, ByPhone}
+import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficerCommunication.{ByEmail, ByPhone, ByPost}
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
-import uk.gov.hmrc.disaaccountfrontend.models.pages.LiaisonOfficerPhoneNumberPage
+import uk.gov.hmrc.disaaccountfrontend.models.pages.LiaisonOfficerCommunicationPage
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates, UserAnswers}
 import utils.BaseUnitSpec
 
-class LiaisonOfficerPhoneNumberPageSpec extends BaseUnitSpec {
+class LiaisonOfficerCommunicationPageSpec extends BaseUnitSpec {
 
   private val id = "target-id"
 
@@ -33,37 +33,37 @@ class LiaisonOfficerPhoneNumberPageSpec extends BaseUnitSpec {
     id = id,
     fullName = Some("Jane Smith"),
     phoneNumber = Some("07777777777"),
-    communication = Set(ByEmail, ByPhone),
+    communication = Set(ByEmail),
     email = Some("jane@example.com")
   )
 
-  "LiaisonOfficerPhoneNumberPage" should {
+  "LiaisonOfficerCommunicationPage" should {
 
-    "allow access when the identified liaison officer exists and has an email" in {
+    "allow access when the identified liaison officer exists and has a phone number" in {
       val answers = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(targetOfficer))))
 
-      LiaisonOfficerPhoneNumberPage(id).canBeAccessedWith(answers) shouldBe true
+      LiaisonOfficerCommunicationPage(id).canBeAccessedWith(answers) shouldBe true
     }
 
     "deny access when the liaison officer section is missing" in {
-      LiaisonOfficerPhoneNumberPage(id).canBeAccessedWith(Answers()) shouldBe false
+      LiaisonOfficerCommunicationPage(id).canBeAccessedWith(Answers()) shouldBe false
     }
 
     "deny access when the identified liaison officer is missing" in {
       val answers = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(targetOfficer.copy(id = "other-id")))))
 
-      LiaisonOfficerPhoneNumberPage(id).canBeAccessedWith(answers) shouldBe false
+      LiaisonOfficerCommunicationPage(id).canBeAccessedWith(answers) shouldBe false
     }
 
-    "deny access when the identified liaison officer has no email" in {
-      val answers = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(targetOfficer.copy(email = None)))))
+    "deny access when the identified liaison officer has no phone number" in {
+      val answers = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(targetOfficer.copy(phoneNumber = None)))))
 
-      LiaisonOfficerPhoneNumberPage(id).canBeAccessedWith(answers) shouldBe false
+      LiaisonOfficerCommunicationPage(id).canBeAccessedWith(answers) shouldBe false
     }
 
-    "update the identified officer phone number and preserve existing session updates" in {
+    "update the identified officer communication options and preserve existing session updates" in {
       val existingUpdates = SessionUpdates(organisationTelephoneNumber = Assign(testOrgTelephoneNumber))
-      val otherOfficer    = LiaisonOfficer("other-id", Some("Other Name"), phoneNumber = Some("01642123456"))
+      val otherOfficer    = LiaisonOfficer("other-id", Some("Other Name"), communication = Set(ByPost))
       val officers        = LiaisonOfficers(Seq(otherOfficer, targetOfficer))
       val request         = DataRequest(
         FakeRequest(),
@@ -74,10 +74,10 @@ class LiaisonOfficerPhoneNumberPageSpec extends BaseUnitSpec {
         Answers(liaisonOfficers = Some(officers))
       )
 
-      LiaisonOfficerPhoneNumberPage(id).saveAnswerAndHandleDependents(request, "07123456789") shouldBe
+      LiaisonOfficerCommunicationPage(id).saveAnswerAndHandleDependents(request, Set(ByEmail, ByPhone)) shouldBe
         existingUpdates.copy(
           liaisonOfficers = Assign(
-            LiaisonOfficers(Seq(otherOfficer, targetOfficer.copy(phoneNumber = Some("07123456789"))))
+            LiaisonOfficers(Seq(otherOfficer, targetOfficer.copy(communication = Set(ByEmail, ByPhone))))
           )
         )
     }

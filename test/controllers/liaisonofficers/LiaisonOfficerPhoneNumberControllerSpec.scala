@@ -136,10 +136,10 @@ class LiaisonOfficerPhoneNumberControllerSpec extends BaseUnitSpec {
       }
     }
 
-    "redirect to change of circumstances when the identified liaison officer has no name" in {
-      val officerWithoutName = existingOfficer.copy(fullName = None)
-      val application        = applicationBuilder(
-        effectiveAnswers = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(officerWithoutName))))
+    "redirect to change of circumstances when the identified liaison officer has no email" in {
+      val officerWithoutEmail = existingOfficer.copy(email = None)
+      val application         = applicationBuilder(
+        effectiveAnswers = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(officerWithoutEmail))))
       ).build()
 
       running(application) {
@@ -169,7 +169,7 @@ class LiaisonOfficerPhoneNumberControllerSpec extends BaseUnitSpec {
         val result  = route(application, request).value
 
         status(result)                 shouldBe SEE_OTHER
-        redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
+        redirectLocation(result).value shouldBe liaisonOfficerCommunicationEndpointFor(existingId)
 
         val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
         verify(mockUserAnswersRepository).set(captor.capture())

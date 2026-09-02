@@ -48,6 +48,14 @@ case class LiaisonOfficers(liaisonOfficers: Seq[LiaisonOfficer] = Seq.empty) {
         case officer                     => officer
       }
     )
+
+  def updateCommunication(id: String, communication: Set[LiaisonOfficerCommunication]): LiaisonOfficers =
+    copy(
+      liaisonOfficers = liaisonOfficers.map {
+        case officer if officer.id == id => officer.copy(communication = communication)
+        case officer                     => officer
+      }
+    )
 }
 
 object LiaisonOfficers {

@@ -17,24 +17,27 @@
 package uk.gov.hmrc.disaaccountfrontend.models.pages
 
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
-import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficers
+import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.{LiaisonOfficerCommunication, LiaisonOfficers}
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates}
 
-final case class LiaisonOfficerPhoneNumberPage(id: String)
+final case class LiaisonOfficerCommunicationPage(id: String)
     extends IdentifiedPage
     with GuardedPage
-    with PageWithAnswers[String] {
+    with PageWithAnswers[Set[LiaisonOfficerCommunication]] {
 
   override def canBeAccessedWith(answers: Answers): Boolean =
     answers.liaisonOfficers.exists(
-      _.liaisonOfficers.exists(officer => officer.id == id && officer.email.isDefined)
+      _.liaisonOfficers.exists(officer => officer.id == id && officer.phoneNumber.isDefined)
     )
 
-  override def saveAnswerAndHandleDependents(request: DataRequest[_], newAnswer: String): SessionUpdates = {
+  override def saveAnswerAndHandleDependents(
+    request: DataRequest[_],
+    newAnswer: Set[LiaisonOfficerCommunication]
+  ): SessionUpdates = {
     val existingUpdates        = request.sessionAnswers.fold(SessionUpdates())(_.updates)
     val existingSection        = request.effectiveAnswers.liaisonOfficers.getOrElse(LiaisonOfficers())
-    val updatedLiaisonOfficers = existingSection.updatePhoneNumber(id, newAnswer)
+    val updatedLiaisonOfficers = existingSection.updateCommunication(id, newAnswer)
 
     existingUpdates.copy(liaisonOfficers = Assign(updatedLiaisonOfficers))
   }
