@@ -17,17 +17,23 @@
 package uk.gov.hmrc.disaaccountfrontend.models.pages.signatories
 
 import uk.gov.hmrc.disaaccountfrontend.models.{SessionUpdates, YesNoAnswer}
-import uk.gov.hmrc.disaaccountfrontend.models.pages.{IdentifiedPage, PageWithAnswers}
+import uk.gov.hmrc.disaaccountfrontend.models.pages.PageWithAnswers
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
+import uk.gov.hmrc.disaaccountfrontend.models.YesNoAnswer._
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
 import uk.gov.hmrc.disaaccountfrontend.models.signatories.Signatories
 
 final case class RemoveSignatoryPage(id: String) extends PageWithAnswers[YesNoAnswer] {
   override def saveAnswerAndHandleDependents(request: DataRequest[_], newAnswer: YesNoAnswer): SessionUpdates = {
-    val existingUpdates        = request.sessionAnswers.fold(SessionUpdates())(_.updates)
-    val existingSection        = request.effectiveAnswers.signatories.getOrElse(Signatories())
-    //val updatedSignatories = existingSection.upsertName(id, newAnswer)
+    val existingUpdates: SessionUpdates = request.sessionAnswers.fold(SessionUpdates())(_.updates)
+    val existingSection: Signatories    = request.effectiveAnswers.signatories.getOrElse(Signatories())
 
-    existingUpdates.copy(signatories = Assign(existingSection))
+    val updatedSection = newAnswer match {
+      case Yes => existingSection.updatedSectionWithSignatoryRemoved(id)
+
+      case No => existingSection
+    }
+
+    existingUpdates.copy(signatories = Assign(updatedSection))
   }
 }

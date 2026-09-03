@@ -24,10 +24,9 @@ import uk.gov.hmrc.disaaccountfrontend.controllers.PageController
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction}
 import uk.gov.hmrc.disaaccountfrontend.forms.generic.YesNoAnswerFormProvider
 import uk.gov.hmrc.disaaccountfrontend.models.{UserAnswers, YesNoAnswer}
-import uk.gov.hmrc.disaaccountfrontend.models.YesNoAnswer.*
 import uk.gov.hmrc.disaaccountfrontend.models.pages.signatories.RemoveSignatoryPage
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
-import uk.gov.hmrc.disaaccountfrontend.models.signatories.{Signatories, Signatory}
+import uk.gov.hmrc.disaaccountfrontend.models.signatories.Signatory
 import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
 import uk.gov.hmrc.disaaccountfrontend.views.html.signatories.RemoveSignatoryView
@@ -68,17 +67,17 @@ class RemoveSignatoryController @Inject() (
           .fold(
             formWithErrors => Future.successful(BadRequest(view(id, name, formWithErrors))),
             value => {
-              val updatedSection = value match {
-                case Yes => signatory.updatedSectionWithSignatoryRemoved(id)
-                case No  => request.effectiveAnswers.signatories
+
+              val sessionUpdates = getSessionUpdates(RemoveSignatoryPage.apply(id), value)
+
+              userAnswersRepository.set(UserAnswers(id = request.sessionId, updates = sessionUpdates)).map { _ =>
+                Redirect(nextPage(RemoveSignatoryPage(id), sessionUpdates))
               }
-              val sessionUpdates = getSessionUpdates(RemoveSignatoryPage, updatedSection)
-              updatedSection.fold(Future.successful(Redirect(ChangeOfCircumstancesController.onPageLoad())))(section =>
-                userAnswersRepository.set(UserAnswers(id = request.sessionId, updates = sessionUpdates))
-              )
+
             }
           )
     )
+
   }
 
   private def findSignatory(id: String)(implicit request: DataRequest[_]): Option[Signatory] =

@@ -18,7 +18,7 @@
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichCheckboxes
 @import uk.gov.hmrc.disaaccountfrontend.views.html.Layout
 @import uk.gov.hmrc.disaaccountfrontend.models.YesNoAnswer
-@import uk.gov.hmrc.disaaccountfrontend.controllers.signatories.RemoveSignatoryController
+@import uk.gov.hmrc.disaaccountfrontend.controllers.signatories.routes.RemoveSignatoryController
 
 @this(
     layout: Layout,
@@ -32,7 +32,7 @@
 
 @layout(pageTitle = Some(title(form, "innovativeFinancialProducts.title"))) {
 
-    @formHelper(action = RemoveSignatoryController.onSubmit(), Symbol("autoComplete") -> "off") {
+    @formHelper(action = RemoveSignatoryController.onSubmit(id), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))

@@ -30,6 +30,10 @@ case class Signatories(signatories: Seq[Signatory] = Seq.empty[Signatory]) {
     } else {
       copy(signatories = signatories :+ Signatory(id = id, fullName = Some(fullName)))
     }
+
+  def updatedSectionWithSignatoryRemoved(id: String): Signatories =
+    Signatories(this.signatories.filterNot(_.id == id))
+
 }
 
 object Signatories {
