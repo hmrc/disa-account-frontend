@@ -44,8 +44,8 @@ class Navigator @Inject() () {
     case EmailVerificationCodePage          => ChangeOfCircumstancesController.onPageLoad()
     // TODO: replace with the organisation email check-your-answers page once it exists.
     case FinancialOrganisationPage          => ChangeOfCircumstancesController.onPageLoad()
-    case SignatoryNamePage(id)              => signatoryNameNextPage(id, mode)
-    case SignatoryJobTitlePage(id)          => SignatoryCheckYourAnswersController.onPageLoad(id)
+    case SignatoryNamePage(id, mode)        => signatoryNameNextPage(id, mode)
+    case SignatoryJobTitlePage(id, mode)    => SignatoryCheckYourAnswersController.onPageLoad(id)
     // TODO: replace the TODOs in the RemoveSignatoryNextPage
     case RemoveSignatoryPage(_)             => RemoveSignatoryNextPage(answers)
     case LiaisonOfficerNamePage(id)         => liaisonOfficerNameNextPage(id, mode)

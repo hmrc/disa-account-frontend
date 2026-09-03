@@ -69,14 +69,14 @@ class SignatoryJobTitleController @Inject() (
         .fold(
           formWithErrors => Future.successful(BadRequest(view(id, name, mode, formWithErrors))),
           answer => {
-            val sessionUpdates = SignatoryJobTitlePage(id).saveAnswerAndHandleDependents(request, answer)
+            val sessionUpdates = SignatoryJobTitlePage(id, mode).saveAnswerAndHandleDependents(request, answer)
 
             userAnswersRepository
               .set(UserAnswers(id = request.sessionId, updates = sessionUpdates))
               .map { _ =>
                 Redirect(
                   navigator.nextPage(
-                    SignatoryJobTitlePage(id),
+                    SignatoryJobTitlePage(id, mode),
                     sessionUpdates.getUpdatedEffectiveAnswers(request.effectiveAnswers),
                     mode
                   )

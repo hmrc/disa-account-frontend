@@ -21,7 +21,7 @@ import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
 import uk.gov.hmrc.disaaccountfrontend.models.pages.SignatoryJobTitlePage
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
 import uk.gov.hmrc.disaaccountfrontend.models.signatories.{Signatories, Signatory}
-import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates, UserAnswers}
+import uk.gov.hmrc.disaaccountfrontend.models.{Answers, CheckMode, SessionUpdates, UserAnswers}
 import utils.BaseUnitSpec
 
 class SignatoryJobTitlePageSpec extends BaseUnitSpec {
@@ -76,7 +76,8 @@ class SignatoryJobTitlePageSpec extends BaseUnitSpec {
         Answers(signatories = Some(Signatories(Seq(existingSignatory))))
       )
 
-      SignatoryJobTitlePage("some-other-id").saveAnswerAndHandleDependents(request, testSignatoryJobTitle) shouldBe
+      SignatoryJobTitlePage("some-other-id", CheckMode)
+        .saveAnswerAndHandleDependents(request, testSignatoryJobTitle) shouldBe
         SessionUpdates(signatories = Assign(Signatories(Seq(existingSignatory))))
     }
   }

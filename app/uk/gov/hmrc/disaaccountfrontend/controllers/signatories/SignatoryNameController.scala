@@ -89,14 +89,14 @@ class SignatoryNameController @Inject() (
           if (isNewSignatory && (mode != NormalMode || signatoryCount(request) >= appConfig.maxSignatories)) {
             Future.successful(Redirect(ChangeOfCircumstancesController.onPageLoad()))
           } else {
-            val sessionUpdates = SignatoryNamePage(id).saveAnswerAndHandleDependents(request, answer)
+            val sessionUpdates = SignatoryNamePage(id, mode).saveAnswerAndHandleDependents(request, answer)
 
             userAnswersRepository
               .set(UserAnswers(id = request.sessionId, updates = sessionUpdates))
               .map { _ =>
                 Redirect(
                   navigator.nextPage(
-                    SignatoryNamePage(id),
+                    SignatoryNamePage(id, mode),
                     sessionUpdates.getUpdatedEffectiveAnswers(request.effectiveAnswers),
                     mode
                   )

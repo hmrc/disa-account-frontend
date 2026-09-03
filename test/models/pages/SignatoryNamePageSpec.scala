@@ -21,7 +21,7 @@ import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
 import uk.gov.hmrc.disaaccountfrontend.models.pages.SignatoryNamePage
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
 import uk.gov.hmrc.disaaccountfrontend.models.signatories.{Signatories, Signatory}
-import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates, UserAnswers}
+import uk.gov.hmrc.disaaccountfrontend.models.{Answers, CheckMode, SessionUpdates, UserAnswers}
 import utils.BaseUnitSpec
 
 class SignatoryNamePageSpec extends BaseUnitSpec {
@@ -78,6 +78,22 @@ class SignatoryNamePageSpec extends BaseUnitSpec {
         SessionUpdates(signatories =
           Assign(Signatories(Seq(existingSignatory.copy(fullName = Some(testSignatoryName)))))
         )
+    }
+
+    "leave the signatories unchanged when the id does not match an existing signatory" in {
+      val existingSignatory = Signatory(testSignatoryId, fullName = Some(testSignatoryName))
+      val request           = DataRequest(
+        FakeRequest(),
+        testZref,
+        testCredentialId,
+        testSessionId,
+        None,
+        Answers(signatories = Some(Signatories(Seq(existingSignatory))))
+      )
+
+      SignatoryNamePage("some-other-id", CheckMode)
+        .saveAnswerAndHandleDependents(request, testSignatoryName) shouldBe
+        SessionUpdates(signatories = Assign(Signatories(Seq(existingSignatory))))
     }
   }
 }

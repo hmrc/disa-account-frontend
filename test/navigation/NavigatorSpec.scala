@@ -75,12 +75,12 @@ class NavigatorSpec extends BaseUnitSpec {
     }
 
     "go from SignatoryNamePage to the signatory job title page" in {
-      navigator.nextPage(SignatoryNamePage(testSignatoryId)) shouldBe
+      navigator.nextPage(SignatoryNamePage(testSignatoryId, NormalMode)) shouldBe
         SignatoryJobTitleController.onPageLoad(testSignatoryId, NormalMode)
     }
 
     "go from SignatoryNamePage to check signatory details in check mode" in {
-      navigator.nextPage(SignatoryNamePage(testSignatoryId), mode = CheckMode) shouldBe
+      navigator.nextPage(SignatoryNamePage(testSignatoryId, CheckMode), mode = CheckMode) shouldBe
         SignatoryCheckYourAnswersController.onPageLoad(testSignatoryId)
     }
 
@@ -90,7 +90,7 @@ class NavigatorSpec extends BaseUnitSpec {
     }
 
     "go from SignatoryJobTitlePage to check signatory details in check mode" in {
-      navigator.nextPage(SignatoryJobTitlePage(testSignatoryId), mode = CheckMode) shouldBe
+      navigator.nextPage(SignatoryJobTitlePage(testSignatoryId, CheckMode), mode = CheckMode) shouldBe
         SignatoryCheckYourAnswersController.onPageLoad(testSignatoryId)
     }
 
