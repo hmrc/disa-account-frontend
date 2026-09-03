@@ -28,7 +28,8 @@ case class Signatories(signatories: Seq[Signatory] = Seq.empty[Signatory]) {
         }
       )
     } else {
-      this
+      // TODO should we use copy or this then?
+      copy(signatories = signatories :+ Signatory(id = id, fullName = Some(fullName)))
     }
 
   def updatedSectionWithSignatoryRemoved(id: String): Signatories =
@@ -39,10 +40,11 @@ case class Signatories(signatories: Seq[Signatory] = Seq.empty[Signatory]) {
       copy(
         signatories = signatories.map {
           case signatory if signatory.id == id => signatory.copy(jobTitle = Some(jobTitle))
-          case signatory if signatory.id != id => signatory
+          case signatory                       => signatory
         }
       )
     } else {
+      // TODO should we use copy or this then?
       this
     }
 }
