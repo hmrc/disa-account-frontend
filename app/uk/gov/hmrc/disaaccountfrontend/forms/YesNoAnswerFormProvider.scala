@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.viewmodels
+package uk.gov.hmrc.disaaccountfrontend.forms
 
-package object govuk {
+import play.api.data.Form
+import uk.gov.hmrc.disaaccountfrontend.forms.mappings.Mappings
+import uk.gov.hmrc.disaaccountfrontend.models.YesNoAnswer
 
-  object all
-      extends ImplicitConversions
-      with ButtonFluency
-      with CheckboxFluency
-      with ErrorSummaryFluency
-      with FieldsetFluency
-      with InputFluency
-      with LabelFluency
-      with RadiosFluency
+import javax.inject.Inject
+
+class YesNoAnswerFormProvider @Inject() extends Mappings {
+
+  def apply(requiredKey: String): Form[YesNoAnswer] =
+    Form(
+      "value" -> enumerable[YesNoAnswer](requiredKey)
+    )
 }

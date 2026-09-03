@@ -24,7 +24,10 @@ case class LiaisonOfficer(
   phoneNumber: Option[String] = None,
   communication: Set[LiaisonOfficerCommunication] = Set.empty,
   email: Option[String] = None
-)
+) {
+  def isComplete: Boolean =
+    fullName.isDefined && phoneNumber.isDefined && communication.nonEmpty && email.isDefined
+}
 
 object LiaisonOfficer {
   implicit val format: OFormat[LiaisonOfficer] = Json.format[LiaisonOfficer]

@@ -3,6 +3,9 @@ service.text = This is your new service
 
 site.continue = Continue
 site.change = Change
+site.remove = Remove
+site.yes = Yes
+site.no = No
 site.govuk = GOV.UK
 site.signIn = Sign in
 site.signOut = Sign out
@@ -138,6 +141,14 @@ signatoryJobTitle.change.hidden = job title
 
 signatoryCheckYourAnswers.title = Check signatory details
 signatoryCheckYourAnswers.heading = Check signatory details
+
+addedSignatory.title = You currently have a signatory
+addedSignatory.title.plural = You have {0} signatories
+addedSignatory.guidance = Add or remove signatories, but you must have at least 1 and no more than {0}.
+addedSignatory.guidance.max = You must have at least one signatory. The maximum is {0}.
+addedSignatory.addAnother = Do you want to add another signatory?
+addedSignatory.error.required = Select yes if you’d like to add another signatory
+addedSignatory.summary.action.hidden = {0} details
 
 liaisonOfficerName.title = What is the full name of the liaison officer?
 liaisonOfficerName.heading = What is the full name of the liaison officer?

@@ -31,8 +31,10 @@ import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.{LiaisonOfficer, L
 import uk.gov.hmrc.disaaccountfrontend.models.registration.{OrganisationDetails, OrganisationEmail, RegistrationDetails}
 import uk.gov.hmrc.disaaccountfrontend.models.signatories.{Signatories, Signatory}
 
+import java.util.concurrent.ThreadLocalRandom
+
 trait TestData {
-  val testZref: String         = "Z1234"
+  val testZref: String         = f"Z${ThreadLocalRandom.current().nextInt(10000)}%04d"
   val testCredentialId: String = "cred-1234"
   val testSessionId: String    = "session-1234"
 

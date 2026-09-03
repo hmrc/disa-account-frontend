@@ -33,7 +33,7 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
   val validFormData: Map[String, String] = Map("value" -> testSignatoryName)
 
   val maxSignatories: Seq[Signatory] =
-    (1 to 25).map(i => Signatory(s"signatory-$i", fullName = Some(s"Signatory $i")))
+    (1 to 25).map(i => Signatory(s"signatory-$i", Some(s"Signatory $i"), Some("Director")))
 
   "SignatoryNameController.onPageLoad" should {
 
@@ -113,6 +113,20 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
 
         status(result)                 shouldBe SEE_OTHER
         redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
+      }
+    }
+
+    "exclude incomplete signatories from the maximum count" in {
+      val signatories = maxSignatories.drop(1) :+ Signatory("incomplete-id", fullName = Some("Incomplete"))
+      val application = applicationBuilder(
+        effectiveAnswers = Answers(signatories = Some(signatories))
+      ).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, signatoryNameEndpoint)).value
+
+        status(result)               shouldBe SEE_OTHER
+        redirectLocation(result).value should startWith(s"$signatoryNameEndpoint?id=")
       }
     }
   }
@@ -242,6 +256,27 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
         status(result)                 shouldBe SEE_OTHER
         redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
         verify(mockUserAnswersRepository, never).set(any())
+      }
+    }
+
+    "allow a new signatory when only incomplete signatories bring the stored collection to the maximum" in {
+      when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
+
+      val signatories = maxSignatories.drop(1) :+ Signatory("incomplete-id", fullName = Some("Incomplete"))
+      val application = applicationBuilder(
+        effectiveAnswers = Answers(signatories = Some(signatories))
+      ).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, s"$signatoryNameEndpoint?id=a-brand-new-id")
+            .withFormUrlEncodedBody(validFormData.toSeq: _*)
+            .withHeaders("Csrf-Token" -> "nocheck")
+
+        val result = route(application, request).value
+
+        status(result) shouldBe SEE_OTHER
+        verify(mockUserAnswersRepository).set(any())
       }
     }
 

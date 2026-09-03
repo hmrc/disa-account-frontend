@@ -21,8 +21,9 @@ import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.{Liais
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.{OrganisationTelephoneNumberController, TradingNameController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.routes.EmailVerificationCodeController
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, PeerToPeerPlatformController}
-import uk.gov.hmrc.disaaccountfrontend.controllers.signatories.routes.{SignatoryCheckYourAnswersController, SignatoryJobTitleController}
-import uk.gov.hmrc.disaaccountfrontend.models.{Answers, CheckMode, Mode, NormalMode}
+import uk.gov.hmrc.disaaccountfrontend.controllers.signatories.routes.{SignatoryCheckYourAnswersController, SignatoryJobTitleController, SignatoryNameController}
+import uk.gov.hmrc.disaaccountfrontend.models.YesNoAnswer.{No, Yes}
+import uk.gov.hmrc.disaaccountfrontend.models.{Answers, CheckMode, Mode, NormalMode, YesNoAnswer}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
 import uk.gov.hmrc.disaaccountfrontend.models.pages.*
 
@@ -30,6 +31,11 @@ import javax.inject.{Inject, Singleton}
 
 @Singleton
 class Navigator @Inject() () {
+
+  def nextPageFromAddedSignatories(answer: YesNoAnswer): Call = answer match {
+    case Yes => SignatoryNameController.onPageLoad(None, NormalMode)
+    case No  => ChangeOfCircumstancesController.onPageLoad()
+  }
 
   def nextPage(page: Page, answers: Answers = Answers(), mode: Mode = NormalMode): Call = page match {
     case EnterYourOrganisationAddressPage   => OrganisationTelephoneNumberController.onPageLoad()

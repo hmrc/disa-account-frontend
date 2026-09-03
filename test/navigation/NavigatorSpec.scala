@@ -19,7 +19,8 @@ package navigation
 import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.{LiaisonOfficerCommunicationController, LiaisonOfficerEmailController, LiaisonOfficerPhoneNumberController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, PeerToPeerPlatformController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.OrganisationTelephoneNumberController
-import uk.gov.hmrc.disaaccountfrontend.controllers.signatories.routes.{SignatoryCheckYourAnswersController, SignatoryJobTitleController}
+import uk.gov.hmrc.disaaccountfrontend.controllers.signatories.routes.{SignatoryCheckYourAnswersController, SignatoryJobTitleController, SignatoryNameController}
+import uk.gov.hmrc.disaaccountfrontend.models.YesNoAnswer.{No, Yes}
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, CheckMode, NormalMode, SessionUpdates}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.{CrowdFundedDebentures, PeertopeerLoansUsingAPlatformWith36hPermissions}
 import uk.gov.hmrc.disaaccountfrontend.models.pages.*
@@ -32,6 +33,14 @@ class NavigatorSpec extends BaseUnitSpec {
   val navigator = new Navigator()
 
   "Navigator" should {
+
+    "go from added signatories to the signatory name page when Yes is selected" in {
+      navigator.nextPageFromAddedSignatories(Yes) shouldBe SignatoryNameController.onPageLoad(None, NormalMode)
+    }
+
+    "go from added signatories to change of circumstances when No is selected" in {
+      navigator.nextPageFromAddedSignatories(No) shouldBe ChangeOfCircumstancesController.onPageLoad()
+    }
 
     "go from EnterYourOrganisationAddressPage to the organisation telephone number page" in {
       navigator.nextPage(EnterYourOrganisationAddressPage) shouldBe OrganisationTelephoneNumberController.onPageLoad()

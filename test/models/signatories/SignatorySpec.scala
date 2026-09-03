@@ -14,17 +14,22 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.viewmodels
+package models.signatories
 
-package object govuk {
+import uk.gov.hmrc.disaaccountfrontend.models.signatories.Signatory
+import utils.BaseUnitSpec
 
-  object all
-      extends ImplicitConversions
-      with ButtonFluency
-      with CheckboxFluency
-      with ErrorSummaryFluency
-      with FieldsetFluency
-      with InputFluency
-      with LabelFluency
-      with RadiosFluency
+class SignatorySpec extends BaseUnitSpec {
+
+  "Signatory.isComplete" should {
+
+    "return true when all required details are present" in {
+      Signatory("id", Some("Jane Smith"), Some("Director")).isComplete shouldBe true
+    }
+
+    "return false when a required detail is absent" in {
+      Signatory("id", None, Some("Director")).isComplete   shouldBe false
+      Signatory("id", Some("Jane Smith"), None).isComplete shouldBe false
+    }
+  }
 }
