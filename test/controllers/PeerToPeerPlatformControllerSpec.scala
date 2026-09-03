@@ -33,16 +33,15 @@ import scala.concurrent.Future
 
 class PeerToPeerPlatformControllerSpec extends BaseUnitSpec {
 
-  private val platformFieldName            = "value"
-  private val csrfHeaderName               = "Csrf-Token"
-  private val csrfHeaderValue              = "nocheck"
-  private val titleMessageKey              = "peerToPeerPlatform.title"
-  private val headingMessageKey            = "peerToPeerPlatform.heading"
-  private val hintMessageKey               = "peerToPeerPlatform.details.summary"
-  private val moreInfoMessageKey           = "peerToPeerPlatform.details.content.link"
-  private val requiredErrorMessageKey      = "peerToPeerPlatform.error.required"
-  private val isaProductsSectionCaptionKey = "sectionTitle.isaProducts"
-  private val previousP2pPlatform          = "Old platform"
+  private val platformFieldName       = "value"
+  private val csrfHeaderName          = "Csrf-Token"
+  private val csrfHeaderValue         = "nocheck"
+  private val titleMessageKey         = "peerToPeerPlatform.title"
+  private val headingMessageKey       = "peerToPeerPlatform.heading"
+  private val hintMessageKey          = "peerToPeerPlatform.details.summary"
+  private val moreInfoMessageKey      = "peerToPeerPlatform.details.content.link"
+  private val requiredErrorMessageKey = "peerToPeerPlatform.error.required"
+  private val previousP2pPlatform     = "Old platform"
 
   private val eligibleAnswers = Answers(
     isaProducts = Some(Seq(CashIsas)),
@@ -66,7 +65,6 @@ class PeerToPeerPlatformControllerSpec extends BaseUnitSpec {
         doc.select("h1").text()                                 should include(messages(headingMessageKey))
         doc.text()                                              should include(messages(hintMessageKey))
         doc.text()                                              should include(messages(moreInfoMessageKey))
-        doc.text()                                              should not include messages(isaProductsSectionCaptionKey)
       }
     }
 

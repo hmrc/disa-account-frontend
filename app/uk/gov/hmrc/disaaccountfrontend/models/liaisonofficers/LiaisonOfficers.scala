@@ -17,6 +17,7 @@
 package uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers
 
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
 
 case class LiaisonOfficers(liaisonOfficers: Seq[LiaisonOfficer] = Seq.empty) {
 
@@ -31,8 +32,35 @@ case class LiaisonOfficers(liaisonOfficers: Seq[LiaisonOfficer] = Seq.empty) {
     } else {
       copy(liaisonOfficers = liaisonOfficers :+ LiaisonOfficer(id = id, fullName = Some(fullName)))
     }
+
+  def updateEmail(id: String, email: String): LiaisonOfficers =
+    copy(
+      liaisonOfficers = liaisonOfficers.map {
+        case officer if officer.id == id => officer.copy(email = Some(email))
+        case officer                     => officer
+      }
+    )
+
+  def updatePhoneNumber(id: String, phoneNumber: String): LiaisonOfficers =
+    copy(
+      liaisonOfficers = liaisonOfficers.map {
+        case officer if officer.id == id => officer.copy(phoneNumber = Some(phoneNumber))
+        case officer                     => officer
+      }
+    )
+
+  def updateCommunication(id: String, communication: Set[LiaisonOfficerCommunication]): LiaisonOfficers =
+    copy(
+      liaisonOfficers = liaisonOfficers.map {
+        case officer if officer.id == id => officer.copy(communication = communication)
+        case officer                     => officer
+      }
+    )
 }
 
 object LiaisonOfficers {
   implicit val format: OFormat[LiaisonOfficers] = Json.format[LiaisonOfficers]
+
+  def findLiaisonOfficer(id: String)(implicit request: DataRequest[_]): Option[LiaisonOfficer] =
+    request.effectiveAnswers.liaisonOfficers.flatMap(_.liaisonOfficers.find(_.id == id))
 }

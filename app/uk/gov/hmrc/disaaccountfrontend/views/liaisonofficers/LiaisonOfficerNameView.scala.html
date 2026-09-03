@@ -16,6 +16,7 @@
 
 @import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.LiaisonOfficerNameController
 @import uk.gov.hmrc.disaaccountfrontend.config.AppConfig
+@import uk.gov.hmrc.disaaccountfrontend.models.Mode
 @import uk.gov.hmrc.disaaccountfrontend.viewmodels.InputWidth._
 @import uk.gov.hmrc.disaaccountfrontend.views.html.Layout
 
@@ -28,11 +29,11 @@
     govukButton: GovukButton
 )
 
-@(id: String, form: Form[_])(implicit request: Request[_], messages: Messages)
+@(id: String, mode: Mode, form: Form[_])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = Some(title(form, "liaisonOfficerName.title", Some("sectionTitle.liaisonOfficers")))) {
+@layout(pageTitle = Some(title(form, "liaisonOfficerName.title"))) {
 
-    @formHelper(action = LiaisonOfficerNameController.onSubmit(id)) {
+    @formHelper(action = LiaisonOfficerNameController.onSubmit(id, mode)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -43,7 +44,6 @@
                 field = form("value"),
                 label = HmrcPageHeadingLabel.apply(
                     content = Text(messages("liaisonOfficerName.heading")),
-                    caption = HmrcSectionCaption(messages("sectionTitle.liaisonOfficers")),
                     classes = "govuk-label--l"
                 )
             )

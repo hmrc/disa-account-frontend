@@ -19,6 +19,7 @@ package models
 import play.api.libs.json.{JsNull, JsSuccess, Json}
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.{Assign, Clear, Unchanged}
 import uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority.FinancialOrganisation.{Bank, BuildingSociety}
+import uk.gov.hmrc.disaaccountfrontend.models.signatories.{Signatories, Signatory}
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates}
 import utils.BaseUnitSpec
@@ -34,6 +35,7 @@ class SessionUpdatesSpec extends BaseUnitSpec {
         correspondenceAddress = Assign(testCorrespondenceAddress),
         isaProducts = Assign(Seq.empty),
         financialOrganisation = Assign(Seq(Bank)),
+        signatories = Assign(testSignatories),
         liaisonOfficers = Assign(testLiaisonOfficers),
         p2pPlatform = Clear
       )
@@ -62,15 +64,18 @@ class SessionUpdatesSpec extends BaseUnitSpec {
     }
 
     "apply typed updates to an answer snapshot" in {
-      val answers = Answers(
+      val answers          = Answers(
         correspondenceAddress = Some(testCorrespondenceAddress),
         organisationTelephoneNumber = Some(testOrgTelephoneNumber),
         financialOrganisation = Some(Seq(BuildingSociety)),
+        signatories = Some(testSignatories),
         p2pPlatform = Some(testP2pPlatform)
       )
-      val updates = SessionUpdates(
+      val updatedSignatory = Signatory(testSignatoryId, fullName = Some("Updated Name"))
+      val updates          = SessionUpdates(
         organisationTelephoneNumber = Assign(updatedOrgTelephoneNumber),
         financialOrganisation = Assign(Seq(Bank)),
+        signatories = Assign(Signatories(Seq(updatedSignatory))),
         liaisonOfficers = Assign(LiaisonOfficers(Seq(LiaisonOfficer("new-id", Some("New Name"))))),
         p2pPlatform = Clear
       )
@@ -79,6 +84,7 @@ class SessionUpdatesSpec extends BaseUnitSpec {
         correspondenceAddress = Some(testCorrespondenceAddress),
         organisationTelephoneNumber = Some(updatedOrgTelephoneNumber),
         financialOrganisation = Some(Seq(Bank)),
+        signatories = Some(Signatories(Seq(updatedSignatory))),
         liaisonOfficers = Some(LiaisonOfficers(Seq(LiaisonOfficer("new-id", Some("New Name")))))
       )
     }

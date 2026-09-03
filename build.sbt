@@ -1,4 +1,5 @@
 import uk.gov.hmrc.DefaultBuildSettings
+import play.sbt.routes.RoutesKeys
 
 ThisBuild / majorVersion := 0
 ThisBuild / scalaVersion := "3.3.6"
@@ -13,6 +14,7 @@ lazy val microservice = Project("disa-account-frontend", file("."))
     // suppress warnings in generated routes files
     scalacOptions += "-Wconf:src=routes/.*:s",
     scalacOptions += "-Wconf:msg=unused import&src=html/.*:s",
+    RoutesKeys.routesImport += "uk.gov.hmrc.disaaccountfrontend.models._",
     pipelineStages := Seq(gzip),
     TwirlKeys.templateImports ++= Seq(
       "play.twirl.api.HtmlFormat",
@@ -22,6 +24,7 @@ lazy val microservice = Project("disa-account-frontend", file("."))
       "uk.gov.hmrc.hmrcfrontend.views.html.helpers._",
       "uk.gov.hmrc.hmrcfrontend.views.config._",
       "uk.gov.hmrc.disaaccountfrontend.views.ViewUtils._",
+      "uk.gov.hmrc.disaaccountfrontend.models.Mode",
       "uk.gov.hmrc.disaaccountfrontend.controllers.routes._",
       "uk.gov.hmrc.disaaccountfrontend.viewmodels.govuk.all._"
     )

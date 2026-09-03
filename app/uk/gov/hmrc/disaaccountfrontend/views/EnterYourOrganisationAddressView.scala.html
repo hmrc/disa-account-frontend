@@ -57,7 +57,7 @@
   )
 }
 
-@layout(pageTitle = Some(title(form, "enterYourOrganisationAddress.title", Some("sectionTitle.orgDetails")))) {
+@layout(pageTitle = Some(title(form, "enterYourOrganisationAddress.title"))) {
 
     @formHelper(action = EnterYourOrganisationAddressController.onSubmit(), Symbol("autoComplete") -> "off") {
 
@@ -67,7 +67,10 @@
 
         @govukFieldset(Fieldset(
             legend = Some(
-                HmrcPageHeadingLegend(Text(messages("enterYourOrganisationAddress.heading")), HmrcSectionCaption(messages("sectionTitle.orgDetails")), "govuk-fieldset__legend--l")
+                HmrcPageHeadingLegend(
+                    content = Text(messages("enterYourOrganisationAddress.heading")),
+                    classes = "govuk-fieldset__legend--l"
+                )
             ),
             html = fields
         ))

@@ -41,6 +41,8 @@ class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig
   val zrefIdentifierKey: String      = config.get[String]("enrolments.zrefIdentifierKey")
   val p2pLoansInformationUrl: String = config.get[String]("urls.external.p2pLoansInformation")
 
-  val cacheTtl: Long          = config.get[Long]("cache.ttlInSeconds")
+  val cacheTtl: Long = config.get[Long]("cache.ttlInSeconds")
+
+  val maxSignatories: Int     = config.get[Int]("max-signatories")
   val maxLiaisonOfficers: Int = config.get[Int]("max-liaison-officers")
 }

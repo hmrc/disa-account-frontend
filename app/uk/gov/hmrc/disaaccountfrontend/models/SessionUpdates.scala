@@ -18,6 +18,7 @@ package uk.gov.hmrc.disaaccountfrontend.models
 
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Unchanged
+import uk.gov.hmrc.disaaccountfrontend.models.articles.FcaArticles
 import uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority.FinancialOrganisation
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.{InnovativeFinancialProduct, IsaProduct}
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficers
@@ -31,11 +32,12 @@ case class SessionUpdates(
   innovativeFinancialProducts: AnswerUpdate[Seq[InnovativeFinancialProduct]] = Unchanged,
   p2pPlatform: AnswerUpdate[String] = Unchanged,
   p2pPlatformNumber: AnswerUpdate[String] = Unchanged,
+  fcaArticles: AnswerUpdate[Seq[FcaArticles]] = Unchanged,
   organisationEmailAddress: AnswerUpdate[String] = Unchanged,
   organisationEmailVerified: AnswerUpdate[Boolean] = Unchanged,
   financialOrganisation: AnswerUpdate[Seq[FinancialOrganisation]] = Unchanged,
-  liaisonOfficers: AnswerUpdate[LiaisonOfficers] = Unchanged,
-  signatories: AnswerUpdate[Signatories] = Unchanged
+  signatories: AnswerUpdate[Signatories] = Unchanged,
+  liaisonOfficers: AnswerUpdate[LiaisonOfficers] = Unchanged
 ) {
   def getUpdatedEffectiveAnswers(answers: Answers): Answers =
     Answers(
@@ -46,11 +48,12 @@ case class SessionUpdates(
       innovativeFinancialProducts = innovativeFinancialProducts.getEffectiveAnswer(answers.innovativeFinancialProducts),
       p2pPlatform = p2pPlatform.getEffectiveAnswer(answers.p2pPlatform),
       p2pPlatformNumber = p2pPlatformNumber.getEffectiveAnswer(answers.p2pPlatformNumber),
+      fcaArticles = fcaArticles.getEffectiveAnswer(answers.fcaArticles),
       organisationEmailAddress = organisationEmailAddress.getEffectiveAnswer(answers.organisationEmailAddress),
       organisationEmailVerified = organisationEmailVerified.getEffectiveAnswer(answers.organisationEmailVerified),
       financialOrganisation = financialOrganisation.getEffectiveAnswer(answers.financialOrganisation),
-      liaisonOfficers = liaisonOfficers.getEffectiveAnswer(answers.liaisonOfficers),
-      signatories = signatories.getEffectiveAnswer(answers.signatories)
+      signatories = signatories.getEffectiveAnswer(answers.signatories),
+      liaisonOfficers = liaisonOfficers.getEffectiveAnswer(answers.liaisonOfficers)
     )
 }
 

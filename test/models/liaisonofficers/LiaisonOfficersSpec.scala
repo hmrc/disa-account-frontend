@@ -17,7 +17,7 @@
 package models.liaisonofficers
 
 import play.api.libs.json.{JsSuccess, Json}
-import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficerCommunication.{ByEmail, ByPhone}
+import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficerCommunication.{ByEmail, ByPhone, ByPost}
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
 import utils.BaseUnitSpec
 
@@ -52,6 +52,51 @@ class LiaisonOfficersSpec extends BaseUnitSpec {
       LiaisonOfficers(Seq(existingOfficer)).upsertName("new-id", "New Name") shouldBe LiaisonOfficers(
         Seq(existingOfficer, LiaisonOfficer("new-id", Some("New Name")))
       )
+    }
+
+    "update the matching email without losing other details, officers or ordering" in {
+      val other    = LiaisonOfficer("other-id", Some("Other Name"), email = Some("other@example.com"))
+      val officers = LiaisonOfficers(Seq(other, existingOfficer))
+
+      officers.updateEmail(existingOfficer.id, "updated@example.com") shouldBe LiaisonOfficers(
+        Seq(other, existingOfficer.copy(email = Some("updated@example.com")))
+      )
+    }
+
+    "leave the officers unchanged when updating an unknown id" in {
+      val officers = LiaisonOfficers(Seq(existingOfficer))
+
+      officers.updateEmail("unknown-id", "updated@example.com") shouldBe officers
+    }
+
+    "update the matching phone number without losing other details, officers or ordering" in {
+      val other    = LiaisonOfficer("other-id", Some("Other Name"), phoneNumber = Some("01642123456"))
+      val officers = LiaisonOfficers(Seq(other, existingOfficer))
+
+      officers.updatePhoneNumber(existingOfficer.id, "07123456789") shouldBe LiaisonOfficers(
+        Seq(other, existingOfficer.copy(phoneNumber = Some("07123456789")))
+      )
+    }
+
+    "leave the officers unchanged when updating the phone number for an unknown id" in {
+      val officers = LiaisonOfficers(Seq(existingOfficer))
+
+      officers.updatePhoneNumber("unknown-id", "07123456789") shouldBe officers
+    }
+
+    "update the matching communication options without losing other details, officers or ordering" in {
+      val other    = LiaisonOfficer("other-id", Some("Other Name"), communication = Set(ByPost))
+      val officers = LiaisonOfficers(Seq(other, existingOfficer))
+
+      officers.updateCommunication(existingOfficer.id, Set(ByPhone, ByPost)) shouldBe LiaisonOfficers(
+        Seq(other, existingOfficer.copy(communication = Set(ByPhone, ByPost)))
+      )
+    }
+
+    "leave the officers unchanged when updating communication options for an unknown id" in {
+      val officers = LiaisonOfficers(Seq(existingOfficer))
+
+      officers.updateCommunication("unknown-id", Set(ByPost)) shouldBe officers
     }
   }
 }

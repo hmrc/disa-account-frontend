@@ -1,0 +1,60 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.LiaisonOfficerCommunicationController
+@import uk.gov.hmrc.disaaccountfrontend.models.Mode
+@import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficerCommunication
+@import uk.gov.hmrc.disaaccountfrontend.views.html.Layout
+
+@this(
+    layout: Layout,
+    formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukCheckboxes: GovukCheckboxes,
+    govukButton: GovukButton
+)
+
+@(id: String, name: String, mode: Mode, form: Form[_])(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = Some(title(form, messages("liaisonOfficerCommunication.title", name)))) {
+
+    @formHelper(action = LiaisonOfficerCommunicationController.onSubmit(id, mode), Symbol("autoComplete") -> "off") {
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(
+                ErrorSummaryViewModel(
+                    form,
+                    errorLinkOverrides = Map("value" -> "value_0", "value[0]" -> "value_0")
+                )
+            )
+        }
+
+        @govukCheckboxes(
+            CheckboxesViewModel(
+                form = form,
+                name = "value",
+                hint = Some(Hint(content = Text(messages("liaisonOfficerCommunication.hint")))),
+                legend = HmrcPageHeadingLegend(
+                    Text(messages("liaisonOfficerCommunication.heading", name)),
+                    classes = "govuk-fieldset__legend--l"
+                ),
+                items = LiaisonOfficerCommunication.checkboxItems
+            )
+        )
+
+        @govukButton(ButtonViewModel(messages("site.continue")))
+    }
+}

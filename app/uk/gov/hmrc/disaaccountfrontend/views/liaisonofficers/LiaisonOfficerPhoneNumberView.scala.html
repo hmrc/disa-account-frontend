@@ -1,0 +1,99 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.LiaisonOfficerPhoneNumberController
+@import uk.gov.hmrc.disaaccountfrontend.models.Mode
+@import uk.gov.hmrc.disaaccountfrontend.viewmodels.InputWidth._
+@import uk.gov.hmrc.disaaccountfrontend.views.html.Layout
+@import uk.gov.hmrc.govukfrontend.views.html.helpers.GovukFormGroup
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.FormGroup
+
+@this(
+    layout: Layout,
+    formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukFormGroup: GovukFormGroup,
+    govukLabel: GovukLabel,
+    govukHint: GovukHint,
+    govukErrorMessage: GovukErrorMessage,
+    govukButton: GovukButton
+)
+
+@(id: String, name: String, mode: Mode, form: Form[_])(implicit request: Request[_], messages: Messages)
+
+@input = @{
+    InputViewModel(
+        field = form("value"),
+        label = HmrcPageHeadingLabel.apply(
+            content = Text(messages("liaisonOfficerPhoneNumber.heading", name)),
+            classes = "govuk-label--l"
+        ).copy(forAttr = Some("value"))
+    )
+    .withWidth(Full)
+    .withHint(HintViewModel(messages("liaisonOfficerPhoneNumber.hint")))
+    .asNumeric()
+}
+
+@inputClasses = @{
+    Seq(
+        "govuk-input",
+        input.classes.trim,
+        if(input.errorMessage.nonEmpty) "govuk-input--error" else ""
+    ).filter(_.nonEmpty).mkString(" ")
+}
+
+@describedBy = @{
+    Seq(
+        Some(s"${input.id}-hint"),
+        input.errorMessage.map(_ => s"${input.id}-error")
+    ).flatten.mkString(" ")
+}
+
+@layout(pageTitle = Some(title(form, messages("liaisonOfficerPhoneNumber.title", name)))) {
+
+    @formHelper(action = LiaisonOfficerPhoneNumberController.onSubmit(id, mode)) {
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form))
+        }
+
+        @govukFormGroup(FormGroup(), input.errorMessage.nonEmpty) {
+            @govukLabel(input.label)
+
+            <p class="govuk-body">@messages("liaisonOfficerPhoneNumber.p1")</p>
+
+            @govukHint(input.hint.get.copy(id = Some(s"${input.id}-hint")))
+
+            @input.errorMessage.map { errorMessage =>
+                @govukErrorMessage(errorMessage.copy(id = Some(s"${input.id}-error")))
+            }
+
+            <input
+                class="@inputClasses"
+                id="@input.id"
+                name="@input.name"
+                type="@input.inputType"
+                inputmode="@input.inputmode.get"
+                aria-describedby="@describedBy"
+                value="@input.value.getOrElse("")"
+            >
+        }
+
+        @govukButton(
+            ButtonViewModel(messages("site.continue"))
+        )
+    }
+}

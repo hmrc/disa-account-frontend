@@ -28,7 +28,7 @@
 
 @(form: Form[_])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = Some(title(form, "organisationEmailAddress.title", Some("sectionTitle.organisationEmail")))) {
+@layout(pageTitle = Some(title(form, "organisationEmailAddress.title"))) {
 
     @formHelper(action = OrganisationEmailAddressController.onSubmit()) {
 
@@ -39,7 +39,10 @@
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = HmrcPageHeadingLabel.apply(Text(messages("organisationEmailAddress.heading")), HmrcSectionCaption(messages("sectionTitle.organisationEmail")), "govuk-label--l")
+                label = HmrcPageHeadingLabel.apply(
+                    content = Text(messages("organisationEmailAddress.heading")),
+                    classes = "govuk-label--l"
+                )
             )
             .withWidth(Full)
             .withHint(HintViewModel(messages("organisationEmailAddress.hint")))

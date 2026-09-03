@@ -17,10 +17,12 @@
 package uk.gov.hmrc.disaaccountfrontend.navigation
 
 import play.api.mvc.Call
+import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.{LiaisonOfficerCommunicationController, LiaisonOfficerEmailController, LiaisonOfficerPhoneNumberController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.{OrganisationTelephoneNumberController, TradingNameController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.routes.EmailVerificationCodeController
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, PeerToPeerPlatformController}
-import uk.gov.hmrc.disaaccountfrontend.models.Answers
+import uk.gov.hmrc.disaaccountfrontend.controllers.signatories.routes.{SignatoryCheckYourAnswersController, SignatoryJobTitleController}
+import uk.gov.hmrc.disaaccountfrontend.models.{Answers, CheckMode, Mode, NormalMode}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
 import uk.gov.hmrc.disaaccountfrontend.models.pages.*
 import uk.gov.hmrc.disaaccountfrontend.models.pages.signatories.RemoveSignatoryPage
@@ -30,22 +32,27 @@ import javax.inject.{Inject, Singleton}
 @Singleton
 class Navigator @Inject() () {
 
-  def nextPage(page: Page, answers: Answers = Answers()): Call = page match {
-    case EnterYourOrganisationAddressPage => OrganisationTelephoneNumberController.onPageLoad()
+  def nextPage(page: Page, answers: Answers = Answers(), mode: Mode = NormalMode): Call = page match {
+    case EnterYourOrganisationAddressPage   => OrganisationTelephoneNumberController.onPageLoad()
     // TODO: replace with the next page in the journey once it exists.
-    case OrganisationTelephoneNumberPage  => OrganisationTelephoneNumberController.onPageLoad()
-    case TradingNamePage                  => TradingNameController.onPageLoad()
-    case InnovativeFinancialProductsPage  => innovativeFinancialProductsNextPage(answers)
-    case PeerToPeerPlatformPage           => peerToPeerPlatformNextPage(answers)
-    case OrganisationEmailAddressPage     => EmailVerificationCodeController.onPageLoad()
-    case EmailVerificationCodePage        => ChangeOfCircumstancesController.onPageLoad()
+    case OrganisationTelephoneNumberPage    => OrganisationTelephoneNumberController.onPageLoad()
+    case TradingNamePage                    => TradingNameController.onPageLoad()
+    case InnovativeFinancialProductsPage    => innovativeFinancialProductsNextPage(answers)
+    case PeerToPeerPlatformPage             => peerToPeerPlatformNextPage(answers)
+    case FcaArticlesPage                    => fcaArticlesNextPage()
+    case OrganisationEmailAddressPage       => EmailVerificationCodeController.onPageLoad()
+    case EmailVerificationCodePage          => ChangeOfCircumstancesController.onPageLoad()
     // TODO: replace with the organisation email check-your-answers page once it exists.
-    case FinancialOrganisationPage        => ChangeOfCircumstancesController.onPageLoad()
-    // TODO: replace with the next liaison officer page once it exists.
-    case LiaisonOfficerNamePage(_)        => ChangeOfCircumstancesController.onPageLoad()
+    case FinancialOrganisationPage          => ChangeOfCircumstancesController.onPageLoad()
+    case SignatoryNamePage(id)              => signatoryNameNextPage(id, mode)
+    case SignatoryJobTitlePage(id)          => SignatoryCheckYourAnswersController.onPageLoad(id)
     // TODO: replace the TODOs in the RemoveSignatoryNextPage
-    case RemoveSignatoryPage(_)           => RemoveSignatoryNextPage(answers)
-    case unsupportedPage                  =>
+    case RemoveSignatoryPage(_)             => RemoveSignatoryNextPage(answers)
+    case LiaisonOfficerNamePage(id)         => liaisonOfficerNameNextPage(id, mode)
+    case LiaisonOfficerEmailPage(id)        => liaisonOfficerEmailNextPage(id, mode)
+    case LiaisonOfficerPhoneNumberPage(id)  => liaisonOfficerPhoneNumberNextPage(id, mode)
+    case LiaisonOfficerCommunicationPage(_) => liaisonOfficerCommunicationNextPage(mode)
+    case unsupportedPage                    =>
       throw new IllegalArgumentException(s"No navigation defined for page: $unsupportedPage")
   }
 
@@ -67,8 +74,17 @@ class Navigator @Inject() () {
     }
 
   private def peerToPeerPlatformNumberQuestionPage: Call =
-    // TODO: Replace this fallback with the FCA/FRN question when that page is implemented.
+    // TODO: Replace this fallback with the FCA/FRN question (NOT FCA Articles!) when that page is implemented.
     ChangeOfCircumstancesController.onPageLoad()
+
+  private def fcaArticlesNextPage(): Call =
+    ChangeOfCircumstancesController.onPageLoad()
+
+  private def signatoryNameNextPage(id: String, mode: Mode): Call =
+    mode match {
+      case NormalMode => SignatoryJobTitleController.onPageLoad(id, NormalMode)
+      case CheckMode  => SignatoryCheckYourAnswersController.onPageLoad(id)
+    }
 
   private def RemoveSignatoryNextPage(answers: Answers): Call =
     answers.signatories match {
@@ -76,5 +92,33 @@ class Navigator @Inject() () {
       case Some(_) => ChangeOfCircumstancesController.onPageLoad()
       // TODO Change to "Add a signatory" once ready
       case None    => ChangeOfCircumstancesController.onPageLoad()
+    }
+
+  private def liaisonOfficerNameNextPage(id: String, mode: Mode): Call =
+    mode match {
+      case NormalMode => LiaisonOfficerEmailController.onPageLoad(id, NormalMode)
+      // TODO: Replace this fallback with the liaison officer check-your-answers page once it is implemented.
+      case CheckMode  => ChangeOfCircumstancesController.onPageLoad()
+    }
+
+  private def liaisonOfficerEmailNextPage(id: String, mode: Mode): Call =
+    mode match {
+      case NormalMode => LiaisonOfficerPhoneNumberController.onPageLoad(id, NormalMode)
+      // TODO: Replace this fallback with the liaison officer check-your-answers page once it is implemented.
+      case CheckMode  => ChangeOfCircumstancesController.onPageLoad()
+    }
+
+  private def liaisonOfficerPhoneNumberNextPage(id: String, mode: Mode): Call =
+    mode match {
+      case NormalMode => LiaisonOfficerCommunicationController.onPageLoad(id, NormalMode)
+      // TODO: Replace this fallback with the liaison officer check-your-answers page once it is implemented.
+      case CheckMode  => ChangeOfCircumstancesController.onPageLoad()
+    }
+
+  private def liaisonOfficerCommunicationNextPage(mode: Mode): Call =
+    mode match {
+      // TODO: Replace these fallbacks with the liaison officer check-your-answers page once it is implemented.
+      case NormalMode => ChangeOfCircumstancesController.onPageLoad()
+      case CheckMode  => ChangeOfCircumstancesController.onPageLoad()
     }
 }

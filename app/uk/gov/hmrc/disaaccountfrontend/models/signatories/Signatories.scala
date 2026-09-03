@@ -23,17 +23,28 @@ case class Signatories(signatories: Seq[Signatory] = Seq.empty[Signatory]) {
     if (signatories.exists(_.id == id)) {
       copy(
         signatories = signatories.map {
-          case officer if officer.id == id => officer.copy(fullName = Some(fullName))
-          case officer                     => officer
+          case signatory if signatory.id == id => signatory.copy(fullName = Some(fullName))
+          case signatory if signatory.id != id => signatory
         }
       )
     } else {
-      copy(signatories = signatories :+ Signatory(id = id, fullName = Some(fullName)))
+      this
     }
 
   def updatedSectionWithSignatoryRemoved(id: String): Signatories =
     Signatories(this.signatories.filterNot(_.id == id))
 
+  def upsertJobTitle(id: String, jobTitle: String): Signatories =
+    if (signatories.exists(_.id == id)) {
+      copy(
+        signatories = signatories.map {
+          case signatory if signatory.id == id => signatory.copy(jobTitle = Some(jobTitle))
+          case signatory if signatory.id != id => signatory
+        }
+      )
+    } else {
+      this
+    }
 }
 
 object Signatories {

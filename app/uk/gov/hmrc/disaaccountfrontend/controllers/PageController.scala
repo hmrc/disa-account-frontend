@@ -17,7 +17,7 @@
 package uk.gov.hmrc.disaaccountfrontend.controllers
 
 import play.api.mvc.Call
-import uk.gov.hmrc.disaaccountfrontend.models.SessionUpdates
+import uk.gov.hmrc.disaaccountfrontend.models.{Mode, NormalMode, SessionUpdates}
 import uk.gov.hmrc.disaaccountfrontend.models.pages.{Page, PageWithAnswers}
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
 import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator
@@ -32,10 +32,12 @@ abstract class PageController(navigator: Navigator) {
 
   protected def nextPage(
     page: Page,
-    sessionUpdates: SessionUpdates
+    sessionUpdates: SessionUpdates,
+    mode: Mode = NormalMode
   )(implicit request: DataRequest[_]): Call =
     navigator.nextPage(
       page,
-      sessionUpdates.getUpdatedEffectiveAnswers(request.effectiveAnswers)
+      sessionUpdates.getUpdatedEffectiveAnswers(request.effectiveAnswers),
+      mode
     )
 }

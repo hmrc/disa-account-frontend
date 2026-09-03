@@ -19,6 +19,8 @@ package utils
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments}
 import uk.gov.hmrc.disaaccountfrontend.models.CorrespondenceAddress
+import uk.gov.hmrc.disaaccountfrontend.models.articles.FcaArticles
+import uk.gov.hmrc.disaaccountfrontend.models.articles.FcaArticles.{FcaArticle14, FcaArticle64}
 import uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority.FinancialOrganisation.{BuildingSociety, InsuranceCompany}
 import uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority.{CertificatesOfAuthority, FinancialOrganisation}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.{CrowdFundedDebentures, PeertopeerLoansAndHave36hPermissions}
@@ -95,9 +97,13 @@ trait TestData {
     )
   )
 
+  val testSignatoryId: String       = "signatory-1"
+  val testSignatoryName: String     = "Jane Smith"
+  val testSignatoryJobTitle: String = "Director"
+
   val testSignatories: Signatories = Signatories(
     Seq(
-      Signatory(id = "signatory-1", fullName = Some("Joe Doe"), jobTitle = Some("Signatory perhaps"))
+      Signatory(id = testSignatoryId, fullName = Some(testSignatoryName), jobTitle = Some(testSignatoryJobTitle))
     )
   )
 
@@ -109,4 +115,11 @@ trait TestData {
       liaisonOfficers = Some(testLiaisonOfficers),
       signatories = Some(testSignatories)
     )
+
+  val testRegistrationDetailsWithSignatories: RegistrationDetails =
+    testRegistrationDetailsWithFinancialOrganisation.copy(
+      signatories = Some(testSignatories)
+    )
+
+  val testFcaArticlesCheckedBoxes: Seq[FcaArticles] = Seq(FcaArticle14, FcaArticle64)
 }

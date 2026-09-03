@@ -53,11 +53,12 @@ class TelephoneNumberFormProviderSpec extends BaseUnitSpec {
       result.errors.map(_.message) should contain(s"$keyPrefix.error.required")
     }
 
-    "return an error when the value contains letters" in {
-      val result = form.bind(Map("value" -> "0164212345a"))
+    "return an error when the value contains invalid characters" in
+      Seq("0164212345a", "01642-123456", "01642'123456").foreach { phoneNumber =>
+        val result = form.bind(Map("value" -> phoneNumber))
 
-      result.errors.map(_.message) should contain(s"$keyPrefix.error.invalid")
-    }
+        result.errors.map(_.message) should contain(s"$keyPrefix.error.invalid")
+      }
 
     "return an error when the value is too short" in {
       val result = form.bind(Map("value" -> "0164212345"))
