@@ -21,6 +21,7 @@ import uk.gov.hmrc.disaaccountfrontend.models.CorrespondenceAddress
 import uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority.{CertificatesOfAuthority, FinancialOrganisation}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficers
+import uk.gov.hmrc.disaaccountfrontend.models.signatories.Signatories
 
 case class OrganisationDetails(
   correspondenceAddress: Option[CorrespondenceAddress] = None,
@@ -43,7 +44,8 @@ case class RegistrationDetails(
   organisationEmail: Option[OrganisationEmail] = None,
   isaProducts: Option[IsaProducts] = None,
   certificatesOfAuthority: Option[CertificatesOfAuthority] = None,
-  liaisonOfficers: Option[LiaisonOfficers] = None
+  liaisonOfficers: Option[LiaisonOfficers] = None,
+  signatories: Option[Signatories] = None
 ) {
   def correspondenceAddress: Option[CorrespondenceAddress] = organisationDetails.flatMap(_.correspondenceAddress)
   def orgTelephoneNumber: Option[String]                   = organisationDetails.flatMap(_.orgTelephoneNumber)

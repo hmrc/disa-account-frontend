@@ -43,7 +43,6 @@ class RemoveSignatoryController @Inject() (
   navigator: Navigator,
   formProvider: YesNoAnswerFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  val signatory: Signatory,
   view: RemoveSignatoryView
 )(implicit ec: ExecutionContext)
     extends PageController(navigator)
