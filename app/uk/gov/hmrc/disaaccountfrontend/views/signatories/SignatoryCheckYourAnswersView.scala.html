@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.disaaccountfrontend.controllers.routes.ChangeOfCircumstancesController
+@import uk.gov.hmrc.disaaccountfrontend.controllers.signatories.routes.AddedSignatoryController
 @import uk.gov.hmrc.disaaccountfrontend.views.html.Layout
 
 @this(
@@ -33,7 +33,7 @@
 
     @govukButton(
         Button(
-            href = Some(ChangeOfCircumstancesController.onPageLoad().url),
+            href = Some(AddedSignatoryController.onPageLoad().url),
             content = Text(messages("site.continue"))
         )
     )

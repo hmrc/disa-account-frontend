@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.viewmodels
+package uk.gov.hmrc.disaaccountfrontend.models.pages
 
-package object govuk {
+import uk.gov.hmrc.disaaccountfrontend.models.Answers
 
-  object all
-      extends ImplicitConversions
-      with ButtonFluency
-      with CheckboxFluency
-      with ErrorSummaryFluency
-      with FieldsetFluency
-      with InputFluency
-      with LabelFluency
-      with RadiosFluency
+case object AddedSignatoryPage extends GuardedPage {
+
+  override def canBeAccessedWith(answers: Answers): Boolean =
+    answers.signatories.exists(
+      signatories =>
+        signatories.nonEmpty &&
+          signatories.forall(signatory => signatory.fullName.isDefined && signatory.jobTitle.isDefined)
+    )
 }

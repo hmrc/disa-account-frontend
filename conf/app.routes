@@ -33,6 +33,9 @@ POST       /change-signatory-job-title          uk.gov.hmrc.disaaccountfrontend.
 
 GET        /check-signatory-details             uk.gov.hmrc.disaaccountfrontend.controllers.signatories.SignatoryCheckYourAnswersController.onPageLoad(id: String)
 
+GET        /added-signatories                    uk.gov.hmrc.disaaccountfrontend.controllers.signatories.AddedSignatoryController.onPageLoad()
+POST       /added-signatories                    uk.gov.hmrc.disaaccountfrontend.controllers.signatories.AddedSignatoryController.onSubmit()
+
 GET        /unauthorised                       uk.gov.hmrc.disaaccountfrontend.controllers.UnauthorisedController.onPageLoad()
 
 GET        /change-of-circumstances            uk.gov.hmrc.disaaccountfrontend.controllers.ChangeOfCircumstancesController.onPageLoad()
