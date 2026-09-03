@@ -33,17 +33,23 @@ class AddedSignatoryPageSpec extends BaseUnitSpec {
     }
 
     "deny access when signatories are absent or empty" in {
-      AddedSignatoryPage.canBeAccessedWith(Answers()) shouldBe false
+      AddedSignatoryPage.canBeAccessedWith(Answers())                              shouldBe false
       AddedSignatoryPage.canBeAccessedWith(Answers(signatories = Some(Seq.empty))) shouldBe false
     }
 
-    "deny access when any signatory has incomplete details" in {
+    "deny access when no complete signatory exists" in {
       AddedSignatoryPage.canBeAccessedWith(
         Answers(signatories = Some(Seq(completeSignatory.copy(fullName = None))))
       ) shouldBe false
       AddedSignatoryPage.canBeAccessedWith(
         Answers(signatories = Some(Seq(completeSignatory.copy(jobTitle = None))))
       ) shouldBe false
+    }
+
+    "allow access when complete and incomplete signatories exist" in {
+      AddedSignatoryPage.canBeAccessedWith(
+        Answers(signatories = Some(Seq(completeSignatory, completeSignatory.copy(id = "incomplete", jobTitle = None))))
+      ) shouldBe true
     }
   }
 }

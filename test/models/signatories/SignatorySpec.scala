@@ -14,12 +14,22 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.models.pages
+package models.signatories
 
-import uk.gov.hmrc.disaaccountfrontend.models.Answers
+import uk.gov.hmrc.disaaccountfrontend.models.signatories.Signatory
+import utils.BaseUnitSpec
 
-case object AddedSignatoryPage extends GuardedPage {
+class SignatorySpec extends BaseUnitSpec {
 
-  override def canBeAccessedWith(answers: Answers): Boolean =
-    answers.signatories.exists(_.exists(_.isComplete))
+  "Signatory.isComplete" should {
+
+    "return true when all required details are present" in {
+      Signatory("id", Some("Jane Smith"), Some("Director")).isComplete shouldBe true
+    }
+
+    "return false when a required detail is absent" in {
+      Signatory("id", None, Some("Director")).isComplete   shouldBe false
+      Signatory("id", Some("Jane Smith"), None).isComplete shouldBe false
+    }
+  }
 }

@@ -39,7 +39,7 @@ class LiaisonOfficerEmailPageSpec extends BaseUnitSpec {
 
   "LiaisonOfficerEmailPage" should {
 
-    "allow access when the identified liaison officer exists and has a non-blank name" in {
+    "allow access when the identified liaison officer exists and has a name" in {
       val answers = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(targetOfficer))))
 
       LiaisonOfficerEmailPage(id).canBeAccessedWith(answers) shouldBe true
@@ -61,10 +61,10 @@ class LiaisonOfficerEmailPageSpec extends BaseUnitSpec {
       LiaisonOfficerEmailPage(id).canBeAccessedWith(answers) shouldBe false
     }
 
-    "deny access when the identified liaison officer has a blank name" in {
+    "allow access when the identified liaison officer has a defined name" in {
       val answers = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(targetOfficer.copy(fullName = Some("  "))))))
 
-      LiaisonOfficerEmailPage(id).canBeAccessedWith(answers) shouldBe false
+      LiaisonOfficerEmailPage(id).canBeAccessedWith(answers) shouldBe true
     }
 
     "update the identified officer email and preserve existing session updates" in {

@@ -24,7 +24,9 @@ import uk.gov.hmrc.govukfrontend.views.Aliases.{ActionItem, Actions, Key, Summar
 
 case class AddedSignatoriesSummary(signatories: Seq[Signatory], maxSignatories: Int) {
 
-  val count: Int       = signatories.size
+  private val completeSignatories = signatories.filter(_.isComplete)
+
+  val count: Int          = completeSignatories.size
   val canAddMore: Boolean = count < maxSignatories
 
   def title(implicit messages: Messages): String =
@@ -36,7 +38,7 @@ case class AddedSignatoriesSummary(signatories: Seq[Signatory], maxSignatories: 
     else messages("addedSignatory.guidance.max", maxSignatories)
 
   def list(implicit messages: Messages): SummaryList =
-    SummaryList(rows = signatories.flatMap(row))
+    SummaryList(rows = completeSignatories.flatMap(row))
 
   private def row(signatory: Signatory)(implicit messages: Messages): Option[SummaryListRow] =
     signatory.fullName.map { name =>

@@ -44,24 +44,24 @@ class AddedSignatoryControllerSpec extends BaseUnitSpec {
         val result = route(application, FakeRequest(GET, addedSignatoriesEndpoint)).value
         val doc    = Jsoup.parse(contentAsString(result))
 
-        status(result)      shouldBe OK
-        doc.title()         shouldBe "You currently have a signatory - Manage ISAs - GOV.UK"
-        doc.select("h1").text() shouldBe "You currently have a signatory"
+        status(result)                         shouldBe OK
+        doc.title()                            shouldBe "You currently have a signatory - Manage ISAs - GOV.UK"
+        doc.select("h1").text()                shouldBe "You currently have a signatory"
         doc.select(".govuk-caption-l").isEmpty shouldBe true
-        doc.text() should include("Add or remove signatories, but you must have at least 1 and no more than 25.")
-        doc.text() should include(testSignatoryName)
+        doc.text()                               should include("Add or remove signatories, but you must have at least 1 and no more than 25.")
+        doc.text()                               should include(testSignatoryName)
 
         val actions = doc.select(".govuk-summary-list__actions a")
-        actions.size()             shouldBe 2
+        actions.size()              shouldBe 2
         actions.get(0).attr("href") shouldBe s"$checkSignatoryDetailsEndpoint?id=$testSignatoryId"
         actions.get(0).text()       shouldBe s"Change $testSignatoryName details"
         actions.get(1).attr("href") shouldBe changeOfCircumstancesEndpoint
         actions.get(1).text()       shouldBe s"Remove $testSignatoryName details"
 
         doc.select("input[type=radio][name=value]").size() shouldBe 2
-        doc.select("input[type=radio][checked]").isEmpty shouldBe true
-        doc.select(".govuk-radios--inline").size() shouldBe 1
-        doc.select("button.govuk-button").text() shouldBe "Continue"
+        doc.select("input[type=radio][checked]").isEmpty   shouldBe true
+        doc.select(".govuk-radios--inline").size()         shouldBe 1
+        doc.select("button.govuk-button").text()           shouldBe "Continue"
       }
     }
 
@@ -74,9 +74,42 @@ class AddedSignatoryControllerSpec extends BaseUnitSpec {
         val result = route(application, FakeRequest(GET, addedSignatoriesEndpoint)).value
         val doc    = Jsoup.parse(contentAsString(result))
 
-        status(result)           shouldBe OK
-        doc.select("h1").text() shouldBe "You have 2 signatories"
+        status(result)                                shouldBe OK
+        doc.select("h1").text()                       shouldBe "You have 2 signatories"
         doc.select(".govuk-summary-list__row").size() shouldBe 2
+      }
+    }
+
+    "exclude incomplete signatories from the list and heading count" in {
+      val incompleteSignatory = Signatory("incomplete-id", Some("Incomplete Signatory"), None)
+      val application         = applicationBuilder(
+        effectiveAnswers = Answers(signatories = Some(completeSignatories(2) :+ incompleteSignatory))
+      ).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, addedSignatoriesEndpoint)).value
+        val doc    = Jsoup.parse(contentAsString(result))
+
+        status(result)                                shouldBe OK
+        doc.select("h1").text()                       shouldBe "You have 2 signatories"
+        doc.select(".govuk-summary-list__row").size() shouldBe 2
+        doc.text()                                      should not include "Incomplete Signatory"
+      }
+    }
+
+    "allow another signatory when incomplete records bring the stored collection to the maximum" in {
+      val signatories = completeSignatories(24) :+ Signatory("incomplete-id", Some("Incomplete Signatory"), None)
+      val application = applicationBuilder(
+        effectiveAnswers = Answers(signatories = Some(signatories))
+      ).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, addedSignatoriesEndpoint)).value
+        val doc    = Jsoup.parse(contentAsString(result))
+
+        status(result)                         shouldBe OK
+        doc.select("h1").text()                shouldBe "You have 24 signatories"
+        doc.select("input[type=radio]").size() shouldBe 2
       }
     }
 
@@ -89,10 +122,10 @@ class AddedSignatoryControllerSpec extends BaseUnitSpec {
         val result = route(application, FakeRequest(GET, addedSignatoriesEndpoint)).value
         val doc    = Jsoup.parse(contentAsString(result))
 
-        status(result)           shouldBe OK
-        doc.select("h1").text() shouldBe "You have 25 signatories"
-        doc.text() should include("You must have at least one signatory. The maximum is 25.")
-        doc.text() should not include "Do you want to add another signatory?"
+        status(result)                          shouldBe OK
+        doc.select("h1").text()                 shouldBe "You have 25 signatories"
+        doc.text()                                should include("You must have at least one signatory. The maximum is 25.")
+        doc.text()                                should not include "Do you want to add another signatory?"
         doc.select("input[type=radio]").isEmpty shouldBe true
       }
     }
@@ -106,8 +139,8 @@ class AddedSignatoryControllerSpec extends BaseUnitSpec {
         val result = route(application, FakeRequest(GET, addedSignatoriesEndpoint)).value
         val doc    = Jsoup.parse(contentAsString(result))
 
-        status(result)           shouldBe OK
-        doc.select("h1").text() shouldBe "You have 26 signatories"
+        status(result)                          shouldBe OK
+        doc.select("h1").text()                 shouldBe "You have 26 signatories"
         doc.select("input[type=radio]").isEmpty shouldBe true
       }
     }
@@ -179,10 +212,10 @@ class AddedSignatoryControllerSpec extends BaseUnitSpec {
         val result  = route(application, request).value
         val doc     = Jsoup.parse(contentAsString(result))
 
-        status(result) shouldBe BAD_REQUEST
+        status(result)                                    shouldBe BAD_REQUEST
         doc.select(".govuk-error-summary a").attr("href") shouldBe "#value_0"
-        doc.select(".govuk-error-summary").text() should include("Select yes if you’d like to add another signatory")
-        doc.select(".govuk-error-message").text() should include("Select yes if you’d like to add another signatory")
+        doc.select(".govuk-error-summary").text()           should include("Select yes if you’d like to add another signatory")
+        doc.select(".govuk-error-message").text()           should include("Select yes if you’d like to add another signatory")
         verify(mockUserAnswersRepository, never).set(any())
       }
     }

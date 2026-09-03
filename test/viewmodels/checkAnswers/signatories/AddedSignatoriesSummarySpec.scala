@@ -31,7 +31,7 @@ class AddedSignatoriesSummarySpec extends BaseUnitSpec {
       val summary = AddedSignatoriesSummary(Seq(signatory(1)), 25)
 
       summary.title(messages(app)) shouldBe "You currently have a signatory"
-      summary.canAddMore          shouldBe true
+      summary.canAddMore           shouldBe true
     }
 
     "use the plural heading and maximum state above the configured maximum" in {
@@ -40,6 +40,15 @@ class AddedSignatoriesSummarySpec extends BaseUnitSpec {
       summary.title(messages(app))    shouldBe "You have 26 signatories"
       summary.guidance(messages(app)) shouldBe "You must have at least one signatory. The maximum is 25."
       summary.canAddMore              shouldBe false
+    }
+
+    "exclude incomplete signatories from the count and summary list" in {
+      val incompleteSignatory = Signatory("incomplete-id", Some("Incomplete Signatory"), None)
+      val summary             = AddedSignatoriesSummary(Seq(signatory(1), incompleteSignatory), 25)
+
+      summary.count                         shouldBe 1
+      summary.title(messages(app))          shouldBe "You currently have a signatory"
+      summary.list(messages(app)).rows.size shouldBe 1
     }
   }
 }
