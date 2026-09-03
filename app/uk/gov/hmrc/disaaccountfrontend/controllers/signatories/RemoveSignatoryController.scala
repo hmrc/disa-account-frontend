@@ -50,7 +50,7 @@ class RemoveSignatoryController @Inject() (
     with I18nSupport {
 
   private val form: Form[YesNoAnswer] = formProvider("removeSignatory.error.required")
-  private val pageAction              = identify andThen getData // andThen guardPage(RemoveSignatoryPage)
+  private val pageAction              = identify andThen getData
 
   def onPageLoad(id: String): Action[AnyContent] = pageAction.async { implicit request =>
     providingName(id, name => Future.successful(Ok(view(id, name, form))))

@@ -20,6 +20,7 @@ import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstances
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.OrganisationTelephoneNumberController
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.{CrowdFundedDebentures, PeertopeerLoansUsingAPlatformWith36hPermissions}
+import uk.gov.hmrc.disaaccountfrontend.models.pages.signatories.RemoveSignatoryPage
 import uk.gov.hmrc.disaaccountfrontend.models.pages.{EnterYourOrganisationAddressPage, FinancialOrganisationPage, InnovativeFinancialProductsPage, LiaisonOfficerNamePage, OrganisationTelephoneNumberPage, PageWithAnswers, PeerToPeerPlatformPage}
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
 import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator
@@ -73,6 +74,18 @@ class NavigatorSpec extends BaseUnitSpec {
 
     "temporarily go from LiaisonOfficerNamePage to change of circumstances until the next page exists" in {
       navigator.nextPage(LiaisonOfficerNamePage("liaison-officer-1")) shouldBe
+        ChangeOfCircumstancesController.onPageLoad()
+    }
+
+    "temporarily go from RemoveSignatoryPage to change of circumstances until the next page exists - With a signatory" in {
+      val answers = Answers(signatories = Some(testSignatories))
+      navigator.nextPage(RemoveSignatoryPage("signatory-1"), answers) shouldBe
+        ChangeOfCircumstancesController.onPageLoad()
+    }
+
+    "temporarily go from RemoveSignatoryPage to change of circumstances until the next page exists - With no more signatories" in {
+      val answers = Answers(signatories = None)
+      navigator.nextPage(RemoveSignatoryPage("signatory-1"), answers) shouldBe
         ChangeOfCircumstancesController.onPageLoad()
     }
 

@@ -23,6 +23,7 @@ import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstances
 import uk.gov.hmrc.disaaccountfrontend.models.Answers
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
 import uk.gov.hmrc.disaaccountfrontend.models.pages.*
+import uk.gov.hmrc.disaaccountfrontend.models.pages.signatories.RemoveSignatoryPage
 
 import javax.inject.{Inject, Singleton}
 
@@ -42,6 +43,8 @@ class Navigator @Inject() () {
     case FinancialOrganisationPage        => ChangeOfCircumstancesController.onPageLoad()
     // TODO: replace with the next liaison officer page once it exists.
     case LiaisonOfficerNamePage(_)        => ChangeOfCircumstancesController.onPageLoad()
+    // TODO: replace the TODOs in the RemoveSignatoryNextPage
+    case RemoveSignatoryPage(_)           => RemoveSignatoryNextPage(answers)
     case unsupportedPage                  =>
       throw new IllegalArgumentException(s"No navigation defined for page: $unsupportedPage")
   }
@@ -66,4 +69,12 @@ class Navigator @Inject() () {
   private def peerToPeerPlatformNumberQuestionPage: Call =
     // TODO: Replace this fallback with the FCA/FRN question when that page is implemented.
     ChangeOfCircumstancesController.onPageLoad()
+
+  private def RemoveSignatoryNextPage(answers: Answers): Call =
+    answers.signatories match {
+      // TODO Change to "You currently have a signatory" once ready
+      case Some(_) => ChangeOfCircumstancesController.onPageLoad()
+      // TODO Change to "Add a signatory" once ready
+      case None    => ChangeOfCircumstancesController.onPageLoad()
+    }
 }
