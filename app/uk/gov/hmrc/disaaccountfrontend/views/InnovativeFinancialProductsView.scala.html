@@ -27,7 +27,7 @@
 
 @(form: Form[_])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = Some(title(form, "innovativeFinancialProducts.title", Some("sectionTitle.isaProducts")))) {
+@layout(pageTitle = Some(title(form, "innovativeFinancialProducts.title"))) {
 
     @formHelper(action = InnovativeFinancialProductsController.onSubmit(), Symbol("autoComplete") -> "off") {
 
@@ -46,9 +46,8 @@
                 name = "value",
                 hint = Some(Hint(content = Text(messages("innovativeFinancialProducts.hint")))),
                 legend = HmrcPageHeadingLegend(
-                    Text(messages("innovativeFinancialProducts.heading")),
-                    HmrcSectionCaption(messages("sectionTitle.isaProducts")),
-                    "govuk-fieldset__legend--l"
+                    content = Text(messages("innovativeFinancialProducts.heading")),
+                    classes = "govuk-fieldset__legend--l"
                 ),
                 items = InnovativeFinancialProduct.checkboxItems
             )

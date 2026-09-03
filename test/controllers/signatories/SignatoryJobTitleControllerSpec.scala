@@ -16,6 +16,7 @@
 
 package controllers.signatories
 
+import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
@@ -58,8 +59,30 @@ class SignatoryJobTitleControllerSpec extends BaseUnitSpec {
       running(application) {
         val result = route(application, FakeRequest(GET, s"$signatoryJobTitleEndpoint?id=$testSignatoryId")).value
 
+        val doc = Jsoup.parse(contentAsString(result))
+
+        status(result)                         shouldBe OK
+        contentAsString(result)                  should include(testSignatoryJobTitle)
+        doc.title()                            shouldBe s"What is the job title of $testSignatoryName within the organisation? - Manage ISAs - GOV.UK"
+        doc.select(".govuk-caption-l").isEmpty shouldBe true
+      }
+    }
+
+    "render the check-mode form for an existing signatory" in {
+      val application = applicationBuilder(
+        effectiveAnswers = Answers(
+          signatories = Some(Seq(existingSignatory.copy(jobTitle = Some(testSignatoryJobTitle))))
+        )
+      ).build()
+
+      running(application) {
+        val result = route(
+          application,
+          FakeRequest(GET, s"$changeSignatoryJobTitleEndpoint?id=$testSignatoryId")
+        ).value
+
         status(result)        shouldBe OK
-        contentAsString(result) should include(testSignatoryJobTitle)
+        contentAsString(result) should include(s"action=\"$changeSignatoryJobTitleEndpoint?id=$testSignatoryId\"")
       }
     }
 
@@ -107,13 +130,34 @@ class SignatoryJobTitleControllerSpec extends BaseUnitSpec {
 
         val result = route(application, request).value
 
-        status(result) shouldBe SEE_OTHER
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe s"$checkSignatoryDetailsEndpoint?id=$testSignatoryId"
 
         val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
         verify(mockUserAnswersRepository).set(captor.capture())
         captor.getValue.updates shouldBe SessionUpdates(
           signatories = Assign(Seq(existingSignatory.copy(jobTitle = Some(testSignatoryJobTitle))))
         )
+      }
+    }
+
+    "return directly to check signatory details after updating a job title in check mode" in {
+      when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
+
+      val application = applicationBuilder(
+        effectiveAnswers = Answers(signatories = Some(Seq(existingSignatory)))
+      ).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, s"$changeSignatoryJobTitleEndpoint?id=$testSignatoryId")
+            .withFormUrlEncodedBody(validFormData.toSeq: _*)
+            .withHeaders("Csrf-Token" -> "nocheck")
+
+        val result = route(application, request).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe s"$checkSignatoryDetailsEndpoint?id=$testSignatoryId"
       }
     }
 

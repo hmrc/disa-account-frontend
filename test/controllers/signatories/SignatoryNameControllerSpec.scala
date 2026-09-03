@@ -61,6 +61,35 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
       }
     }
 
+    "render the check-mode form for an existing signatory" in {
+      val application = applicationBuilder(
+        effectiveAnswers = Answers(signatories = Some(testSignatories))
+      ).build()
+
+      running(application) {
+        val result = route(
+          application,
+          FakeRequest(GET, s"$changeSignatoryNameEndpoint?id=$testSignatoryId")
+        ).value
+
+        status(result)        shouldBe OK
+        contentAsString(result) should include(s"action=\"$changeSignatoryNameEndpoint?id=$testSignatoryId\"")
+      }
+    }
+
+    "reject an unknown signatory id in check mode" in {
+      val application = applicationBuilder(
+        effectiveAnswers = Answers(signatories = Some(testSignatories))
+      ).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, s"$changeSignatoryNameEndpoint?id=unknown-id")).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
+      }
+    }
+
     "return 200 OK with an empty form when the id does not match an existing signatory" in {
       val application = applicationBuilder(
         effectiveAnswers = Answers(signatories = Some(testSignatories))
@@ -139,6 +168,45 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
         captor.getValue.updates shouldBe SessionUpdates(
           signatories = Assign(Seq(existingSignatory.copy(fullName = Some(testSignatoryName))))
         )
+      }
+    }
+
+    "return directly to check signatory details after updating a name in check mode" in {
+      when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
+
+      val existingSignatory =
+        Signatory(testSignatoryId, fullName = Some("Old Name"), jobTitle = Some(testSignatoryJobTitle))
+      val application       = applicationBuilder(
+        effectiveAnswers = Answers(signatories = Some(Seq(existingSignatory)))
+      ).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, s"$changeSignatoryNameEndpoint?id=$testSignatoryId")
+            .withFormUrlEncodedBody(validFormData.toSeq: _*)
+            .withHeaders("Csrf-Token" -> "nocheck")
+
+        val result = route(application, request).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe s"$checkSignatoryDetailsEndpoint?id=$testSignatoryId"
+      }
+    }
+
+    "reject an unknown signatory id in check mode" in {
+      val application = applicationBuilder(effectiveAnswers = Answers(signatories = Some(testSignatories))).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, s"$changeSignatoryNameEndpoint?id=unknown-id")
+            .withFormUrlEncodedBody(validFormData.toSeq: _*)
+            .withHeaders("Csrf-Token" -> "nocheck")
+
+        val result = route(application, request).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
+        verify(mockUserAnswersRepository, never).set(any())
       }
     }
 

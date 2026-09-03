@@ -23,7 +23,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction}
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes.ChangeOfCircumstancesController
 import uk.gov.hmrc.disaaccountfrontend.forms.SignatoryJobTitleFormProvider
-import uk.gov.hmrc.disaaccountfrontend.models.UserAnswers
+import uk.gov.hmrc.disaaccountfrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.disaaccountfrontend.models.pages.SignatoryJobTitlePage
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
 import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator
@@ -50,7 +50,7 @@ class SignatoryJobTitleController @Inject() (
 
   val form: Form[String] = formProvider()
 
-  def onPageLoad(id: String): Action[AnyContent] = (identify andThen getData) { implicit request =>
+  def onPageLoad(id: String, mode: Mode): Action[AnyContent] = (identify andThen getData) { implicit request =>
     signatoryName(id, request).fold(Redirect(ChangeOfCircumstancesController.onPageLoad())) { name =>
       val preparedForm =
         (for {
@@ -59,16 +59,16 @@ class SignatoryJobTitleController @Inject() (
           jobTitle    <- signatory.jobTitle
         } yield form.fill(jobTitle)).getOrElse(form)
 
-      Ok(view(id, name, preparedForm))
+      Ok(view(id, name, mode, preparedForm))
     }
   }
 
-  def onSubmit(id: String): Action[AnyContent] = (identify andThen getData).async { implicit request =>
+  def onSubmit(id: String, mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
     signatoryName(id, request).fold(Future.successful(Redirect(ChangeOfCircumstancesController.onPageLoad()))) { name =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(id, name, formWithErrors))),
+          formWithErrors => Future.successful(BadRequest(view(id, name, mode, formWithErrors))),
           answer => {
             val sessionUpdates = SignatoryJobTitlePage(id).saveAnswerAndHandleDependents(request, answer)
 
@@ -78,7 +78,8 @@ class SignatoryJobTitleController @Inject() (
                 Redirect(
                   navigator.nextPage(
                     SignatoryJobTitlePage(id),
-                    sessionUpdates.getUpdatedEffectiveAnswers(request.effectiveAnswers)
+                    sessionUpdates.getUpdatedEffectiveAnswers(request.effectiveAnswers),
+                    mode
                   )
                 )
               }
