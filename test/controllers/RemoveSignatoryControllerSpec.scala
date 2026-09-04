@@ -16,19 +16,18 @@
 
 package controllers
 
+import org.jsoup.Jsoup
+import org.mockito.ArgumentMatchers.any
 import play.api.data.Form
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import org.mockito.Mockito.*
 import play.api.test.Helpers.*
 import uk.gov.hmrc.disaaccountfrontend.forms.generic.YesNoAnswerFormProvider
-import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
 import uk.gov.hmrc.disaaccountfrontend.models.YesNoAnswer.Yes
-import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates, UserAnswers, YesNoAnswer}
-import uk.gov.hmrc.disaaccountfrontend.models.signatories.{Signatories, Signatory}
+import uk.gov.hmrc.disaaccountfrontend.models.{Answers, YesNoAnswer}
+import uk.gov.hmrc.disaaccountfrontend.models.signatories.Signatory
 import utils.BaseUnitSpec
-
-import scala.concurrent.Future
 
 class RemoveSignatoryControllerSpec extends BaseUnitSpec {
 
@@ -86,10 +85,17 @@ class RemoveSignatoryControllerSpec extends BaseUnitSpec {
       running(application) {
         val result = route(
           application,
-          FakeRequest(POST, s"$removeSignatoryEndpoint?id=$testSignatoryId").withFormUrlEncodedBody("value" -> Yes.toString)
+          FakeRequest(POST, s"$removeSignatoryEndpoint?id=$testSignatoryId").withHeaders(Yes.toString -> "nocheck")
         ).value
+        val html   = contentAsString(result)
+        val doc    = Jsoup.parse(html)
 
-        status(result) shouldBe BAD_REQUEST
+        status(result)                          shouldBe BAD_REQUEST
+        doc.select(".govuk-error-message").text() should include(
+          "Select yes if you want to remove this signatory"
+        )
+        doc.title()                               should startWith("Error:")
+        verify(mockUserAnswersRepository, never).set(any())
       }
     }
 
