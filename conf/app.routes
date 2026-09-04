@@ -21,6 +21,8 @@ POST       /peer-to-peer-loans                 uk.gov.hmrc.disaaccountfrontend.c
 GET        /financial-organisation              uk.gov.hmrc.disaaccountfrontend.controllers.FinancialOrganisationController.onPageLoad()
 POST       /financial-organisation              uk.gov.hmrc.disaaccountfrontend.controllers.FinancialOrganisationController.onSubmit()
 
+## Signatories
+
 GET        /signatory-name                      uk.gov.hmrc.disaaccountfrontend.controllers.signatories.SignatoryNameController.onPageLoad(id: Option[String], mode: Mode = NormalMode)
 POST       /signatory-name                      uk.gov.hmrc.disaaccountfrontend.controllers.signatories.SignatoryNameController.onSubmit(id: String, mode: Mode = NormalMode)
 GET        /change-signatory-name               uk.gov.hmrc.disaaccountfrontend.controllers.signatories.SignatoryNameController.onPageLoad(id: Option[String], mode: Mode = CheckMode)
@@ -33,9 +35,8 @@ POST       /change-signatory-job-title          uk.gov.hmrc.disaaccountfrontend.
 
 GET        /check-signatory-details             uk.gov.hmrc.disaaccountfrontend.controllers.signatories.SignatoryCheckYourAnswersController.onPageLoad(id: String)
 
-GET        /unauthorised                       uk.gov.hmrc.disaaccountfrontend.controllers.UnauthorisedController.onPageLoad()
-
-GET        /change-of-circumstances            uk.gov.hmrc.disaaccountfrontend.controllers.ChangeOfCircumstancesController.onPageLoad()
+GET        /remove-signatory                   uk.gov.hmrc.disaaccountfrontend.controllers.signatories.RemoveSignatoryController.onPageLoad(id: String)
+POST       /remove-signatory                   uk.gov.hmrc.disaaccountfrontend.controllers.signatories.RemoveSignatoryController.onSubmit(id: String)
 
 ## Liaison officers
 
@@ -64,10 +65,10 @@ POST       /change-liaison-officer-communication uk.gov.hmrc.disaaccountfrontend
 GET        /organisation-email-address         uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.OrganisationEmailAddressController.onPageLoad()
 POST       /organisation-email-address         uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.OrganisationEmailAddressController.onSubmit()
 
-## Signatories
 
-GET        /remove-signatory                   uk.gov.hmrc.disaaccountfrontend.controllers.signatories.RemoveSignatoryController.onPageLoad(id: String)
-POST       /remove-signatory                   uk.gov.hmrc.disaaccountfrontend.controllers.signatories.RemoveSignatoryController.onSubmit(id: String)
+GET        /unauthorised                       uk.gov.hmrc.disaaccountfrontend.controllers.UnauthorisedController.onPageLoad()
+
+GET        /change-of-circumstances            uk.gov.hmrc.disaaccountfrontend.controllers.ChangeOfCircumstancesController.onPageLoad()
 
 GET        /email-verification-code            uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.EmailVerificationCodeController.onPageLoad()
 POST       /email-verification-code            uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.EmailVerificationCodeController.onSubmit()

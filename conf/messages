@@ -6,6 +6,8 @@ site.change = Change
 site.govuk = GOV.UK
 site.signIn = Sign in
 site.signOut = Sign out
+site.yes	= Yes
+site.no 	= No
 
 error.prefix = Error
 error.title.prefix = Error:
