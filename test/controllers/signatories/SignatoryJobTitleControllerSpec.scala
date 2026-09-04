@@ -18,12 +18,12 @@ package controllers.signatories
 
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers._
-import org.mockito.Mockito._
-import play.api.test.Helpers._
-import play.api.test._
+import org.mockito.ArgumentMatchers.*
+import org.mockito.Mockito.*
+import play.api.test.Helpers.*
+import play.api.test.*
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
-import uk.gov.hmrc.disaaccountfrontend.models.signatories.Signatory
+import uk.gov.hmrc.disaaccountfrontend.models.signatories.{Signatories, Signatory}
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates, UserAnswers}
 import utils.BaseUnitSpec
 
@@ -39,7 +39,7 @@ class SignatoryJobTitleControllerSpec extends BaseUnitSpec {
 
     "return 200 OK with an empty form when the signatory has no job title yet" in {
       val application = applicationBuilder(
-        effectiveAnswers = Answers(signatories = Some(Seq(existingSignatory)))
+        effectiveAnswers = Answers(signatories = Some(Signatories(Seq(existingSignatory))))
       ).build()
 
       running(application) {
@@ -53,7 +53,7 @@ class SignatoryJobTitleControllerSpec extends BaseUnitSpec {
     "return 200 OK prefilled from the effective answers when the signatory already has a job title" in {
       val application = applicationBuilder(
         effectiveAnswers =
-          Answers(signatories = Some(Seq(existingSignatory.copy(jobTitle = Some(testSignatoryJobTitle)))))
+          Answers(signatories = Some(Signatories(Seq(existingSignatory.copy(jobTitle = Some(testSignatoryJobTitle))))))
       ).build()
 
       running(application) {
@@ -71,7 +71,7 @@ class SignatoryJobTitleControllerSpec extends BaseUnitSpec {
     "render the check-mode form for an existing signatory" in {
       val application = applicationBuilder(
         effectiveAnswers = Answers(
-          signatories = Some(Seq(existingSignatory.copy(jobTitle = Some(testSignatoryJobTitle))))
+          signatories = Some(Signatories(Seq(existingSignatory.copy(jobTitle = Some(testSignatoryJobTitle)))))
         )
       ).build()
 
@@ -88,7 +88,7 @@ class SignatoryJobTitleControllerSpec extends BaseUnitSpec {
 
     "redirect to change of circumstances when the id does not match an existing signatory" in {
       val application = applicationBuilder(
-        effectiveAnswers = Answers(signatories = Some(Seq(existingSignatory)))
+        effectiveAnswers = Answers(signatories = Some(Signatories(Seq(existingSignatory))))
       ).build()
 
       running(application) {
@@ -101,7 +101,7 @@ class SignatoryJobTitleControllerSpec extends BaseUnitSpec {
 
     "redirect to change of circumstances when the matching signatory has no name yet" in {
       val application = applicationBuilder(
-        effectiveAnswers = Answers(signatories = Some(Seq(Signatory(testSignatoryId))))
+        effectiveAnswers = Answers(signatories = Some(Signatories(Seq(Signatory(testSignatoryId)))))
       ).build()
 
       running(application) {
@@ -119,7 +119,7 @@ class SignatoryJobTitleControllerSpec extends BaseUnitSpec {
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
 
       val application = applicationBuilder(
-        effectiveAnswers = Answers(signatories = Some(Seq(existingSignatory)))
+        effectiveAnswers = Answers(signatories = Some(Signatories(Seq(existingSignatory))))
       ).build()
 
       running(application) {
@@ -136,7 +136,7 @@ class SignatoryJobTitleControllerSpec extends BaseUnitSpec {
         val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
         verify(mockUserAnswersRepository).set(captor.capture())
         captor.getValue.updates shouldBe SessionUpdates(
-          signatories = Assign(Seq(existingSignatory.copy(jobTitle = Some(testSignatoryJobTitle))))
+          signatories = Assign(Signatories(Seq(existingSignatory.copy(jobTitle = Some(testSignatoryJobTitle)))))
         )
       }
     }
@@ -145,7 +145,7 @@ class SignatoryJobTitleControllerSpec extends BaseUnitSpec {
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
 
       val application = applicationBuilder(
-        effectiveAnswers = Answers(signatories = Some(Seq(existingSignatory)))
+        effectiveAnswers = Answers(signatories = Some(Signatories(Seq(existingSignatory))))
       ).build()
 
       running(application) {
@@ -163,7 +163,7 @@ class SignatoryJobTitleControllerSpec extends BaseUnitSpec {
 
     "return 400 BadRequest when the form is invalid" in {
       val application = applicationBuilder(
-        effectiveAnswers = Answers(signatories = Some(Seq(existingSignatory)))
+        effectiveAnswers = Answers(signatories = Some(Signatories(Seq(existingSignatory))))
       ).build()
 
       running(application) {
@@ -182,7 +182,7 @@ class SignatoryJobTitleControllerSpec extends BaseUnitSpec {
 
     "redirect to change of circumstances and not save when the id does not match an existing signatory" in {
       val application = applicationBuilder(
-        effectiveAnswers = Answers(signatories = Some(Seq(existingSignatory)))
+        effectiveAnswers = Answers(signatories = Some(Signatories(Seq(existingSignatory))))
       ).build()
 
       running(application) {

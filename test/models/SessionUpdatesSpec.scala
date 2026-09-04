@@ -19,7 +19,7 @@ package models
 import play.api.libs.json.{JsNull, JsSuccess, Json}
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.{Assign, Clear, Unchanged}
 import uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority.FinancialOrganisation.{Bank, BuildingSociety}
-import uk.gov.hmrc.disaaccountfrontend.models.signatories.Signatory
+import uk.gov.hmrc.disaaccountfrontend.models.signatories.{Signatories, Signatory}
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates}
 import utils.BaseUnitSpec
@@ -75,7 +75,7 @@ class SessionUpdatesSpec extends BaseUnitSpec {
       val updates          = SessionUpdates(
         organisationTelephoneNumber = Assign(updatedOrgTelephoneNumber),
         financialOrganisation = Assign(Seq(Bank)),
-        signatories = Assign(Seq(updatedSignatory)),
+        signatories = Assign(Signatories(Seq(updatedSignatory))),
         liaisonOfficers = Assign(LiaisonOfficers(Seq(LiaisonOfficer("new-id", Some("New Name"))))),
         p2pPlatform = Clear
       )
@@ -84,7 +84,7 @@ class SessionUpdatesSpec extends BaseUnitSpec {
         correspondenceAddress = Some(testCorrespondenceAddress),
         organisationTelephoneNumber = Some(updatedOrgTelephoneNumber),
         financialOrganisation = Some(Seq(Bank)),
-        signatories = Some(Seq(updatedSignatory)),
+        signatories = Some(Signatories(Seq(updatedSignatory))),
         liaisonOfficers = Some(LiaisonOfficers(Seq(LiaisonOfficer("new-id", Some("New Name")))))
       )
     }

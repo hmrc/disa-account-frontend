@@ -25,7 +25,7 @@ import uk.gov.hmrc.disaaccountfrontend.controllers.PageController
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction, PageGuardAction}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.routes.EmailVerificationCodeController as EmailVerificationCodeRoutes
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.routes.OrganisationEmailAddressController as OrganisationEmailAddressRoutes
-import uk.gov.hmrc.disaaccountfrontend.forms.EmailVerificationCodeFormProvider
+import uk.gov.hmrc.disaaccountfrontend.forms.generic.EmailVerificationCodeFormProvider
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Clear
 import uk.gov.hmrc.disaaccountfrontend.models.UserAnswers
 import uk.gov.hmrc.disaaccountfrontend.models.SessionUpdates

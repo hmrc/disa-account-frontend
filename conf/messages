@@ -6,6 +6,8 @@ site.change = Change
 site.govuk = GOV.UK
 site.signIn = Sign in
 site.signOut = Sign out
+site.yes	= Yes
+site.no 	= No
 
 error.prefix = Error
 error.title.prefix = Error:
@@ -138,6 +140,10 @@ signatoryJobTitle.change.hidden = job title
 
 signatoryCheckYourAnswers.title = Check signatory details
 signatoryCheckYourAnswers.heading = Check signatory details
+
+removeSignatory.title = Are you sure you want to remove {0} as a signatory?
+removeSignatory.heading = Are you sure you want to remove {0} as a signatory?
+removeSignatory.error.required = Select yes if you want to remove this signatory
 
 liaisonOfficerName.title = What is the full name of the liaison officer?
 liaisonOfficerName.heading = What is the full name of the liaison officer?

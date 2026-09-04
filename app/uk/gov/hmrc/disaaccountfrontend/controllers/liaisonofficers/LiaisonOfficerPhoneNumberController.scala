@@ -21,7 +21,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.disaaccountfrontend.controllers.PageController
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction, PageGuardAction}
-import uk.gov.hmrc.disaaccountfrontend.forms.TelephoneNumberFormProvider
+import uk.gov.hmrc.disaaccountfrontend.forms.generic.TelephoneNumberFormProvider
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficers.findLiaisonOfficer
 import uk.gov.hmrc.disaaccountfrontend.models.pages.LiaisonOfficerPhoneNumberPage
 import uk.gov.hmrc.disaaccountfrontend.models.{Mode, UserAnswers}

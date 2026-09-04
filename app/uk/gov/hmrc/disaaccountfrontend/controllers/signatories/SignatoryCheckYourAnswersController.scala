@@ -41,7 +41,7 @@ class SignatoryCheckYourAnswersController @Inject() (
   def onPageLoad(id: String): Action[AnyContent] =
     (identify andThen getData andThen guardPage(SignatoryCheckYourAnswersPage(id))) { implicit request =>
       request.effectiveAnswers.signatories
-        .flatMap(_.find(_.id == id))
+        .flatMap(_.signatories.find(_.id == id))
         .fold(Redirect(ChangeOfCircumstancesController.onPageLoad())) { signatory =>
           val rows = Seq(SignatoryNameSummary.row(signatory), SignatoryJobTitleSummary.row(signatory)).flatten
           Ok(view(SummaryList(rows = rows)))

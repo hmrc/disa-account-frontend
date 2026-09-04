@@ -23,6 +23,7 @@ import uk.gov.hmrc.disaaccountfrontend.controllers.signatories.routes.{Signatory
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, CheckMode, NormalMode, SessionUpdates}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.{CrowdFundedDebentures, PeertopeerLoansUsingAPlatformWith36hPermissions}
 import uk.gov.hmrc.disaaccountfrontend.models.pages.*
+import uk.gov.hmrc.disaaccountfrontend.models.pages.signatories.RemoveSignatoryPage
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
 import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator
 import utils.BaseUnitSpec
@@ -74,12 +75,12 @@ class NavigatorSpec extends BaseUnitSpec {
     }
 
     "go from SignatoryNamePage to the signatory job title page" in {
-      navigator.nextPage(SignatoryNamePage(testSignatoryId)) shouldBe
+      navigator.nextPage(SignatoryNamePage(testSignatoryId, NormalMode)) shouldBe
         SignatoryJobTitleController.onPageLoad(testSignatoryId, NormalMode)
     }
 
     "go from SignatoryNamePage to check signatory details in check mode" in {
-      navigator.nextPage(SignatoryNamePage(testSignatoryId), mode = CheckMode) shouldBe
+      navigator.nextPage(SignatoryNamePage(testSignatoryId, CheckMode), mode = CheckMode) shouldBe
         SignatoryCheckYourAnswersController.onPageLoad(testSignatoryId)
     }
 
@@ -89,7 +90,7 @@ class NavigatorSpec extends BaseUnitSpec {
     }
 
     "go from SignatoryJobTitlePage to check signatory details in check mode" in {
-      navigator.nextPage(SignatoryJobTitlePage(testSignatoryId), mode = CheckMode) shouldBe
+      navigator.nextPage(SignatoryJobTitlePage(testSignatoryId, CheckMode), mode = CheckMode) shouldBe
         SignatoryCheckYourAnswersController.onPageLoad(testSignatoryId)
     }
 
@@ -134,6 +135,18 @@ class NavigatorSpec extends BaseUnitSpec {
 
     "temporarily go from LiaisonOfficerCommunicationPage to change of circumstances in check mode" in {
       navigator.nextPage(LiaisonOfficerCommunicationPage("liaison-officer-1"), mode = CheckMode) shouldBe
+        ChangeOfCircumstancesController.onPageLoad()
+    }
+
+    "temporarily go from RemoveSignatoryPage to change of circumstances until the next page exists - With a signatory" in {
+      val answers = Answers(signatories = Some(testSignatories))
+      navigator.nextPage(RemoveSignatoryPage("signatory-1"), answers) shouldBe
+        ChangeOfCircumstancesController.onPageLoad()
+    }
+
+    "temporarily go from RemoveSignatoryPage to change of circumstances until the next page exists - With no more signatories" in {
+      val answers = Answers(signatories = None)
+      navigator.nextPage(RemoveSignatoryPage("signatory-1"), answers) shouldBe
         ChangeOfCircumstancesController.onPageLoad()
     }
 

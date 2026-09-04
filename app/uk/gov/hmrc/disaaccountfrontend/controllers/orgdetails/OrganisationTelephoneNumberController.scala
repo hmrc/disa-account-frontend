@@ -20,7 +20,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.disaaccountfrontend.controllers.PageController
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction}
-import uk.gov.hmrc.disaaccountfrontend.forms.TelephoneNumberFormProvider
+import uk.gov.hmrc.disaaccountfrontend.forms.generic.TelephoneNumberFormProvider
 import uk.gov.hmrc.disaaccountfrontend.models.UserAnswers
 import uk.gov.hmrc.disaaccountfrontend.models.pages.OrganisationTelephoneNumberPage
 import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator

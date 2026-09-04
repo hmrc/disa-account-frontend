@@ -20,7 +20,7 @@ import org.jsoup.Jsoup
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.disaaccountfrontend.models.Answers
-import uk.gov.hmrc.disaaccountfrontend.models.signatories.Signatory
+import uk.gov.hmrc.disaaccountfrontend.models.signatories.{Signatories, Signatory}
 import utils.BaseUnitSpec
 
 class SignatoryCheckYourAnswersControllerSpec extends BaseUnitSpec {
@@ -32,7 +32,7 @@ class SignatoryCheckYourAnswersControllerSpec extends BaseUnitSpec {
 
     "render the matching signatory details and change links" in {
       val application = applicationBuilder(
-        effectiveAnswers = Answers(signatories = Some(Seq(signatory)))
+        effectiveAnswers = Answers(signatories = Some(Signatories(Seq(signatory))))
       ).build()
 
       running(application) {
@@ -62,7 +62,8 @@ class SignatoryCheckYourAnswersControllerSpec extends BaseUnitSpec {
     }
 
     "redirect when the signatory cannot be found" in {
-      val application = applicationBuilder(effectiveAnswers = Answers(signatories = Some(Seq.empty))).build()
+      val application =
+        applicationBuilder(effectiveAnswers = Answers(signatories = Some(Signatories(Seq.empty)))).build()
 
       running(application) {
         val result = route(application, FakeRequest(GET, url)).value
@@ -75,7 +76,7 @@ class SignatoryCheckYourAnswersControllerSpec extends BaseUnitSpec {
     "redirect when the signatory details are incomplete" in {
       val incomplete  = signatory.copy(jobTitle = None)
       val application = applicationBuilder(
-        effectiveAnswers = Answers(signatories = Some(Seq(incomplete)))
+        effectiveAnswers = Answers(signatories = Some(Signatories(Seq(incomplete))))
       ).build()
 
       running(application) {

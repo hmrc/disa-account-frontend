@@ -17,19 +17,17 @@
 package uk.gov.hmrc.disaaccountfrontend.models.pages
 
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
-import uk.gov.hmrc.disaaccountfrontend.models.SessionUpdates
+import uk.gov.hmrc.disaaccountfrontend.models.{Mode, NormalMode, SessionUpdates}
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
+import uk.gov.hmrc.disaaccountfrontend.models.signatories.Signatories
 
-case class SignatoryJobTitlePage(id: String) extends PageWithAnswers[String] {
+case class SignatoryJobTitlePage(id: String, mode: Mode = NormalMode) extends PageWithAnswers[String] {
 
   def saveAnswerAndHandleDependents(request: DataRequest[_], newAnswer: String): SessionUpdates = {
-    val existingUpdates     = request.sessionAnswers.fold(SessionUpdates())(_.updates)
-    val existingSignatories = request.effectiveAnswers.signatories.getOrElse(Seq.empty)
-
-    val updatedSignatories = existingSignatories.map {
-      case signatory if signatory.id == id => signatory.copy(jobTitle = Some(newAnswer))
-      case signatory                       => signatory
-    }
+    val existingUpdates    = request.sessionAnswers.fold(SessionUpdates())(_.updates)
+    val updatedSignatories = request.effectiveAnswers.signatories
+      .getOrElse(Signatories())
+      .upsertJobTitle(id, newAnswer, mode)
 
     existingUpdates.copy(signatories = Assign(updatedSignatories))
   }

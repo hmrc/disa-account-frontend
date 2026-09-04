@@ -38,6 +38,7 @@ trait TestEndpoints {
   val changeSignatoryJobTitleEndpoint: String           =
     s"$accountFrontendRoutePrefix/change-signatory-job-title"
   val checkSignatoryDetailsEndpoint: String             = s"$accountFrontendRoutePrefix/check-signatory-details"
+  val removeSignatoryEndpoint: String                   = s"$accountFrontendRoutePrefix/remove-signatory"
   val liaisonOfficerNameEndpoint: String                = s"$accountFrontendRoutePrefix/liaison-officer-name"
   val changeLiaisonOfficerNameEndpoint: String          = s"$accountFrontendRoutePrefix/change-liaison-officer-name"
   val liaisonOfficerEmailEndpoint: String               = s"$accountFrontendRoutePrefix/liaison-officer-email"

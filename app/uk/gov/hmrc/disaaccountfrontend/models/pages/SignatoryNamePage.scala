@@ -17,27 +17,20 @@
 package uk.gov.hmrc.disaaccountfrontend.models.pages
 
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
-import uk.gov.hmrc.disaaccountfrontend.models.SessionUpdates
+import uk.gov.hmrc.disaaccountfrontend.models.{Mode, NormalMode, SessionUpdates}
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
-import uk.gov.hmrc.disaaccountfrontend.models.signatories.Signatory
+import uk.gov.hmrc.disaaccountfrontend.models.signatories.Signatories
 
-case class SignatoryNamePage(id: String) extends PageWithAnswers[String] {
+case class SignatoryNamePage(id: String, mode: Mode = NormalMode) extends PageWithAnswers[String] {
 
   def saveAnswerAndHandleDependents(request: DataRequest[_], newAnswer: String): SessionUpdates = {
-    val existingUpdates     = request.sessionAnswers.fold(SessionUpdates())(_.updates)
-    val existingSignatories = request.effectiveAnswers.signatories.getOrElse(Seq.empty)
-    val exists              = existingSignatories.exists(_.id == id)
-
+    val existingUpdates    = request.sessionAnswers.fold(SessionUpdates())(_.updates)
     val updatedSignatories =
-      if (exists) {
-        existingSignatories.map {
-          case signatory if signatory.id == id => signatory.copy(fullName = Some(newAnswer))
-          case signatory                       => signatory
-        }
-      } else {
-        existingSignatories :+ Signatory(id, fullName = Some(newAnswer))
-      }
+      request.effectiveAnswers.signatories
+        .getOrElse(Signatories())
+        .upsertName(id, newAnswer, mode)
 
     existingUpdates.copy(signatories = Assign(updatedSignatories))
+
   }
 }

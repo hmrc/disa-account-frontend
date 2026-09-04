@@ -97,23 +97,28 @@ trait TestData {
     )
   )
 
+  val testSignatoryId: String       = "signatory-1"
+  val testSignatoryName: String     = "Jane Smith"
+  val testSignatoryJobTitle: String = "Director"
+
+  val testSignatories: Signatories = Signatories(
+    Seq(
+      Signatory(id = testSignatoryId, fullName = Some(testSignatoryName), jobTitle = Some(testSignatoryJobTitle))
+    )
+  )
+
   val testRegistrationDetailsWithFinancialOrganisation: RegistrationDetails =
     testRegistrationDetailsWithInnovativeFinanceIsa.copy(
       certificatesOfAuthority = Some(
         CertificatesOfAuthority(financialOrganisation = Some(testFinancialOrganisationSelections))
       ),
-      liaisonOfficers = Some(testLiaisonOfficers)
+      liaisonOfficers = Some(testLiaisonOfficers),
+      signatories = Some(testSignatories)
     )
-
-  val testSignatoryId: String       = "signatory-1"
-  val testSignatoryName: String     = "Jane Smith"
-  val testSignatoryJobTitle: String = "Director"
-
-  val testSignatories: Seq[Signatory] = Seq(Signatory(testSignatoryId, fullName = Some(testSignatoryName)))
 
   val testRegistrationDetailsWithSignatories: RegistrationDetails =
     testRegistrationDetailsWithFinancialOrganisation.copy(
-      signatories = Some(Signatories(testSignatories))
+      signatories = Some(testSignatories)
     )
 
   val testFcaArticlesCheckedBoxes: Seq[FcaArticles] = Seq(FcaArticle14, FcaArticle64)

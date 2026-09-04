@@ -25,6 +25,7 @@ import uk.gov.hmrc.disaaccountfrontend.controllers.signatories.routes.{Signatory
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, CheckMode, Mode, NormalMode}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
 import uk.gov.hmrc.disaaccountfrontend.models.pages.*
+import uk.gov.hmrc.disaaccountfrontend.models.pages.signatories.RemoveSignatoryPage
 
 import javax.inject.{Inject, Singleton}
 
@@ -43,8 +44,10 @@ class Navigator @Inject() () {
     case EmailVerificationCodePage          => ChangeOfCircumstancesController.onPageLoad()
     // TODO: replace with the organisation email check-your-answers page once it exists.
     case FinancialOrganisationPage          => ChangeOfCircumstancesController.onPageLoad()
-    case SignatoryNamePage(id)              => signatoryNameNextPage(id, mode)
-    case SignatoryJobTitlePage(id)          => SignatoryCheckYourAnswersController.onPageLoad(id)
+    case SignatoryNamePage(id, mode)        => signatoryNameNextPage(id, mode)
+    case SignatoryJobTitlePage(id, mode)    => SignatoryCheckYourAnswersController.onPageLoad(id)
+    // TODO: replace the TODOs in the RemoveSignatoryNextPage
+    case RemoveSignatoryPage(_)             => RemoveSignatoryNextPage(answers)
     case LiaisonOfficerNamePage(id)         => liaisonOfficerNameNextPage(id, mode)
     case LiaisonOfficerEmailPage(id)        => liaisonOfficerEmailNextPage(id, mode)
     case LiaisonOfficerPhoneNumberPage(id)  => liaisonOfficerPhoneNumberNextPage(id, mode)
@@ -81,6 +84,14 @@ class Navigator @Inject() () {
     mode match {
       case NormalMode => SignatoryJobTitleController.onPageLoad(id, NormalMode)
       case CheckMode  => SignatoryCheckYourAnswersController.onPageLoad(id)
+    }
+
+  private def RemoveSignatoryNextPage(answers: Answers): Call =
+    answers.signatories match {
+      // TODO Change to "You currently have a signatory" once ready
+      case Some(_) => ChangeOfCircumstancesController.onPageLoad()
+      // TODO Change to "Add a signatory" once ready
+      case None    => ChangeOfCircumstancesController.onPageLoad()
     }
 
   private def liaisonOfficerNameNextPage(id: String, mode: Mode): Call =

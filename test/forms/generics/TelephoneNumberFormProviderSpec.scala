@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package forms
+package forms.generics
 
 import play.api.data.Form
-import uk.gov.hmrc.disaaccountfrontend.forms.TelephoneNumberFormProvider
+import uk.gov.hmrc.disaaccountfrontend.forms.generic.TelephoneNumberFormProvider
 import utils.BaseUnitSpec
 
 class TelephoneNumberFormProviderSpec extends BaseUnitSpec {

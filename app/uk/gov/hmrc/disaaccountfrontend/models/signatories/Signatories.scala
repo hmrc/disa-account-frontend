@@ -16,10 +16,45 @@
 
 package uk.gov.hmrc.disaaccountfrontend.models.signatories
 
-import play.api.libs.json.{Json, Reads}
+import uk.gov.hmrc.disaaccountfrontend.models.{Mode, NormalMode}
+import play.api.libs.json.{Json, OFormat}
 
-case class Signatories(signatories: Seq[Signatory] = Seq.empty)
+case class Signatories(signatories: Seq[Signatory] = Seq.empty[Signatory]) {
+
+  def upsertName(id: String, fullName: String, mode: Mode): Signatories =
+    if (signatories.exists(_.id == id)) {
+      copy(
+        signatories = signatories.map {
+          case signatory if signatory.id == id => signatory.copy(fullName = Some(fullName))
+          case signatory                       => signatory
+        }
+      )
+    } else if (mode == NormalMode) {
+      copy(signatories = signatories :+ Signatory(id = id, fullName = Some(fullName)))
+    } else {
+      this
+    }
+
+  def upsertJobTitle(id: String, jobTitle: String, mode: Mode): Signatories =
+    if (signatories.exists(_.id == id)) {
+      copy(
+        signatories = signatories.map {
+          case signatory if signatory.id == id => signatory.copy(jobTitle = Some(jobTitle))
+          case signatory                       => signatory
+        }
+      )
+    } else if (mode == NormalMode) {
+      copy(signatories = signatories :+ Signatory(id = id, jobTitle = Some(jobTitle)))
+    } else {
+      // TODO should we use copy or this then?
+      this
+    }
+
+  def updatedSectionWithSignatoryRemoved(id: String): Signatories =
+    Signatories(this.signatories.filterNot(_.id == id))
+}
 
 object Signatories {
-  implicit val reads: Reads[Signatories] = Json.reads[Signatories]
+  val sectionName: String                   = "signatories"
+  implicit val format: OFormat[Signatories] = Json.format[Signatories]
 }

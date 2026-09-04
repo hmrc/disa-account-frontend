@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.models.pages
+package uk.gov.hmrc.disaaccountfrontend.forms.generic
 
-import uk.gov.hmrc.disaaccountfrontend.models.Answers
+import play.api.data.Form
+import uk.gov.hmrc.disaaccountfrontend.forms.mappings.Mappings
+import uk.gov.hmrc.disaaccountfrontend.models.YesNoAnswer
 
-final case class SignatoryCheckYourAnswersPage(id: String) extends IdentifiedPage with GuardedPage {
+import javax.inject.Inject
 
-  override def canBeAccessedWith(answers: Answers): Boolean =
-    answers.signatories.exists { signatories =>
-      signatories.signatories.exists { signatory =>
-        signatory.id == id &&
-        signatory.fullName.isDefined &&
-        signatory.jobTitle.isDefined
-      }
-    }
+class YesNoAnswerFormProvider @Inject() extends Mappings {
+
+  def apply(requiredKey: String): Form[YesNoAnswer] =
+    Form(
+      "value" -> enumerable[YesNoAnswer](requiredKey)
+    )
 }
