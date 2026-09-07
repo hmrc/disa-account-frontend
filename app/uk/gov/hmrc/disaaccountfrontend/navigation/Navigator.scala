@@ -91,7 +91,7 @@ class Navigator @Inject() () {
       // TODO Change to "You currently have a signatory" once ready
       case Some(_) => ChangeOfCircumstancesController.onPageLoad()
       // TODO Change to "Add a signatory" once ready
-      case None    => ChangeOfCircumstancesController.onPageLoad()
+      case _       => ChangeOfCircumstancesController.onPageLoad()
     }
 
   private def liaisonOfficerNameNextPage(id: String, mode: Mode): Call =
