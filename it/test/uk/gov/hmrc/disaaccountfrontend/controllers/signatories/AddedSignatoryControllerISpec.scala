@@ -104,8 +104,8 @@ class AddedSignatoryControllerISpec extends BaseIntegrationSpec {
 
       val result = route(app, authenticatedPost("yes")).get
 
-      status(result)            shouldBe SEE_OTHER
-      redirectLocation(result) shouldBe Some("/obligations/account/isa/signatory-name")
+      status(result)                 shouldBe SEE_OTHER
+      redirectLocation(result)       shouldBe Some("/obligations/account/isa/signatory-name")
       await(repo.get(testSessionId)) shouldBe None
     }
   }
