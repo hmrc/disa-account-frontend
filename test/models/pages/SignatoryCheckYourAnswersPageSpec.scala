@@ -18,7 +18,7 @@ package models.pages
 
 import uk.gov.hmrc.disaaccountfrontend.models.Answers
 import uk.gov.hmrc.disaaccountfrontend.models.pages.SignatoryCheckYourAnswersPage
-import uk.gov.hmrc.disaaccountfrontend.models.signatories.Signatory
+import uk.gov.hmrc.disaaccountfrontend.models.signatories.{Signatories, Signatory}
 import utils.BaseUnitSpec
 
 class SignatoryCheckYourAnswersPageSpec extends BaseUnitSpec {
@@ -31,22 +31,22 @@ class SignatoryCheckYourAnswersPageSpec extends BaseUnitSpec {
   "SignatoryCheckYourAnswersPage" should {
 
     "allow access with complete matching signatory details" in {
-      page.canBeAccessedWith(Answers(signatories = Some(Seq(completeSignatory)))) shouldBe true
+      page.canBeAccessedWith(Answers(signatories = Some(Signatories(Seq(completeSignatory))))) shouldBe true
     }
 
     "deny access when the signatory is missing" in {
-      page.canBeAccessedWith(Answers(signatories = Some(Seq.empty))) shouldBe false
+      page.canBeAccessedWith(Answers(signatories = Some(Signatories()))) shouldBe false
     }
 
     "deny access when the signatory name is missing" in {
       page.canBeAccessedWith(
-        Answers(signatories = Some(Seq(completeSignatory.copy(fullName = None))))
+        Answers(signatories = Some(Signatories(Seq(completeSignatory.copy(fullName = None)))))
       ) shouldBe false
     }
 
     "deny access when the signatory job title is missing" in {
       page.canBeAccessedWith(
-        Answers(signatories = Some(Seq(completeSignatory.copy(jobTitle = None))))
+        Answers(signatories = Some(Signatories(Seq(completeSignatory.copy(jobTitle = None)))))
       ) shouldBe false
     }
   }

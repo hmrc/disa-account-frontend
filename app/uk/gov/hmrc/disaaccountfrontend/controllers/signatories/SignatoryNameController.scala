@@ -89,14 +89,14 @@ class SignatoryNameController @Inject() (
           if (isNewSignatory && (mode != NormalMode || signatoryCount(request) >= appConfig.maxSignatories)) {
             Future.successful(Redirect(ChangeOfCircumstancesController.onPageLoad()))
           } else {
-            val sessionUpdates = SignatoryNamePage(id).saveAnswerAndHandleDependents(request, answer)
+            val sessionUpdates = SignatoryNamePage(id, mode).saveAnswerAndHandleDependents(request, answer)
 
             userAnswersRepository
               .set(UserAnswers(id = request.sessionId, updates = sessionUpdates))
               .map { _ =>
                 Redirect(
                   navigator.nextPage(
-                    SignatoryNamePage(id),
+                    SignatoryNamePage(id, mode),
                     sessionUpdates.getUpdatedEffectiveAnswers(request.effectiveAnswers),
                     mode
                   )
@@ -108,12 +108,11 @@ class SignatoryNameController @Inject() (
   }
 
   private def signatoryCount(request: DataRequest[_]): Int =
-    request.effectiveAnswers.signatories.map(_.size).getOrElse(0)
+    request.effectiveAnswers.signatories.map(_.signatories.size).getOrElse(0)
 
   private def findSignatory(id: Option[String], request: DataRequest[_]): Option[Signatory] =
     for {
-      existingId  <- id
-      signatories <- request.effectiveAnswers.signatories
-      signatory   <- signatories.find(_.id == existingId)
+      existingId <- id
+      signatory  <- request.effectiveAnswers.signatories.flatMap(_.signatories.find(_.id == existingId))
     } yield signatory
 }

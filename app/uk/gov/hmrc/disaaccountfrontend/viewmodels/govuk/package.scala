@@ -26,4 +26,5 @@ package object govuk {
       with FieldsetFluency
       with InputFluency
       with LabelFluency
+      with RadiosFluency
 }

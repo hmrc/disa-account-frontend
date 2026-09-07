@@ -16,18 +16,18 @@
 
 package controllers.actions
 
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
 import play.api.mvc.Result
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.disaaccountfrontend.config.ErrorHandler
 import uk.gov.hmrc.disaaccountfrontend.connectors.RegistrationConnector
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.DataRetrievalActionImpl
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.{Assign, Clear}
 import uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority.FinancialOrganisation.Bank
 import uk.gov.hmrc.disaaccountfrontend.models.requests.{DataRequest, IdentifierRequest}
-import uk.gov.hmrc.disaaccountfrontend.models.signatories.Signatory
+import uk.gov.hmrc.disaaccountfrontend.models.signatories.{Signatories, Signatory}
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates, UserAnswers}
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
 import utils.BaseUnitSpec
@@ -78,7 +78,8 @@ class DataRetrievalActionSpec extends BaseUnitSpec {
             p2pPlatformNumber = Some(testP2pPlatformNumber),
             organisationEmailAddress = Some(testOrganisationEmailAddress),
             financialOrganisation = Some(testFinancialOrganisationSelections),
-            liaisonOfficers = Some(testLiaisonOfficers)
+            liaisonOfficers = Some(testLiaisonOfficers),
+            signatories = Some(testSignatories)
           )
         )
       )
@@ -117,7 +118,8 @@ class DataRetrievalActionSpec extends BaseUnitSpec {
             innovativeFinancialProducts = Some(testInnovativeFinancialProductSelections),
             organisationEmailAddress = Some(testOrganisationEmailAddress),
             financialOrganisation = Some(Seq(Bank)),
-            liaisonOfficers = Some(testLiaisonOfficers)
+            liaisonOfficers = Some(testLiaisonOfficers),
+            signatories = Some(testSignatories)
           )
         )
       )
@@ -140,7 +142,7 @@ class DataRetrievalActionSpec extends BaseUnitSpec {
       val request          = FakeRequest()
       val updatedSignatory = Signatory(testSignatoryId, fullName = Some("Updated Name"))
       val savedAnswers     =
-        UserAnswers(testSessionId, SessionUpdates(signatories = Assign(Seq(updatedSignatory))))
+        UserAnswers(testSessionId, SessionUpdates(signatories = Assign(Signatories(Seq(updatedSignatory)))))
 
       when(mockRegistrationConnector.getRegistrationDetails(eqTo(testZref))(any()))
         .thenReturn(Future.successful(Some(testRegistrationDetailsWithSignatories)))
@@ -150,7 +152,7 @@ class DataRetrievalActionSpec extends BaseUnitSpec {
         .callRefine(IdentifierRequest(request, testZref, testCredentialId, testSessionId))
         .futureValue
 
-      result.value.effectiveAnswers.signatories shouldBe Some(Seq(updatedSignatory))
+      result.value.effectiveAnswers.signatories shouldBe Some(Signatories(Seq(updatedSignatory)))
     }
 
     "use empty effective answers when neither source has answers" in {
