@@ -30,7 +30,7 @@
 
 @(id: String, name: String, form: Form[_])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = Some(title(form, "innovativeFinancialProducts.title"))) {
+@layout(pageTitle = Some(title(form, "removeSignatory.title"))) {
 
     @formHelper(action = RemoveSignatoryController.onSubmit(id), Symbol("autoComplete") -> "off") {
 
