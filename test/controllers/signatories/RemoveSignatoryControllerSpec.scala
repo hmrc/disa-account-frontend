@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.signatories
 
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import play.api.test.FakeRequest
 import org.mockito.Mockito.*
 import play.api.data.Form
 import play.api.mvc.Call
+import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.disaaccountfrontend.forms.generic.YesNoAnswerFormProvider
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
 import uk.gov.hmrc.disaaccountfrontend.models.YesNoAnswer.{No, Yes}
-import uk.gov.hmrc.disaaccountfrontend.models.{Answers, UserAnswers, YesNoAnswer}
 import uk.gov.hmrc.disaaccountfrontend.models.signatories.{Signatories, Signatory}
+import uk.gov.hmrc.disaaccountfrontend.models.{Answers, UserAnswers, YesNoAnswer}
 import utils.BaseUnitSpec
 
 import scala.concurrent.Future
