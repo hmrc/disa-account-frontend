@@ -28,7 +28,7 @@ final case class LiaisonOfficerEmailPage(id: String)
 
   override def canBeAccessedWith(answers: Answers): Boolean =
     answers.liaisonOfficers.exists(
-      _.liaisonOfficers.exists(officer => officer.id == id && officer.fullName.exists(_.trim.nonEmpty))
+      _.liaisonOfficers.exists(officer => officer.id == id && officer.fullName.isDefined)
     )
 
   override def saveAnswerAndHandleDependents(request: DataRequest[_], newAnswer: String): SessionUpdates = {

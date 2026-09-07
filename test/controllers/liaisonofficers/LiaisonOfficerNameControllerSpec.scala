@@ -45,7 +45,13 @@ class LiaisonOfficerNameControllerSpec extends BaseUnitSpec {
   )
 
   private val otherOfficers = (1 until 15).map { index =>
-    LiaisonOfficer(s"officer-$index", Some(s"Officer $index"))
+    LiaisonOfficer(
+      id = s"officer-$index",
+      fullName = Some(s"Officer $index"),
+      phoneNumber = Some("07777777777"),
+      communication = Set(ByEmail),
+      email = Some(s"officer$index@example.com")
+    )
   }
 
   private val officersAtLimit = LiaisonOfficers(otherOfficers :+ existingOfficer)
@@ -103,6 +109,25 @@ class LiaisonOfficerNameControllerSpec extends BaseUnitSpec {
         redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
         verify(uuidGenerator).generate()
         verify(mockUserAnswersRepository, never).set(any())
+      }
+    }
+
+    "exclude incomplete liaison officers from the maximum count" in {
+      val generatedId   = "generated-id"
+      val uuidGenerator = mock[UuidGenerator]
+      when(uuidGenerator.generate()).thenReturn(generatedId)
+      val officers      = LiaisonOfficers(otherOfficers :+ LiaisonOfficer("incomplete-id", Some("Incomplete")))
+      val application   = applicationBuilder(
+        effectiveAnswers = Answers(liaisonOfficers = Some(officers))
+      )
+        .overrides(bind[UuidGenerator].toInstance(uuidGenerator))
+        .build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, liaisonOfficerNameEndpoint)).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe liaisonOfficerNameEndpointFor(generatedId)
       }
     }
 

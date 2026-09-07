@@ -27,19 +27,17 @@ object YesNoAnswer extends Enumerable.Implicits {
   case object Yes extends WithName("yes") with YesNoAnswer
   case object No extends WithName("no") with YesNoAnswer
 
-  val values: Seq[YesNoAnswer] = Seq(
-    Yes,
-    No
-  )
+  val values: Seq[YesNoAnswer] = Seq(Yes, No)
 
-  def options(implicit messages: Messages): Seq[RadioItem] = values.zipWithIndex.map { case (value, index) =>
-    RadioItem(
-      content = Text(messages(s"site.${value.toString}")),
-      value = Some(value.toString),
-      id = Some(s"value_$index")
-    )
-  }
+  def options(implicit messages: Messages): Seq[RadioItem] =
+    values.zipWithIndex.map { case (value, index) =>
+      RadioItem(
+        content = Text(messages(s"site.${value.toString}")),
+        value = Some(value.toString),
+        id = Some(s"value_$index")
+      )
+    }
 
   implicit val enumerable: Enumerable[YesNoAnswer] =
-    Enumerable(values.map(v => v.toString -> v): _*)
+    Enumerable(values.map(value => value.toString -> value): _*)
 }

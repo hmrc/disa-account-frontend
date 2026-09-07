@@ -21,8 +21,9 @@ import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.{Liais
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.{OrganisationTelephoneNumberController, TradingNameController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.routes.EmailVerificationCodeController
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, PeerToPeerPlatformController}
-import uk.gov.hmrc.disaaccountfrontend.controllers.signatories.routes.{SignatoryCheckYourAnswersController, SignatoryJobTitleController}
-import uk.gov.hmrc.disaaccountfrontend.models.{Answers, CheckMode, Mode, NormalMode}
+import uk.gov.hmrc.disaaccountfrontend.controllers.signatories.routes.{AddedSignatoryController, SignatoryCheckYourAnswersController, SignatoryJobTitleController, SignatoryNameController}
+import uk.gov.hmrc.disaaccountfrontend.models.YesNoAnswer.{No, Yes}
+import uk.gov.hmrc.disaaccountfrontend.models.{Answers, CheckMode, Mode, NormalMode, YesNoAnswer}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
 import uk.gov.hmrc.disaaccountfrontend.models.pages.*
 import uk.gov.hmrc.disaaccountfrontend.models.pages.signatories.RemoveSignatoryPage
@@ -31,6 +32,11 @@ import javax.inject.{Inject, Singleton}
 
 @Singleton
 class Navigator @Inject() () {
+
+  def nextPageFromAddedSignatories(answer: YesNoAnswer): Call = answer match {
+    case Yes => SignatoryNameController.onPageLoad(None, NormalMode)
+    case No  => ChangeOfCircumstancesController.onPageLoad()
+  }
 
   def nextPage(page: Page, answers: Answers = Answers(), mode: Mode = NormalMode): Call = page match {
     case EnterYourOrganisationAddressPage   => OrganisationTelephoneNumberController.onPageLoad()
@@ -46,8 +52,7 @@ class Navigator @Inject() () {
     case FinancialOrganisationPage          => ChangeOfCircumstancesController.onPageLoad()
     case SignatoryNamePage(id, mode)        => signatoryNameNextPage(id, mode)
     case SignatoryJobTitlePage(id, mode)    => SignatoryCheckYourAnswersController.onPageLoad(id)
-    // TODO: replace the TODOs in the RemoveSignatoryNextPage
-    case RemoveSignatoryPage(_)             => RemoveSignatoryNextPage(answers)
+    case RemoveSignatoryPage(_)             => removeSignatoryNextPage(answers)
     case LiaisonOfficerNamePage(id)         => liaisonOfficerNameNextPage(id, mode)
     case LiaisonOfficerEmailPage(id)        => liaisonOfficerEmailNextPage(id, mode)
     case LiaisonOfficerPhoneNumberPage(id)  => liaisonOfficerPhoneNumberNextPage(id, mode)
@@ -86,14 +91,11 @@ class Navigator @Inject() () {
       case CheckMode  => SignatoryCheckYourAnswersController.onPageLoad(id)
     }
 
-  private def RemoveSignatoryNextPage(answers: Answers): Call =
-    answers.signatories match {
-      // TODO Change to "You currently have a signatory" once ready
-      case Some(value) if value.signatories.nonEmpty => ChangeOfCircumstancesController.onPageLoad()
-      // TODO Change to "Add a signatory" once ready
-      case Some(_)                                   => ChangeOfCircumstancesController.onPageLoad()
-
-      case _ => ChangeOfCircumstancesController.onPageLoad()
+  private def removeSignatoryNextPage(answers: Answers): Call =
+    if (answers.signatories.exists(_.signatories.exists(_.isComplete))) {
+      AddedSignatoryController.onPageLoad()
+    } else {
+      SignatoryNameController.onPageLoad(None, NormalMode)
     }
 
   private def liaisonOfficerNameNextPage(id: String, mode: Mode): Call =

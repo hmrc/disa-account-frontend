@@ -30,7 +30,7 @@ final case class LiaisonOfficerNamePage(id: String)
   override def canBeAccessedWith(answers: Answers, appConfig: AppConfig): Boolean = {
     val existingOfficers = answers.liaisonOfficers.fold(Seq.empty)(_.liaisonOfficers)
 
-    existingOfficers.exists(_.id == id) || existingOfficers.size < appConfig.maxLiaisonOfficers
+    existingOfficers.exists(_.id == id) || existingOfficers.count(_.isComplete) < appConfig.maxLiaisonOfficers
   }
 
   override def saveAnswerAndHandleDependents(request: DataRequest[_], newAnswer: String): SessionUpdates = {

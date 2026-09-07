@@ -108,7 +108,7 @@ class SignatoryNameController @Inject() (
   }
 
   private def signatoryCount(request: DataRequest[_]): Int =
-    request.effectiveAnswers.signatories.map(_.signatories.size).getOrElse(0)
+    request.effectiveAnswers.signatories.fold(0)(_.signatories.count(_.isComplete))
 
   private def findSignatory(id: Option[String], request: DataRequest[_]): Option[Signatory] =
     for {

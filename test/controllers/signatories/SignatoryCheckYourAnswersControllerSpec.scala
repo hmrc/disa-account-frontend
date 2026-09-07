@@ -56,7 +56,7 @@ class SignatoryCheckYourAnswersControllerSpec extends BaseUnitSpec {
 
         val continue = doc.select("a.govuk-button")
         continue.text()       shouldBe "Continue"
-        continue.attr("href") shouldBe changeOfCircumstancesEndpoint
+        continue.attr("href") shouldBe addedSignatoriesEndpoint
         doc.text()              should include("Is this page not working properly?")
       }
     }

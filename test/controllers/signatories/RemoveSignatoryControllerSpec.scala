@@ -93,7 +93,7 @@ class RemoveSignatoryControllerSpec extends BaseUnitSpec {
         val result  = route(application, request).value
 
         status(result)                 shouldBe SEE_OTHER
-        redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
+        redirectLocation(result).value shouldBe addedSignatoriesEndpoint
 
         val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
         verify(mockUserAnswersRepository).set(captor.capture())
@@ -117,7 +117,7 @@ class RemoveSignatoryControllerSpec extends BaseUnitSpec {
         val result  = route(application, request).value
 
         status(result)                 shouldBe SEE_OTHER
-        redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
+        redirectLocation(result).value shouldBe addedSignatoriesEndpoint
 
         val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
         verify(mockUserAnswersRepository).set(captor.capture())

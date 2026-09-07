@@ -14,21 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers
+package uk.gov.hmrc.disaaccountfrontend.models.pages
 
-import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.disaaccountfrontend.models.Answers
 
-case class LiaisonOfficer(
-  id: String,
-  fullName: Option[String] = None,
-  phoneNumber: Option[String] = None,
-  communication: Set[LiaisonOfficerCommunication] = Set.empty,
-  email: Option[String] = None
-) {
-  def isComplete: Boolean =
-    fullName.isDefined && phoneNumber.isDefined && communication.nonEmpty && email.isDefined
-}
+case object AddedSignatoryPage extends GuardedPage {
 
-object LiaisonOfficer {
-  implicit val format: OFormat[LiaisonOfficer] = Json.format[LiaisonOfficer]
+  override def canBeAccessedWith(answers: Answers): Boolean =
+    answers.signatories.exists(_.signatories.exists(_.isComplete))
 }

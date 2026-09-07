@@ -14,21 +14,22 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers
+package models.signatories
 
-import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.disaaccountfrontend.models.signatories.Signatory
+import utils.BaseUnitSpec
 
-case class LiaisonOfficer(
-  id: String,
-  fullName: Option[String] = None,
-  phoneNumber: Option[String] = None,
-  communication: Set[LiaisonOfficerCommunication] = Set.empty,
-  email: Option[String] = None
-) {
-  def isComplete: Boolean =
-    fullName.isDefined && phoneNumber.isDefined && communication.nonEmpty && email.isDefined
-}
+class SignatorySpec extends BaseUnitSpec {
 
-object LiaisonOfficer {
-  implicit val format: OFormat[LiaisonOfficer] = Json.format[LiaisonOfficer]
+  "Signatory.isComplete" should {
+
+    "return true when all required details are present" in {
+      Signatory("id", Some("Jane Smith"), Some("Director")).isComplete shouldBe true
+    }
+
+    "return false when a required detail is absent" in {
+      Signatory("id", None, Some("Director")).isComplete   shouldBe false
+      Signatory("id", Some("Jane Smith"), None).isComplete shouldBe false
+    }
+  }
 }
