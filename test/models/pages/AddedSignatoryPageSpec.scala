@@ -18,7 +18,7 @@ package models.pages
 
 import uk.gov.hmrc.disaaccountfrontend.models.Answers
 import uk.gov.hmrc.disaaccountfrontend.models.pages.AddedSignatoryPage
-import uk.gov.hmrc.disaaccountfrontend.models.signatories.Signatory
+import uk.gov.hmrc.disaaccountfrontend.models.signatories.{Signatories, Signatory}
 import utils.BaseUnitSpec
 
 class AddedSignatoryPageSpec extends BaseUnitSpec {
@@ -29,26 +29,32 @@ class AddedSignatoryPageSpec extends BaseUnitSpec {
   "AddedSignatoryPage" should {
 
     "allow access when at least one complete signatory exists" in {
-      AddedSignatoryPage.canBeAccessedWith(Answers(signatories = Some(Seq(completeSignatory)))) shouldBe true
+      AddedSignatoryPage.canBeAccessedWith(
+        Answers(signatories = Some(Signatories(Seq(completeSignatory))))
+      ) shouldBe true
     }
 
     "deny access when signatories are absent or empty" in {
-      AddedSignatoryPage.canBeAccessedWith(Answers())                              shouldBe false
-      AddedSignatoryPage.canBeAccessedWith(Answers(signatories = Some(Seq.empty))) shouldBe false
+      AddedSignatoryPage.canBeAccessedWith(Answers())                                  shouldBe false
+      AddedSignatoryPage.canBeAccessedWith(Answers(signatories = Some(Signatories()))) shouldBe false
     }
 
     "deny access when no complete signatory exists" in {
       AddedSignatoryPage.canBeAccessedWith(
-        Answers(signatories = Some(Seq(completeSignatory.copy(fullName = None))))
+        Answers(signatories = Some(Signatories(Seq(completeSignatory.copy(fullName = None)))))
       ) shouldBe false
       AddedSignatoryPage.canBeAccessedWith(
-        Answers(signatories = Some(Seq(completeSignatory.copy(jobTitle = None))))
+        Answers(signatories = Some(Signatories(Seq(completeSignatory.copy(jobTitle = None)))))
       ) shouldBe false
     }
 
     "allow access when complete and incomplete signatories exist" in {
       AddedSignatoryPage.canBeAccessedWith(
-        Answers(signatories = Some(Seq(completeSignatory, completeSignatory.copy(id = "incomplete", jobTitle = None))))
+        Answers(
+          signatories = Some(
+            Signatories(Seq(completeSignatory, completeSignatory.copy(id = "incomplete", jobTitle = None)))
+          )
+        )
       ) shouldBe true
     }
   }

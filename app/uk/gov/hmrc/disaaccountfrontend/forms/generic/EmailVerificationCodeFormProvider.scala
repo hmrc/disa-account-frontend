@@ -14,18 +14,23 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.forms
+package uk.gov.hmrc.disaaccountfrontend.forms.generic
 
 import play.api.data.Form
 import uk.gov.hmrc.disaaccountfrontend.forms.mappings.Mappings
-import uk.gov.hmrc.disaaccountfrontend.models.YesNoAnswer
 
 import javax.inject.Inject
 
-class YesNoAnswerFormProvider @Inject() extends Mappings {
+class EmailVerificationCodeFormProvider @Inject() extends Mappings {
 
-  def apply(requiredKey: String): Form[YesNoAnswer] =
+  private val emailVerificationCodePattern = "^[A-Za-z]+$"
+
+  def apply(): Form[String] =
     Form(
-      "value" -> enumerable[YesNoAnswer](requiredKey)
+      "value" -> text("emailVerificationCode.error.required")
+        .transform(_.trim.toUpperCase, identity: String => String)
+        .verifying(regexp(emailVerificationCodePattern, "emailVerificationCode.error.format"))
+        .verifying(minLength(6, "emailVerificationCode.error.tooShort"))
+        .verifying(maxLength(6, "emailVerificationCode.error.tooLong"))
     )
 }

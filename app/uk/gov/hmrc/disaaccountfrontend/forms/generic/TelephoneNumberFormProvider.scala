@@ -14,23 +14,27 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.forms
+package uk.gov.hmrc.disaaccountfrontend.forms.generic
 
 import play.api.data.Form
+import TelephoneNumberFormProvider.{digitsOnlyPattern, whitespacePattern}
 import uk.gov.hmrc.disaaccountfrontend.forms.mappings.Mappings
 
 import javax.inject.Inject
 
-class EmailVerificationCodeFormProvider @Inject() extends Mappings {
+class TelephoneNumberFormProvider @Inject() () extends Mappings {
 
-  private val emailVerificationCodePattern = "^[A-Za-z]+$"
-
-  def apply(): Form[String] =
+  def apply(keyPrefix: String): Form[String] =
     Form(
-      "value" -> text("emailVerificationCode.error.required")
-        .transform(_.trim.toUpperCase, identity: String => String)
-        .verifying(regexp(emailVerificationCodePattern, "emailVerificationCode.error.format"))
-        .verifying(minLength(6, "emailVerificationCode.error.tooShort"))
-        .verifying(maxLength(6, "emailVerificationCode.error.tooLong"))
+      "value" -> text(s"$keyPrefix.error.required")
+        .transform(formToModel => formToModel.replaceAll(whitespacePattern, ""), identity: String => String)
+        .verifying(regexp(digitsOnlyPattern, s"$keyPrefix.error.invalid"))
+        .verifying(minLength(11, s"$keyPrefix.error.tooShort"))
+        .verifying(maxLength(11, s"$keyPrefix.error.tooLong"))
     )
+}
+
+object TelephoneNumberFormProvider {
+  private[forms] val whitespacePattern = "\\s+"
+  private[forms] val digitsOnlyPattern = "^\\d+$"
 }

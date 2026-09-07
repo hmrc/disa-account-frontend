@@ -21,5 +21,5 @@ import uk.gov.hmrc.disaaccountfrontend.models.Answers
 case object AddedSignatoryPage extends GuardedPage {
 
   override def canBeAccessedWith(answers: Answers): Boolean =
-    answers.signatories.exists(_.exists(_.isComplete))
+    answers.signatories.exists(_.signatories.exists(_.isComplete))
 }

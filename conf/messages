@@ -150,6 +150,10 @@ addedSignatory.addAnother = Do you want to add another signatory?
 addedSignatory.error.required = Select yes if you’d like to add another signatory
 addedSignatory.summary.action.hidden = {0} details
 
+removeSignatory.title = Are you sure you want to remove {0} as a signatory?
+removeSignatory.heading = Are you sure you want to remove {0} as a signatory?
+removeSignatory.error.required = Select yes if you want to remove this signatory
+
 liaisonOfficerName.title = What is the full name of the liaison officer?
 liaisonOfficerName.heading = What is the full name of the liaison officer?
 liaisonOfficerName.hint = You must have at least 1 liaison officer to register your organisation as an ISA manager. You can add up to {0} liaison officers.

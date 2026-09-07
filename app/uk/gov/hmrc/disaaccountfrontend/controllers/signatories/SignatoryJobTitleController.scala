@@ -54,9 +54,8 @@ class SignatoryJobTitleController @Inject() (
     signatoryName(id, request).fold(Redirect(ChangeOfCircumstancesController.onPageLoad())) { name =>
       val preparedForm =
         (for {
-          signatories <- request.effectiveAnswers.signatories
-          signatory   <- signatories.find(_.id == id)
-          jobTitle    <- signatory.jobTitle
+          signatory <- request.effectiveAnswers.signatories.flatMap(_.signatories.find(_.id == id))
+          jobTitle  <- signatory.jobTitle
         } yield form.fill(jobTitle)).getOrElse(form)
 
       Ok(view(id, name, mode, preparedForm))
@@ -70,14 +69,14 @@ class SignatoryJobTitleController @Inject() (
         .fold(
           formWithErrors => Future.successful(BadRequest(view(id, name, mode, formWithErrors))),
           answer => {
-            val sessionUpdates = SignatoryJobTitlePage(id).saveAnswerAndHandleDependents(request, answer)
+            val sessionUpdates = SignatoryJobTitlePage(id, mode).saveAnswerAndHandleDependents(request, answer)
 
             userAnswersRepository
               .set(UserAnswers(id = request.sessionId, updates = sessionUpdates))
               .map { _ =>
                 Redirect(
                   navigator.nextPage(
-                    SignatoryJobTitlePage(id),
+                    SignatoryJobTitlePage(id, mode),
                     sessionUpdates.getUpdatedEffectiveAnswers(request.effectiveAnswers),
                     mode
                   )
@@ -90,8 +89,7 @@ class SignatoryJobTitleController @Inject() (
 
   private def signatoryName(id: String, request: DataRequest[_]): Option[String] =
     for {
-      signatories <- request.effectiveAnswers.signatories
-      signatory   <- signatories.find(_.id == id)
-      name        <- signatory.fullName
+      signatory <- request.effectiveAnswers.signatories.flatMap(_.signatories.find(_.id == id))
+      name      <- signatory.fullName
     } yield name
 }

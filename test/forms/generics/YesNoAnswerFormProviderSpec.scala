@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package forms
+package forms.generics
 
-import uk.gov.hmrc.disaaccountfrontend.forms.YesNoAnswerFormProvider
+import uk.gov.hmrc.disaaccountfrontend.forms.generic.YesNoAnswerFormProvider
 import uk.gov.hmrc.disaaccountfrontend.models.YesNoAnswer.{No, Yes}
 import utils.BaseUnitSpec
 

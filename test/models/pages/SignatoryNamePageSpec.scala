@@ -20,8 +20,8 @@ import play.api.test.FakeRequest
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
 import uk.gov.hmrc.disaaccountfrontend.models.pages.SignatoryNamePage
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
-import uk.gov.hmrc.disaaccountfrontend.models.signatories.Signatory
-import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates, UserAnswers}
+import uk.gov.hmrc.disaaccountfrontend.models.signatories.{Signatories, Signatory}
+import uk.gov.hmrc.disaaccountfrontend.models.{Answers, CheckMode, SessionUpdates, UserAnswers}
 import utils.BaseUnitSpec
 
 class SignatoryNamePageSpec extends BaseUnitSpec {
@@ -40,7 +40,9 @@ class SignatoryNamePageSpec extends BaseUnitSpec {
       )
 
       SignatoryNamePage(testSignatoryId).saveAnswerAndHandleDependents(request, testSignatoryName) shouldBe
-        existingUpdates.copy(signatories = Assign(Seq(Signatory(testSignatoryId, fullName = Some(testSignatoryName)))))
+        existingUpdates.copy(signatories =
+          Assign(Signatories(Seq(Signatory(testSignatoryId, fullName = Some(testSignatoryName)))))
+        )
     }
 
     "append a new signatory while preserving other signatories already in the effective answers" in {
@@ -56,7 +58,9 @@ class SignatoryNamePageSpec extends BaseUnitSpec {
       val newId = "signatory-2"
 
       SignatoryNamePage(newId).saveAnswerAndHandleDependents(request, "New Signatory") shouldBe
-        SessionUpdates(signatories = Assign(testSignatories :+ Signatory(newId, fullName = Some("New Signatory"))))
+        SessionUpdates(signatories =
+          Assign(Signatories(testSignatories.signatories :+ Signatory(newId, fullName = Some("New Signatory"))))
+        )
     }
 
     "update the matching signatory's name and preserve their job title" in {
@@ -67,11 +71,29 @@ class SignatoryNamePageSpec extends BaseUnitSpec {
         testCredentialId,
         testSessionId,
         None,
-        Answers(signatories = Some(Seq(existingSignatory)))
+        Answers(signatories = Some(Signatories(Seq(existingSignatory))))
       )
 
       SignatoryNamePage(testSignatoryId).saveAnswerAndHandleDependents(request, testSignatoryName) shouldBe
-        SessionUpdates(signatories = Assign(Seq(existingSignatory.copy(fullName = Some(testSignatoryName)))))
+        SessionUpdates(signatories =
+          Assign(Signatories(Seq(existingSignatory.copy(fullName = Some(testSignatoryName)))))
+        )
+    }
+
+    "leave the signatories unchanged when the id does not match an existing signatory" in {
+      val existingSignatory = Signatory(testSignatoryId, fullName = Some(testSignatoryName))
+      val request           = DataRequest(
+        FakeRequest(),
+        testZref,
+        testCredentialId,
+        testSessionId,
+        None,
+        Answers(signatories = Some(Signatories(Seq(existingSignatory))))
+      )
+
+      SignatoryNamePage("some-other-id", CheckMode)
+        .saveAnswerAndHandleDependents(request, testSignatoryName) shouldBe
+        SessionUpdates(signatories = Assign(Signatories(Seq(existingSignatory))))
     }
   }
 }

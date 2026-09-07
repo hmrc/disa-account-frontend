@@ -21,7 +21,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.disaaccountfrontend.config.AppConfig
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction, PageGuardAction}
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes.ChangeOfCircumstancesController
-import uk.gov.hmrc.disaaccountfrontend.forms.YesNoAnswerFormProvider
+import uk.gov.hmrc.disaaccountfrontend.forms.generic.YesNoAnswerFormProvider
 import uk.gov.hmrc.disaaccountfrontend.models.pages.AddedSignatoryPage
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
 import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator
@@ -68,7 +68,7 @@ class AddedSignatoryController @Inject() (
 
   private def summary(implicit request: DataRequest[_]): AddedSignatoriesSummary =
     AddedSignatoriesSummary(
-      signatories = request.effectiveAnswers.signatories.getOrElse(Seq.empty),
+      signatories = request.effectiveAnswers.signatories.fold(Seq.empty)(_.signatories),
       maxSignatories = appConfig.maxSignatories
     )
 }

@@ -19,12 +19,14 @@ package navigation
 import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.{LiaisonOfficerCommunicationController, LiaisonOfficerEmailController, LiaisonOfficerPhoneNumberController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, PeerToPeerPlatformController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.OrganisationTelephoneNumberController
-import uk.gov.hmrc.disaaccountfrontend.controllers.signatories.routes.{SignatoryCheckYourAnswersController, SignatoryJobTitleController, SignatoryNameController}
+import uk.gov.hmrc.disaaccountfrontend.controllers.signatories.routes.{AddedSignatoryController, SignatoryCheckYourAnswersController, SignatoryJobTitleController, SignatoryNameController}
 import uk.gov.hmrc.disaaccountfrontend.models.YesNoAnswer.{No, Yes}
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, CheckMode, NormalMode, SessionUpdates}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.{CrowdFundedDebentures, PeertopeerLoansUsingAPlatformWith36hPermissions}
 import uk.gov.hmrc.disaaccountfrontend.models.pages.*
+import uk.gov.hmrc.disaaccountfrontend.models.pages.signatories.RemoveSignatoryPage
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
+import uk.gov.hmrc.disaaccountfrontend.models.signatories.{Signatories, Signatory}
 import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator
 import utils.BaseUnitSpec
 
@@ -83,12 +85,12 @@ class NavigatorSpec extends BaseUnitSpec {
     }
 
     "go from SignatoryNamePage to the signatory job title page" in {
-      navigator.nextPage(SignatoryNamePage(testSignatoryId)) shouldBe
+      navigator.nextPage(SignatoryNamePage(testSignatoryId, NormalMode)) shouldBe
         SignatoryJobTitleController.onPageLoad(testSignatoryId, NormalMode)
     }
 
     "go from SignatoryNamePage to check signatory details in check mode" in {
-      navigator.nextPage(SignatoryNamePage(testSignatoryId), mode = CheckMode) shouldBe
+      navigator.nextPage(SignatoryNamePage(testSignatoryId, CheckMode), mode = CheckMode) shouldBe
         SignatoryCheckYourAnswersController.onPageLoad(testSignatoryId)
     }
 
@@ -98,8 +100,30 @@ class NavigatorSpec extends BaseUnitSpec {
     }
 
     "go from SignatoryJobTitlePage to check signatory details in check mode" in {
-      navigator.nextPage(SignatoryJobTitlePage(testSignatoryId), mode = CheckMode) shouldBe
+      navigator.nextPage(SignatoryJobTitlePage(testSignatoryId, CheckMode), mode = CheckMode) shouldBe
         SignatoryCheckYourAnswersController.onPageLoad(testSignatoryId)
+    }
+
+    "go from RemoveSignatoryPage to add a signatory when none remain" in {
+      navigator.nextPage(
+        RemoveSignatoryPage(testSignatoryId),
+        Answers(signatories = Some(Signatories(Seq.empty)))
+      ) shouldBe
+        SignatoryNameController.onPageLoad(None, NormalMode)
+    }
+
+    "go from RemoveSignatoryPage to added signatories when a complete signatory remains" in {
+      navigator.nextPage(RemoveSignatoryPage(testSignatoryId), Answers(signatories = Some(testSignatories))) shouldBe
+        AddedSignatoryController.onPageLoad()
+    }
+
+    "go from RemoveSignatoryPage to add a signatory when only incomplete records remain" in {
+      val incomplete = Signatory("incomplete", fullName = Some("Incomplete"))
+
+      navigator.nextPage(
+        RemoveSignatoryPage(testSignatoryId),
+        Answers(signatories = Some(Signatories(Seq(incomplete))))
+      ) shouldBe SignatoryNameController.onPageLoad(None, NormalMode)
     }
 
     "go from FcaArticlesPage to change of circumstances" in {

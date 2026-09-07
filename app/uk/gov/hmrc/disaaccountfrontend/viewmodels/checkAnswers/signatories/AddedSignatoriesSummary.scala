@@ -17,8 +17,7 @@
 package uk.gov.hmrc.disaaccountfrontend.viewmodels.checkAnswers.signatories
 
 import play.api.i18n.Messages
-import uk.gov.hmrc.disaaccountfrontend.controllers.routes.ChangeOfCircumstancesController
-import uk.gov.hmrc.disaaccountfrontend.controllers.signatories.routes.SignatoryCheckYourAnswersController
+import uk.gov.hmrc.disaaccountfrontend.controllers.signatories.routes.{RemoveSignatoryController, SignatoryCheckYourAnswersController}
 import uk.gov.hmrc.disaaccountfrontend.models.signatories.Signatory
 import uk.gov.hmrc.govukfrontend.views.Aliases.{ActionItem, Actions, Key, SummaryList, SummaryListRow, Text, Value}
 
@@ -54,8 +53,7 @@ case class AddedSignatoriesSummary(signatories: Seq[Signatory], maxSignatories: 
                 visuallyHiddenText = Some(messages("addedSignatory.summary.action.hidden", name))
               ),
               ActionItem(
-                // TODO: Replace this fallback with the remove-signatory page once it is implemented.
-                href = ChangeOfCircumstancesController.onPageLoad().url,
+                href = RemoveSignatoryController.onPageLoad(signatory.id).url,
                 content = Text(messages("site.remove")),
                 visuallyHiddenText = Some(messages("addedSignatory.summary.action.hidden", name))
               )

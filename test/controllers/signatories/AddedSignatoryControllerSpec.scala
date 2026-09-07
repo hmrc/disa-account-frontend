@@ -22,7 +22,7 @@ import org.mockito.Mockito.{never, verify}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.disaaccountfrontend.models.Answers
-import uk.gov.hmrc.disaaccountfrontend.models.signatories.Signatory
+import uk.gov.hmrc.disaaccountfrontend.models.signatories.{Signatories, Signatory}
 import utils.BaseUnitSpec
 
 class AddedSignatoryControllerSpec extends BaseUnitSpec {
@@ -35,9 +35,9 @@ class AddedSignatoryControllerSpec extends BaseUnitSpec {
 
   "AddedSignatoryController.onPageLoad" should {
 
-    "render one signatory with Change and the temporary Remove fallback" in {
+    "render one signatory with Change and Remove actions" in {
       val application = applicationBuilder(
-        effectiveAnswers = Answers(signatories = Some(Seq(completeSignatory)))
+        effectiveAnswers = Answers(signatories = Some(Signatories(Seq(completeSignatory))))
       ).build()
 
       running(application) {
@@ -55,7 +55,7 @@ class AddedSignatoryControllerSpec extends BaseUnitSpec {
         actions.size()              shouldBe 2
         actions.get(0).attr("href") shouldBe s"$checkSignatoryDetailsEndpoint?id=$testSignatoryId"
         actions.get(0).text()       shouldBe s"Change $testSignatoryName details"
-        actions.get(1).attr("href") shouldBe changeOfCircumstancesEndpoint
+        actions.get(1).attr("href") shouldBe s"$removeSignatoryEndpoint?id=$testSignatoryId"
         actions.get(1).text()       shouldBe s"Remove $testSignatoryName details"
 
         doc.select("input[type=radio][name=value]").size() shouldBe 2
@@ -67,7 +67,7 @@ class AddedSignatoryControllerSpec extends BaseUnitSpec {
 
     "render the plural heading for multiple signatories" in {
       val application = applicationBuilder(
-        effectiveAnswers = Answers(signatories = Some(completeSignatories(2)))
+        effectiveAnswers = Answers(signatories = Some(Signatories(completeSignatories(2))))
       ).build()
 
       running(application) {
@@ -83,7 +83,7 @@ class AddedSignatoryControllerSpec extends BaseUnitSpec {
     "exclude incomplete signatories from the list and heading count" in {
       val incompleteSignatory = Signatory("incomplete-id", Some("Incomplete Signatory"), None)
       val application         = applicationBuilder(
-        effectiveAnswers = Answers(signatories = Some(completeSignatories(2) :+ incompleteSignatory))
+        effectiveAnswers = Answers(signatories = Some(Signatories(completeSignatories(2) :+ incompleteSignatory)))
       ).build()
 
       running(application) {
@@ -100,7 +100,7 @@ class AddedSignatoryControllerSpec extends BaseUnitSpec {
     "allow another signatory when incomplete records bring the stored collection to the maximum" in {
       val signatories = completeSignatories(24) :+ Signatory("incomplete-id", Some("Incomplete Signatory"), None)
       val application = applicationBuilder(
-        effectiveAnswers = Answers(signatories = Some(signatories))
+        effectiveAnswers = Answers(signatories = Some(Signatories(signatories)))
       ).build()
 
       running(application) {
@@ -115,7 +115,7 @@ class AddedSignatoryControllerSpec extends BaseUnitSpec {
 
     "render the maximum state without the add-another question" in {
       val application = applicationBuilder(
-        effectiveAnswers = Answers(signatories = Some(completeSignatories(25)))
+        effectiveAnswers = Answers(signatories = Some(Signatories(completeSignatories(25))))
       ).build()
 
       running(application) {
@@ -132,7 +132,7 @@ class AddedSignatoryControllerSpec extends BaseUnitSpec {
 
     "defensively use the maximum state above 25 signatories" in {
       val application = applicationBuilder(
-        effectiveAnswers = Answers(signatories = Some(completeSignatories(26)))
+        effectiveAnswers = Answers(signatories = Some(Signatories(completeSignatories(26))))
       ).build()
 
       running(application) {
@@ -148,8 +148,8 @@ class AddedSignatoryControllerSpec extends BaseUnitSpec {
     "redirect when signatories are missing, empty or incomplete" in {
       val answerSets = Seq(
         Answers(),
-        Answers(signatories = Some(Seq.empty)),
-        Answers(signatories = Some(Seq(completeSignatory.copy(jobTitle = None))))
+        Answers(signatories = Some(Signatories())),
+        Answers(signatories = Some(Signatories(Seq(completeSignatory.copy(jobTitle = None)))))
       )
 
       answerSets.foreach { answers =>
@@ -169,7 +169,7 @@ class AddedSignatoryControllerSpec extends BaseUnitSpec {
 
     "redirect Yes to the signatory name page without persisting the answer" in {
       val application = applicationBuilder(
-        effectiveAnswers = Answers(signatories = Some(Seq(completeSignatory)))
+        effectiveAnswers = Answers(signatories = Some(Signatories(Seq(completeSignatory))))
       ).build()
 
       running(application) {
@@ -186,7 +186,7 @@ class AddedSignatoryControllerSpec extends BaseUnitSpec {
 
     "redirect No to change of circumstances without persisting the answer" in {
       val application = applicationBuilder(
-        effectiveAnswers = Answers(signatories = Some(Seq(completeSignatory)))
+        effectiveAnswers = Answers(signatories = Some(Signatories(Seq(completeSignatory))))
       ).build()
 
       running(application) {
@@ -203,7 +203,7 @@ class AddedSignatoryControllerSpec extends BaseUnitSpec {
 
     "show the required inline error and error summary when no option is selected" in {
       val application = applicationBuilder(
-        effectiveAnswers = Answers(signatories = Some(Seq(completeSignatory)))
+        effectiveAnswers = Answers(signatories = Some(Signatories(Seq(completeSignatory))))
       ).build()
 
       running(application) {
@@ -222,7 +222,7 @@ class AddedSignatoryControllerSpec extends BaseUnitSpec {
 
     "redirect from the maximum state without validating or persisting a radio answer" in {
       val application = applicationBuilder(
-        effectiveAnswers = Answers(signatories = Some(completeSignatories(25)))
+        effectiveAnswers = Answers(signatories = Some(Signatories(completeSignatories(25))))
       ).build()
 
       running(application) {

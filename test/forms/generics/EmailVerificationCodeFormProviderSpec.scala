@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package forms
+package forms.generics
 
 import play.api.data.Form
-import uk.gov.hmrc.disaaccountfrontend.forms.EmailVerificationCodeFormProvider
+import uk.gov.hmrc.disaaccountfrontend.forms.generic.EmailVerificationCodeFormProvider
 import utils.BaseUnitSpec
 
 class EmailVerificationCodeFormProviderSpec extends BaseUnitSpec {

@@ -17,12 +17,12 @@
 package controllers.signatories
 
 import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers._
-import org.mockito.Mockito._
-import play.api.test.Helpers._
-import play.api.test._
+import org.mockito.ArgumentMatchers.*
+import org.mockito.Mockito.*
+import play.api.test.Helpers.*
+import play.api.test.*
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
-import uk.gov.hmrc.disaaccountfrontend.models.signatories.Signatory
+import uk.gov.hmrc.disaaccountfrontend.models.signatories.{Signatories, Signatory}
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates, UserAnswers}
 import utils.BaseUnitSpec
 
@@ -32,8 +32,10 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
 
   val validFormData: Map[String, String] = Map("value" -> testSignatoryName)
 
-  val maxSignatories: Seq[Signatory] =
-    (1 to 25).map(i => Signatory(s"signatory-$i", Some(s"Signatory $i"), Some("Director")))
+  val maxSignatories: Signatories =
+    Signatories(
+      (1 to 25).map(i => Signatory(s"signatory-$i", Some(s"Signatory $i"), Some("Director")))
+    )
 
   "SignatoryNameController.onPageLoad" should {
 
@@ -117,7 +119,9 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
     }
 
     "exclude incomplete signatories from the maximum count" in {
-      val signatories = maxSignatories.drop(1) :+ Signatory("incomplete-id", fullName = Some("Incomplete"))
+      val signatories = Signatories(
+        maxSignatories.signatories.drop(1) :+ Signatory("incomplete-id", fullName = Some("Incomplete"))
+      )
       val application = applicationBuilder(
         effectiveAnswers = Answers(signatories = Some(signatories))
       ).build()
@@ -154,7 +158,8 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
         val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
         verify(mockUserAnswersRepository).set(captor.capture())
         captor.getValue.updates shouldBe SessionUpdates(
-          signatories = Assign(testSignatories :+ Signatory(newId, fullName = Some(testSignatoryName)))
+          signatories =
+            Assign(Signatories(testSignatories.signatories :+ Signatory(newId, fullName = Some(testSignatoryName))))
         )
       }
     }
@@ -164,7 +169,7 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
 
       val existingSignatory = Signatory(testSignatoryId, fullName = Some("Old Name"), jobTitle = Some("Director"))
       val application       = applicationBuilder(
-        effectiveAnswers = Answers(signatories = Some(Seq(existingSignatory)))
+        effectiveAnswers = Answers(signatories = Some(Signatories(Seq(existingSignatory))))
       ).build()
 
       running(application) {
@@ -180,7 +185,7 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
         val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
         verify(mockUserAnswersRepository).set(captor.capture())
         captor.getValue.updates shouldBe SessionUpdates(
-          signatories = Assign(Seq(existingSignatory.copy(fullName = Some(testSignatoryName))))
+          signatories = Assign(Signatories(Seq(existingSignatory.copy(fullName = Some(testSignatoryName)))))
         )
       }
     }
@@ -191,7 +196,7 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
       val existingSignatory =
         Signatory(testSignatoryId, fullName = Some("Old Name"), jobTitle = Some(testSignatoryJobTitle))
       val application       = applicationBuilder(
-        effectiveAnswers = Answers(signatories = Some(Seq(existingSignatory)))
+        effectiveAnswers = Answers(signatories = Some(Signatories(Seq(existingSignatory))))
       ).build()
 
       running(application) {
@@ -262,7 +267,9 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
     "allow a new signatory when only incomplete signatories bring the stored collection to the maximum" in {
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
 
-      val signatories = maxSignatories.drop(1) :+ Signatory("incomplete-id", fullName = Some("Incomplete"))
+      val signatories = Signatories(
+        maxSignatories.signatories.drop(1) :+ Signatory("incomplete-id", fullName = Some("Incomplete"))
+      )
       val application = applicationBuilder(
         effectiveAnswers = Answers(signatories = Some(signatories))
       ).build()
@@ -288,7 +295,7 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
       ).build()
 
       running(application) {
-        val existingId = maxSignatories.head.id
+        val existingId = maxSignatories.signatories.head.id
         val request    =
           FakeRequest(POST, s"$signatoryNameEndpoint?id=$existingId")
             .withFormUrlEncodedBody(validFormData.toSeq: _*)
