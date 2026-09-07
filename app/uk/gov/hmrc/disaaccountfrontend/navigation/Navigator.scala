@@ -89,9 +89,11 @@ class Navigator @Inject() () {
   private def RemoveSignatoryNextPage(answers: Answers): Call =
     answers.signatories match {
       // TODO Change to "You currently have a signatory" once ready
-      case Some(_) => ChangeOfCircumstancesController.onPageLoad()
+      case Some(value) if value.signatories.nonEmpty => ChangeOfCircumstancesController.onPageLoad()
       // TODO Change to "Add a signatory" once ready
-      case _       => ChangeOfCircumstancesController.onPageLoad()
+      case Some(_)                                   => ChangeOfCircumstancesController.onPageLoad()
+
+      case _ => ChangeOfCircumstancesController.onPageLoad()
     }
 
   private def liaisonOfficerNameNextPage(id: String, mode: Mode): Call =

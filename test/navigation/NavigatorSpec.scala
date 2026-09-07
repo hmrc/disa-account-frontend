@@ -25,6 +25,7 @@ import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialPro
 import uk.gov.hmrc.disaaccountfrontend.models.pages.*
 import uk.gov.hmrc.disaaccountfrontend.models.pages.signatories.RemoveSignatoryPage
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
+import uk.gov.hmrc.disaaccountfrontend.models.signatories.Signatories
 import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator
 import utils.BaseUnitSpec
 
@@ -92,6 +93,20 @@ class NavigatorSpec extends BaseUnitSpec {
     "go from SignatoryJobTitlePage to check signatory details in check mode" in {
       navigator.nextPage(SignatoryJobTitlePage(testSignatoryId, CheckMode), mode = CheckMode) shouldBe
         SignatoryCheckYourAnswersController.onPageLoad(testSignatoryId)
+    }
+
+    // TODO When "Add a Signatory" change this test accordingly
+    "go from RemoveSignatoryPage to \"Add a Signatory\" in check mode" in {
+      navigator.nextPage(
+        RemoveSignatoryPage(testSignatoryId),
+        Answers(signatories = Some(Signatories(Seq.empty)))
+      ) shouldBe
+        ChangeOfCircumstancesController.onPageLoad()
+    }
+    // TODO When "You currently have a signatory" change this test accordingly
+    "go from RemoveSignatoryPage to \"You currently have a signatory\" in check mode" in {
+      navigator.nextPage(RemoveSignatoryPage(testSignatoryId), Answers(signatories = Some(testSignatories))) shouldBe
+        ChangeOfCircumstancesController.onPageLoad()
     }
 
     "go from FcaArticlesPage to change of circumstances" in {
