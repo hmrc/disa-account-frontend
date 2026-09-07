@@ -1,0 +1,15 @@
+@import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.AddedLiaisonOfficersController
+@import uk.gov.hmrc.disaaccountfrontend.models.YesNoAnswer
+@import uk.gov.hmrc.disaaccountfrontend.viewmodels.checkAnswers.liaisonofficers.AddedLiaisonOfficersSummary
+@import uk.gov.hmrc.disaaccountfrontend.views.html.Layout
+
+@this(
+    layout: Layout,
+    formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukSummaryList: GovukSummaryList,
+    govukRadios: GovukRadios,
+    govukButton: GovukButton
+)
+
+@(form: Form[_], summary: AddedLiaisonOfficersSummary)(implicit request: Request[_], messages: Messages)
