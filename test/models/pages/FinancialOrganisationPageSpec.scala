@@ -34,8 +34,10 @@ class FinancialOrganisationPageSpec extends BaseUnitSpec {
         FakeRequest(),
         testZref,
         testCredentialId,
+        None,
         testSessionId,
         Some(UserAnswers(testSessionId, existingUpdates)),
+        Answers(),
         Answers()
       )
 

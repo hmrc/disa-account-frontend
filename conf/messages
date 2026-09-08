@@ -1,5 +1,4 @@
 service.name = Manage ISAs
-service.text = This is your new service
 
 site.continue = Continue
 site.change = Change
@@ -13,6 +12,9 @@ site.signOut = Sign out
 error.prefix = Error
 error.title.prefix = Error:
 error.summary.title = There is a problem
+
+changeInformation.title = What would you like to change?
+changeInformation.heading = What would you like to change?
 
 enterYourOrganisationAddress.title = Enter your organisation’s address
 enterYourOrganisationAddress.heading = Enter your organisation’s address
@@ -189,6 +191,16 @@ unauthorised.body = You need to be signed in with an organisation that is enroll
 
 changeOfCircumstances.title = Change of circumstances
 changeOfCircumstances.heading = Change of circumstances
+
+changeInformation.title = What would you like to change?
+changeInformation.heading = What would you like to change?
+changeInformation.caption = Select all sections that apply
+changeInformation.organisationInformation = Organisation information
+changeInformation.isaProductInformation = ISA Product information
+changeInformation.authorisedUsers = Authorised users
+changeInformation.divider = or
+changeInformation.viewAllInformation = View all information
+changeInformation.error.required = Select from the options what you would like to change
 
 timeout.title = You’re about to be signed out
 timeout.message = For security reasons, you will be signed out of this service in

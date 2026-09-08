@@ -23,7 +23,17 @@ case class DataRequest[A](
   request: Request[A],
   zReference: String,
   credentialId: String,
+  loggedInEmail: Option[String],
   sessionId: String,
   sessionAnswers: Option[UserAnswers],
+  originalAnswers: Answers,
   effectiveAnswers: Answers
-) extends WrappedRequest[A](request)
+) extends WrappedRequest[A](request) {
+
+  def isSignatory: Boolean =
+    loggedInEmail.map(_.trim).filter(_.nonEmpty).exists { authenticatedEmail =>
+      originalAnswers.signatories.exists(
+        _.signatories.exists(_.email.exists(_.trim.equalsIgnoreCase(authenticatedEmail)))
+      )
+    }
+}

@@ -50,14 +50,14 @@ class AuthenticatedIdentifierAction @Inject() (
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    authorised(Enrolment(enrolmentKey)).retrieve(authorisedEnrolments and credentials) {
-      case enrolments ~ credentials =>
+    authorised(Enrolment(enrolmentKey)).retrieve(authorisedEnrolments and credentials and email) {
+      case enrolments ~ credentials ~ email =>
         val zref      = enrolments.getEnrolment(enrolmentKey).flatMap(_.getIdentifier(identifierKey)).map(_.value)
         val sessionId = hc.sessionId.map(_.value)
 
         (zref, credentials, sessionId) match {
           case (Some(zref), Some(creds), Some(sessionId)) =>
-            block(IdentifierRequest(request, zref, creds.providerId, sessionId))
+            block(IdentifierRequest(request, zref, creds.providerId, sessionId, email))
           case (None, _, _)                               =>
             logger.warn(
               s"[AuthenticatedIdentifierAction][invokeBlock] User with enrolment [$enrolmentKey] was missing identifier [$identifierKey]"

@@ -25,7 +25,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class FakeDataRetrievalAction(
   effectiveAnswers: Answers = Answers(),
-  sessionAnswers: Option[UserAnswers] = None
+  sessionAnswers: Option[UserAnswers] = None,
+  originalAnswers: Option[Answers] = None
 ) extends DataRetrievalAction {
 
   override protected def refine[A](request: IdentifierRequest[A]): Future[Either[Result, DataRequest[A]]] =
@@ -35,8 +36,10 @@ class FakeDataRetrievalAction(
           request.request,
           request.zReference,
           request.credentialId,
+          request.email,
           request.sessionId,
           sessionAnswers,
+          originalAnswers.getOrElse(effectiveAnswers),
           effectiveAnswers
         )
       )

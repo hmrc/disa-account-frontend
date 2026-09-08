@@ -26,11 +26,12 @@ class FakeIdentifierAction(
   bodyParsers: PlayBodyParsers,
   zReference: String,
   credentialId: String,
-  sessionId: String
+  sessionId: String,
+  email: Option[String] = None
 ) extends IdentifierAction {
 
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] =
-    block(IdentifierRequest(request, zReference, credentialId, sessionId))
+    block(IdentifierRequest(request, zReference, credentialId, sessionId, email))
 
   override def parser: BodyParser[AnyContent] =
     bodyParsers.default

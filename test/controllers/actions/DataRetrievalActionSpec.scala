@@ -50,9 +50,23 @@ class DataRetrievalActionSpec extends BaseUnitSpec {
 
   private def action = new Harness(mockRegistrationConnector, mockUserAnswersRepository, errorHandler)
 
+  private val expectedOriginalAnswers = Answers(
+    correspondenceAddress = Some(testCorrespondenceAddress),
+    organisationTelephoneNumber = Some(testOrgTelephoneNumber),
+    isaProducts = Some(testIsaProductSelections),
+    innovativeFinancialProducts = Some(testInnovativeFinancialProductSelections),
+    p2pPlatform = Some(testP2pPlatform),
+    p2pPlatformNumber = Some(testP2pPlatformNumber),
+    fcaArticles = Some(testFcaArticlesCheckedBoxes),
+    organisationEmailAddress = Some(testOrganisationEmailAddress),
+    financialOrganisation = Some(testFinancialOrganisationSelections),
+    liaisonOfficers = Some(testLiaisonOfficers),
+    signatories = Some(testSignatories)
+  )
+
   "DataRetrievalAction.refine" should {
 
-    "convert registration details into effective answers when there are no session answers" in {
+    "convert registration details into original and effective answers when there are no session answers" in {
       val request = FakeRequest()
       when(mockRegistrationConnector.getRegistrationDetails(eqTo(testZref))(any()))
         .thenReturn(Future.successful(Some(testRegistrationDetailsWithFinancialOrganisation)))
@@ -67,20 +81,11 @@ class DataRetrievalActionSpec extends BaseUnitSpec {
           request,
           testZref,
           testCredentialId,
+          None,
           testSessionId,
           sessionAnswers = None,
-          effectiveAnswers = Answers(
-            correspondenceAddress = Some(testCorrespondenceAddress),
-            organisationTelephoneNumber = Some(testOrgTelephoneNumber),
-            isaProducts = Some(testIsaProductSelections),
-            innovativeFinancialProducts = Some(testInnovativeFinancialProductSelections),
-            p2pPlatform = Some(testP2pPlatform),
-            p2pPlatformNumber = Some(testP2pPlatformNumber),
-            organisationEmailAddress = Some(testOrganisationEmailAddress),
-            financialOrganisation = Some(testFinancialOrganisationSelections),
-            liaisonOfficers = Some(testLiaisonOfficers),
-            signatories = Some(testSignatories)
-          )
+          originalAnswers = expectedOriginalAnswers,
+          effectiveAnswers = expectedOriginalAnswers
         )
       )
     }
@@ -109,13 +114,16 @@ class DataRetrievalActionSpec extends BaseUnitSpec {
           request,
           testZref,
           testCredentialId,
+          None,
           testSessionId,
           sessionAnswers = Some(savedAnswers),
+          originalAnswers = expectedOriginalAnswers,
           effectiveAnswers = Answers(
             correspondenceAddress = Some(testCorrespondenceAddress),
             organisationTelephoneNumber = Some(updatedOrgTelephoneNumber),
             isaProducts = Some(Seq.empty),
             innovativeFinancialProducts = Some(testInnovativeFinancialProductSelections),
+            fcaArticles = Some(testFcaArticlesCheckedBoxes),
             organisationEmailAddress = Some(testOrganisationEmailAddress),
             financialOrganisation = Some(Seq(Bank)),
             liaisonOfficers = Some(testLiaisonOfficers),
@@ -132,10 +140,13 @@ class DataRetrievalActionSpec extends BaseUnitSpec {
       when(mockUserAnswersRepository.get(testSessionId)).thenReturn(Future.successful(None))
 
       val result = action
-        .callRefine(IdentifierRequest(request, testZref, testCredentialId, testSessionId))
+        .callRefine(IdentifierRequest(request, testZref, testCredentialId, testSessionId, Some(testSignatoryEmail)))
         .futureValue
 
       result.value.effectiveAnswers.signatories shouldBe Some(testSignatories)
+      result.value.originalAnswers.signatories  shouldBe Some(testSignatories)
+      result.value.loggedInEmail                shouldBe Some(testSignatoryEmail)
+      result.value.isSignatory                  shouldBe true
     }
 
     "let a session-cached signatories update take precedence over the registration details response" in {
@@ -153,6 +164,7 @@ class DataRetrievalActionSpec extends BaseUnitSpec {
         .futureValue
 
       result.value.effectiveAnswers.signatories shouldBe Some(Signatories(Seq(updatedSignatory)))
+      result.value.originalAnswers.signatories  shouldBe Some(testSignatories)
     }
 
     "use empty effective answers when neither source has answers" in {
@@ -166,7 +178,7 @@ class DataRetrievalActionSpec extends BaseUnitSpec {
         .futureValue
 
       result shouldBe Right(
-        DataRequest(request, testZref, testCredentialId, testSessionId, None, Answers())
+        DataRequest(request, testZref, testCredentialId, None, testSessionId, None, Answers(), Answers())
       )
     }
 

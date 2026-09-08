@@ -35,8 +35,10 @@ class SignatoryJobTitlePageSpec extends BaseUnitSpec {
         FakeRequest(),
         testZref,
         testCredentialId,
+        None,
         testSessionId,
         Some(UserAnswers(testSessionId, existingUpdates)),
+        Answers(),
         Answers(signatories = Some(Signatories(Seq(existingSignatory))))
       )
 
@@ -53,8 +55,10 @@ class SignatoryJobTitlePageSpec extends BaseUnitSpec {
         FakeRequest(),
         testZref,
         testCredentialId,
+        None,
         testSessionId,
         None,
+        Answers(),
         Answers(signatories = Some(Signatories(Seq(existingSignatory, otherSignatory))))
       )
 
@@ -71,8 +75,10 @@ class SignatoryJobTitlePageSpec extends BaseUnitSpec {
         FakeRequest(),
         testZref,
         testCredentialId,
+        None,
         testSessionId,
         None,
+        Answers(),
         Answers(signatories = Some(Signatories(Seq(existingSignatory))))
       )
 
