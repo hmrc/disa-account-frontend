@@ -20,7 +20,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction, PageGuardAction}
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes.ChangeOfCircumstancesController
-import uk.gov.hmrc.disaaccountfrontend.models.pages.SignatoryCheckYourAnswersPage
+import uk.gov.hmrc.disaaccountfrontend.models.pages.signatories.SignatoryCheckYourAnswersPage
 import uk.gov.hmrc.disaaccountfrontend.viewmodels.checkAnswers.signatories.{SignatoryJobTitleSummary, SignatoryNameSummary}
 import uk.gov.hmrc.disaaccountfrontend.views.html.signatories.SignatoryCheckYourAnswersView
 import uk.gov.hmrc.govukfrontend.views.Aliases.SummaryList

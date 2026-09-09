@@ -1,4 +1,4 @@
-@import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.AddedLiaisonOfficersController
+@import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.AddedLiaisonOfficersController
 @import uk.gov.hmrc.disaaccountfrontend.models.YesNoAnswer
 @import uk.gov.hmrc.disaaccountfrontend.viewmodels.checkAnswers.liaisonofficers.AddedLiaisonOfficersSummary
 @import uk.gov.hmrc.disaaccountfrontend.views.html.Layout
@@ -13,3 +13,36 @@
 )
 
 @(form: Form[_], summary: AddedLiaisonOfficersSummary)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = Some(titleNoForm(s"${errorPrefix(form)} ${summary.title}".trim))) {
+
+    @formHelper(action = AddedLiaisonOfficersController.onSubmit(), Symbol("autoComplete") -> "off") {
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(
+                ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0"))
+            )
+        }
+
+        <h1 class="govuk-heading-l">@summary.title</h1>
+
+        <p class="govuk-body">@summary.guidance</p>
+
+        @govukSummaryList(summary.list)
+
+        @if(summary.canAddMore) {
+            @govukRadios(
+                RadiosViewModel(
+                    field = form("value"),
+                    items = YesNoAnswer.options,
+                    legend = Legend(
+                        content = Text(messages("addedLiaisonOfficer.addAnother")),
+                        classes = "govuk-fieldset__legend--m"
+                    )
+                ).inline()
+            )
+        }
+
+        @govukButton(ButtonViewModel(messages("site.continue")))
+    }
+}

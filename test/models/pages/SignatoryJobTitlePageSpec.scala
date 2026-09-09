@@ -18,7 +18,7 @@ package models.pages
 
 import play.api.test.FakeRequest
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
-import uk.gov.hmrc.disaaccountfrontend.models.pages.SignatoryJobTitlePage
+import uk.gov.hmrc.disaaccountfrontend.models.pages.signatories.SignatoryJobTitlePage
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
 import uk.gov.hmrc.disaaccountfrontend.models.signatories.{Signatories, Signatory}
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, CheckMode, SessionUpdates, UserAnswers}
