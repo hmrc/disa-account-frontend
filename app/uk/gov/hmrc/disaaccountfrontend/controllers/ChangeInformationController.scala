@@ -45,7 +45,7 @@ class ChangeInformationController @Inject() (
   def onPageLoad(): Action[AnyContent] = (identify andThen getData) { implicit request =>
     val availableSelections = ChangeInformationSelection.availableValues(request.isSignatory)
     val form                = formProvider(availableSelections)
-    val preparedForm = request.sessionAnswers
+    val preparedForm        = request.sessionAnswers
       .map(_.updates.changeInformationSelections)
       .collect { case Assign(selections) =>
         val formValues =
@@ -70,7 +70,7 @@ class ChangeInformationController @Inject() (
         formValues => {
           val selections      = ChangeInformationSelection.fromForm(formValues, availableSelections)
           val existingUpdates = request.sessionAnswers.fold(SessionUpdates())(_.updates)
-          val updatedAnswers = UserAnswers(
+          val updatedAnswers  = UserAnswers(
             id = request.sessionId,
             updates = existingUpdates.copy(changeInformationSelections = Assign(selections))
           )

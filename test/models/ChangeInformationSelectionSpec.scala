@@ -27,7 +27,7 @@ class ChangeInformationSelectionSpec extends BaseUnitSpec {
 
     "serialise and deserialise every supported wire value" in
       values.foreach { selection =>
-        Json.toJson(selection)                                             shouldBe JsString(selection.toString)
+        Json.toJson(selection)                                                  shouldBe JsString(selection.toString)
         JsString(selection.toString).validate[ChangeInformationSelection].asOpt shouldBe Some(selection)
       }
 

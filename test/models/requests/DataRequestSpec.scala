@@ -53,7 +53,7 @@ class DataRequestSpec extends BaseUnitSpec {
     }
 
     "return false when the authenticated email is missing or blank" in {
-      request(None).isSignatory       shouldBe false
+      request(None).isSignatory        shouldBe false
       request(Some("   ")).isSignatory shouldBe false
     }
   }

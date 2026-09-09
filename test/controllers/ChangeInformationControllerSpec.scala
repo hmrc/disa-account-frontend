@@ -51,20 +51,20 @@ class ChangeInformationControllerSpec extends BaseUnitSpec {
         val result = route(application, FakeRequest(GET, changeInformationEndpoint)).value
         val doc    = Jsoup.parse(contentAsString(result))
 
-        status(result) shouldBe OK
-        doc.title()     should startWith("What would you like to change?")
-        doc.select("h1").text() shouldBe "What would you like to change?"
-        doc.select(".govuk-hint").text() shouldBe "Select all sections that apply"
-        doc.select(".govuk-checkboxes__label").eachText().asScala.toSeq shouldBe Seq(
+        status(result)                                                             shouldBe OK
+        doc.title()                                                                  should startWith("What would you like to change?")
+        doc.select("h1").text()                                                    shouldBe "What would you like to change?"
+        doc.select(".govuk-hint").text()                                           shouldBe "Select all sections that apply"
+        doc.select(".govuk-checkboxes__label").eachText().asScala.toSeq            shouldBe Seq(
           "Organisation information",
           "ISA Product information",
           "Authorised users",
           "View all information"
         )
-        doc.select(".govuk-checkboxes__divider").text() shouldBe "or"
-        doc.select("button.govuk-button").text()        shouldBe "Continue"
+        doc.select(".govuk-checkboxes__divider").text()                            shouldBe "or"
+        doc.select("button.govuk-button").text()                                   shouldBe "Continue"
         doc.select("input.govuk-checkboxes__input").eachAttr("name").asScala.toSet shouldBe Set("value[]")
-        doc.select("input[data-behaviour=exclusive]").attr("value") shouldBe "viewAllInformation"
+        doc.select("input[data-behaviour=exclusive]").attr("value")                shouldBe "viewAllInformation"
       }
     }
 
@@ -76,7 +76,7 @@ class ChangeInformationControllerSpec extends BaseUnitSpec {
         val labels = Jsoup.parse(contentAsString(result)).select(".govuk-checkboxes__label").eachText().asScala.toSeq
 
         status(result) shouldBe OK
-        labels shouldBe Seq("Organisation information", "Authorised users", "View all information")
+        labels         shouldBe Seq("Organisation information", "Authorised users", "View all information")
       }
     }
 
@@ -93,7 +93,7 @@ class ChangeInformationControllerSpec extends BaseUnitSpec {
         val result = route(application, FakeRequest(GET, changeInformationEndpoint)).value
         val html   = contentAsString(result)
 
-        status(result)                                             shouldBe OK
+        status(result)                                            shouldBe OK
         checkboxIsChecked(html, OrganisationInformation.toString) shouldBe true
         checkboxIsChecked(html, IsaProductInformation.toString)   shouldBe false
         checkboxIsChecked(html, AuthorisedUsers.toString)         shouldBe true
@@ -112,7 +112,7 @@ class ChangeInformationControllerSpec extends BaseUnitSpec {
         val result = route(application, FakeRequest(GET, changeInformationEndpoint)).value
         val html   = contentAsString(result)
 
-        status(result)                                             shouldBe OK
+        status(result)                                            shouldBe OK
         checkboxIsChecked(html, OrganisationInformation.toString) shouldBe false
         checkboxIsChecked(html, AuthorisedUsers.toString)         shouldBe false
         checkboxIsChecked(html, viewAllInformationFormValue)      shouldBe true
@@ -131,14 +131,14 @@ class ChangeInformationControllerSpec extends BaseUnitSpec {
         val result  = route(application, request).value
         val doc     = Jsoup.parse(contentAsString(result))
 
-        status(result) shouldBe BAD_REQUEST
-        doc.select(".govuk-error-message").text() should include(
+        status(result)                                    shouldBe BAD_REQUEST
+        doc.select(".govuk-error-message").text()           should include(
           "Select from the options what you would like to change"
         )
-        doc.select(".govuk-error-summary a").text() shouldBe
+        doc.select(".govuk-error-summary a").text()       shouldBe
           "Select from the options what you would like to change"
         doc.select(".govuk-error-summary a").attr("href") shouldBe "#value_0"
-        doc.title() should startWith("Error:")
+        doc.title()                                         should startWith("Error:")
         verify(mockUserAnswersRepository, never).set(any())
       }
     }
@@ -157,9 +157,9 @@ class ChangeInformationControllerSpec extends BaseUnitSpec {
             "value[]" -> "viewAllInformation"
           )
           .withHeaders("Csrf-Token" -> "nocheck")
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
-        status(result)                 shouldBe SEE_OTHER
+        status(result)               shouldBe SEE_OTHER
         redirectLocation(result).value should endWith(changeOfCircumstancesEndpoint)
 
         val captor = ArgumentCaptor.forClass(classOf[UserAnswers])

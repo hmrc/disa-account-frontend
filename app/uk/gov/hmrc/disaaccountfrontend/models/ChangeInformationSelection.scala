@@ -40,7 +40,9 @@ object ChangeInformationSelection extends Enumerable.Implicits {
   val viewAllInformationFormValue = ViewAllInformation.toString
 
   def availableValues(isSignatory: Boolean): Seq[ChangeInformationSelection] =
-    values.filterNot(selection => selection == ViewAllInformation || (!isSignatory && selection == IsaProductInformation))
+    values.filterNot(selection =>
+      selection == ViewAllInformation || (!isSignatory && selection == IsaProductInformation)
+    )
 
   def validFormValues(availableSelections: Seq[ChangeInformationSelection]): Set[String] =
     availableSelections.map(_.toString).toSet + viewAllInformationFormValue
@@ -52,7 +54,9 @@ object ChangeInformationSelection extends Enumerable.Implicits {
     if (formValues.contains(viewAllInformationFormValue)) Seq(ViewAllInformation)
     else availableSelections.filter(selection => formValues.contains(selection.toString))
 
-  def checkboxItems(availableSelections: Seq[ChangeInformationSelection])(implicit messages: Messages): Seq[CheckboxItem] = {
+  def checkboxItems(
+    availableSelections: Seq[ChangeInformationSelection]
+  )(implicit messages: Messages): Seq[CheckboxItem] = {
     val selectionItems = availableSelections.zipWithIndex.map { case (value, index) =>
       CheckboxItemViewModel(
         content = Text(messages(s"changeInformation.${value.toString}")),
