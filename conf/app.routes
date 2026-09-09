@@ -6,6 +6,9 @@ GET        /assets/*file            controllers.Assets.versioned(path = "/public
 GET        /change-information                 uk.gov.hmrc.disaaccountfrontend.controllers.ChangeInformationController.onPageLoad()
 POST       /change-information                 uk.gov.hmrc.disaaccountfrontend.controllers.ChangeInformationController.onSubmit()
 
+GET        /change-products                    uk.gov.hmrc.disaaccountfrontend.controllers.ChangeProductsController.onPageLoad()
+POST       /change-products                    uk.gov.hmrc.disaaccountfrontend.controllers.ChangeProductsController.onSubmit()
+
 GET        /enter-your-organisation-address    uk.gov.hmrc.disaaccountfrontend.controllers.EnterYourOrganisationAddressController.onPageLoad()
 POST       /enter-your-organisation-address    uk.gov.hmrc.disaaccountfrontend.controllers.EnterYourOrganisationAddressController.onSubmit()
 

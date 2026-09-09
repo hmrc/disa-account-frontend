@@ -21,6 +21,7 @@ trait TestEndpoints {
   val accountFrontendRoutePrefix: String = "/obligations/account/isa"
 
   val changeInformationEndpoint: String                 = s"$accountFrontendRoutePrefix/change-information"
+  val changeProductsEndpoint: String                    = s"$accountFrontendRoutePrefix/change-products"
   val enterYourOrganisationAddressEndpoint: String      =
     s"$accountFrontendRoutePrefix/enter-your-organisation-address"
   val organisationTelephoneNumberEndpoint: String       =

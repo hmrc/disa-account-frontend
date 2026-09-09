@@ -17,12 +17,13 @@
 package navigation
 
 import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.{LiaisonOfficerCommunicationController, LiaisonOfficerEmailController, LiaisonOfficerPhoneNumberController}
-import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, PeerToPeerPlatformController}
+import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, InnovativeFinancialProductsController, PeerToPeerPlatformController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.OrganisationTelephoneNumberController
 import uk.gov.hmrc.disaaccountfrontend.controllers.signatories.routes.{AddedSignatoryController, SignatoryCheckYourAnswersController, SignatoryJobTitleController, SignatoryNameController}
 import uk.gov.hmrc.disaaccountfrontend.models.YesNoAnswer.{No, Yes}
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, CheckMode, NormalMode, SessionUpdates}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.{CrowdFundedDebentures, PeertopeerLoansUsingAPlatformWith36hPermissions}
+import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct.{CashIsas, InnovativeFinanceIsas}
 import uk.gov.hmrc.disaaccountfrontend.models.pages.*
 import uk.gov.hmrc.disaaccountfrontend.models.pages.signatories.RemoveSignatoryPage
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
@@ -42,6 +43,36 @@ class NavigatorSpec extends BaseUnitSpec {
 
     "go from added signatories to change of circumstances when No is selected" in {
       navigator.nextPageFromAddedSignatories(No) shouldBe ChangeOfCircumstancesController.onPageLoad()
+    }
+
+    "go from change products to Innovative Finance when it is selected but unanswered" in {
+      navigator.nextPageFromChangeProducts(
+        Answers(isaProducts = Some(Seq(CashIsas, InnovativeFinanceIsas)))
+      ) shouldBe InnovativeFinancialProductsController.onPageLoad()
+    }
+
+    "go from change products to Innovative Finance when its answer is empty" in {
+      navigator.nextPageFromChangeProducts(
+        Answers(
+          isaProducts = Some(Seq(CashIsas, InnovativeFinanceIsas)),
+          innovativeFinancialProducts = Some(Seq.empty)
+        )
+      ) shouldBe InnovativeFinancialProductsController.onPageLoad()
+    }
+
+    "go from change products to change of circumstances when Innovative Finance is answered" in {
+      navigator.nextPageFromChangeProducts(
+        Answers(
+          isaProducts = Some(Seq(CashIsas, InnovativeFinanceIsas)),
+          innovativeFinancialProducts = Some(Seq(CrowdFundedDebentures))
+        )
+      ) shouldBe ChangeOfCircumstancesController.onPageLoad()
+    }
+
+    "go from change products to change of circumstances when Innovative Finance is not selected" in {
+      navigator.nextPageFromChangeProducts(
+        Answers(isaProducts = Some(Seq(CashIsas)))
+      ) shouldBe ChangeOfCircumstancesController.onPageLoad()
     }
 
     "go from EnterYourOrganisationAddressPage to the organisation telephone number page" in {

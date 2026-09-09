@@ -16,6 +16,23 @@ error.summary.title = There is a problem
 changeInformation.title = What would you like to change?
 changeInformation.heading = What would you like to change?
 
+changeProducts.title = Change ISA products
+changeProducts.heading = Change ISA products
+changeProducts.manualProcessing = Any changes to ISA products will require manual processing by HMRC.
+changeProducts.restrictionsIntroduction = Once you have submitted your ISA product changes, you will be unable to update or change your:
+changeProducts.restriction.organisationDetails = organisation details
+changeProducts.restriction.isaProducts = further ISA products amendments
+changeProducts.restriction.authorisedUsers = authorised users
+changeProducts.approval = Once the changes to the ISA products have been checked and approved you will be able to carry out other updates as required.
+changeProducts.question = Which ISA products does your organisation offer?
+changeProducts.hint = Select or remove the ISA products your organisation offers
+changeProducts.cashIsas = Cash ISAs
+changeProducts.cashJuniorIsas = Cash Junior ISAs
+changeProducts.stocksAndSharesIsas = Stocks and Shares ISAs
+changeProducts.stocksAndSharesJuniorIsas = Stocks and Shares Junior ISAs
+changeProducts.innovativeFinanceIsas = Innovative Finance ISAs
+changeProducts.error.required = Select the ISA products your organisation offers
+
 enterYourOrganisationAddress.title = Enter your organisation’s address
 enterYourOrganisationAddress.heading = Enter your organisation’s address
 enterYourOrganisationAddress.addressLine1 = Address line 1
