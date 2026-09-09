@@ -17,8 +17,10 @@
 package uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority
 
 import play.api.libs.json.{Json, Reads}
+import uk.gov.hmrc.disaaccountfrontend.models.articles.FcaArticles
 
 case class CertificatesOfAuthority(
+  fcaArticles: Option[Seq[FcaArticles]] = None,
   financialOrganisation: Option[Seq[FinancialOrganisation]] = None
 )
 

@@ -25,6 +25,7 @@ import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficers
 import uk.gov.hmrc.disaaccountfrontend.models.signatories.Signatories
 
 case class SessionUpdates(
+  changeInformationSelections: AnswerUpdate[Seq[ChangeInformationSelection]] = Unchanged,
   correspondenceAddress: AnswerUpdate[CorrespondenceAddress] = Unchanged,
   organisationTelephoneNumber: AnswerUpdate[String] = Unchanged,
   tradingName: AnswerUpdate[String] = Unchanged,

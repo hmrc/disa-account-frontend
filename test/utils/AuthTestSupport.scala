@@ -27,14 +27,15 @@ trait AuthTestSupport extends TestData {
 
   protected def successfulAuthConnector(
     enrolments: Enrolments = testEnrolments,
-    credentials: Option[Credentials] = Some(testCredentials)
+    credentials: Option[Credentials] = Some(testCredentials),
+    email: Option[String] = Some(testSignatoryEmail)
   ): AuthConnector =
     new AuthConnector {
       override def authorise[A](predicate: Predicate, retrieval: Retrieval[A])(implicit
         hc: HeaderCarrier,
         ec: ExecutionContext
       ): Future[A] = {
-        val result: Enrolments ~ Option[Credentials] = new ~(enrolments, credentials)
+        val result: Enrolments ~ Option[Credentials] ~ Option[String] = new ~(new ~(enrolments, credentials), email)
         Future.successful(result.asInstanceOf[A])
       }
     }

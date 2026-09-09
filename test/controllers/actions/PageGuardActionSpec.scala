@@ -79,8 +79,10 @@ class PageGuardActionSpec extends BaseUnitSpec {
       FakeRequest(),
       testZref,
       testCredentialId,
+      None,
       testSessionId,
       sessionAnswers = None,
+      originalAnswers = Answers(),
       effectiveAnswers = answers
     )
 }

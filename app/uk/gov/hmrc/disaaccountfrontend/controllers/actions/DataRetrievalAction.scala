@@ -22,7 +22,7 @@ import uk.gov.hmrc.disaaccountfrontend.config.ErrorHandler
 import uk.gov.hmrc.disaaccountfrontend.connectors.RegistrationConnector
 import uk.gov.hmrc.disaaccountfrontend.models.registration.RegistrationDetails
 import uk.gov.hmrc.disaaccountfrontend.models.requests.{DataRequest, IdentifierRequest}
-import uk.gov.hmrc.disaaccountfrontend.models.{Answers, UserAnswers}
+import uk.gov.hmrc.disaaccountfrontend.models.Answers
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
@@ -50,14 +50,18 @@ class DataRetrievalActionImpl @Inject() (
     registrationDetails
       .zip(sessionAnswers)
       .map { case (registrationDetails, sessionAnswers) =>
+        val originalAnswers = toAnswers(registrationDetails)
+
         Right(
           DataRequest(
             request.request,
             request.zReference,
             request.credentialId,
+            request.email,
             request.sessionId,
             sessionAnswers,
-            mergeAnswers(registrationDetails, sessionAnswers)
+            originalAnswers,
+            sessionAnswers.fold(originalAnswers)(_.updates.getUpdatedEffectiveAnswers(originalAnswers))
           )
         )
       }
@@ -70,11 +74,8 @@ class DataRetrievalActionImpl @Inject() (
       }
   }
 
-  private def mergeAnswers(
-    registrationDetails: Option[RegistrationDetails],
-    sessionAnswers: Option[UserAnswers]
-  ): Answers = {
-    val registrationAnswers = Answers(
+  private def toAnswers(registrationDetails: Option[RegistrationDetails]): Answers =
+    Answers(
       correspondenceAddress = registrationDetails.flatMap(_.correspondenceAddress),
       organisationTelephoneNumber = registrationDetails.flatMap(_.orgTelephoneNumber),
       tradingName = registrationDetails.flatMap(_.tradingName),
@@ -82,12 +83,10 @@ class DataRetrievalActionImpl @Inject() (
       innovativeFinancialProducts = registrationDetails.flatMap(_.innovativeFinancialProductSelections),
       p2pPlatform = registrationDetails.flatMap(_.p2pPlatform),
       p2pPlatformNumber = registrationDetails.flatMap(_.p2pPlatformNumber),
+      fcaArticles = registrationDetails.flatMap(_.fcaArticles),
       organisationEmailAddress = registrationDetails.flatMap(_.organisationEmailAddress),
       financialOrganisation = registrationDetails.flatMap(_.financialOrganisation),
       signatories = registrationDetails.flatMap(_.signatories),
       liaisonOfficers = registrationDetails.flatMap(_.liaisonOfficers)
     )
-
-    sessionAnswers.fold(registrationAnswers)(_.updates.getUpdatedEffectiveAnswers(registrationAnswers))
-  }
 }
