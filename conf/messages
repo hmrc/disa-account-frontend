@@ -183,6 +183,9 @@ liaisonOfficerCommunication.byPhone = By phone
 liaisonOfficerCommunication.byPost = By post
 liaisonOfficerCommunication.error.required = Select the ways you want HMRC to communicate with this liaison officer
 
+liaisonOfficerCheckYourAnswers.title = Check liaison officer details
+liaisonOfficerCheckYourAnswers.heading = Check liaison officer details
+
 unauthorised.title = You cannot access this service
 unauthorised.heading = You cannot access this service
 unauthorised.body = You need to be signed in with an organisation that is enrolled to manage ISAs to use this service.
