@@ -105,7 +105,7 @@ class ChangeInformationControllerISpec extends BaseIntegrationSpec {
 
       val result = route(app, authenticatedGet()).get
 
-      status(result)          shouldBe OK
+      status(result)        shouldBe OK
       contentAsString(result) should include("What would you like to change?")
     }
 
@@ -115,7 +115,7 @@ class ChangeInformationControllerISpec extends BaseIntegrationSpec {
 
       val result = route(app, authenticatedGet()).get
 
-      status(result)          shouldBe OK
+      status(result)        shouldBe OK
       contentAsString(result) should include("ISA Product information")
     }
 
@@ -133,7 +133,7 @@ class ChangeInformationControllerISpec extends BaseIntegrationSpec {
 
       val result = route(app, authenticatedGet()).get
 
-      status(result)          shouldBe OK
+      status(result)        shouldBe OK
       contentAsString(result) should include("ISA Product information")
     }
 
@@ -152,7 +152,7 @@ class ChangeInformationControllerISpec extends BaseIntegrationSpec {
       val result = route(app, authenticatedGet()).get
       val html   = contentAsString(result)
 
-      status(result)                                             shouldBe OK
+      status(result)                                            shouldBe OK
       checkboxIsChecked(html, OrganisationInformation.toString) shouldBe true
       checkboxIsChecked(html, IsaProductInformation.toString)   shouldBe false
       checkboxIsChecked(html, AuthorisedUsers.toString)         shouldBe true
@@ -174,7 +174,7 @@ class ChangeInformationControllerISpec extends BaseIntegrationSpec {
       val result = route(app, authenticatedGet()).get
       val html   = contentAsString(result)
 
-      status(result)                                             shouldBe OK
+      status(result)                                            shouldBe OK
       checkboxIsChecked(html, OrganisationInformation.toString) shouldBe false
       checkboxIsChecked(html, AuthorisedUsers.toString)         shouldBe false
       checkboxIsChecked(html, viewAllInformationFormValue)      shouldBe true
@@ -185,7 +185,7 @@ class ChangeInformationControllerISpec extends BaseIntegrationSpec {
 
       val result = route(app, FakeRequest(GET, endpoint)).get
 
-      status(result)                 shouldBe SEE_OTHER
+      status(result)             shouldBe SEE_OTHER
       redirectLocation(result).get should include("auth-login-stub")
     }
   }
@@ -204,8 +204,8 @@ class ChangeInformationControllerISpec extends BaseIntegrationSpec {
         )
       ).get
 
-      status(postResult)                 shouldBe SEE_OTHER
-      redirectLocation(postResult).get should endWith("/change-of-circumstances")
+      status(postResult)                                                        shouldBe SEE_OTHER
+      redirectLocation(postResult).get                                            should endWith("/change-of-circumstances")
       await(repo.get(testSessionId)).map(_.updates.changeInformationSelections) shouldBe Some(
         Assign(Seq(OrganisationInformation, AuthorisedUsers))
       )
@@ -213,7 +213,7 @@ class ChangeInformationControllerISpec extends BaseIntegrationSpec {
       val getResult = route(app, authenticatedGet()).get
       val html      = contentAsString(getResult)
 
-      status(getResult)                                          shouldBe OK
+      status(getResult)                                         shouldBe OK
       checkboxIsChecked(html, OrganisationInformation.toString) shouldBe true
       checkboxIsChecked(html, IsaProductInformation.toString)   shouldBe false
       checkboxIsChecked(html, AuthorisedUsers.toString)         shouldBe true
@@ -231,14 +231,14 @@ class ChangeInformationControllerISpec extends BaseIntegrationSpec {
         )
       ).get
 
-      status(result) shouldBe SEE_OTHER
+      status(result)                                                            shouldBe SEE_OTHER
       await(repo.get(testSessionId)).map(_.updates.changeInformationSelections) shouldBe Some(
         Assign(Seq(ViewAllInformation))
       )
 
       val getResult = route(app, authenticatedGet()).get
 
-      status(getResult)                                        shouldBe OK
+      status(getResult)                                                          shouldBe OK
       checkboxIsChecked(contentAsString(getResult), viewAllInformationFormValue) shouldBe true
     }
 
@@ -248,7 +248,7 @@ class ChangeInformationControllerISpec extends BaseIntegrationSpec {
 
       val result = route(app, authenticatedPost("value[]" -> IsaProductInformation.toString)).get
 
-      status(result) shouldBe SEE_OTHER
+      status(result)                                                            shouldBe SEE_OTHER
       await(repo.get(testSessionId)).map(_.updates.changeInformationSelections) shouldBe Some(
         Assign(Seq(IsaProductInformation))
       )
@@ -260,7 +260,7 @@ class ChangeInformationControllerISpec extends BaseIntegrationSpec {
 
       val result = route(app, authenticatedPost("value[]" -> IsaProductInformation.toString)).get
 
-      status(result) shouldBe BAD_REQUEST
+      status(result)                 shouldBe BAD_REQUEST
       await(repo.get(testSessionId)) shouldBe None
     }
 
@@ -270,8 +270,8 @@ class ChangeInformationControllerISpec extends BaseIntegrationSpec {
 
       val result = route(app, authenticatedPost()).get
 
-      status(result)          shouldBe BAD_REQUEST
-      contentAsString(result) should include("Select from the options what you would like to change")
+      status(result)                 shouldBe BAD_REQUEST
+      contentAsString(result)          should include("Select from the options what you would like to change")
       await(repo.get(testSessionId)) shouldBe None
     }
 
@@ -284,7 +284,7 @@ class ChangeInformationControllerISpec extends BaseIntegrationSpec {
       val result  = route(app, request).get
 
       status(result)                 shouldBe SEE_OTHER
-      redirectLocation(result).get should include("auth-login-stub")
+      redirectLocation(result).get     should include("auth-login-stub")
       await(repo.get(testSessionId)) shouldBe None
     }
   }
