@@ -18,6 +18,7 @@ package uk.gov.hmrc.disaaccountfrontend.viewmodels.checkAnswers.liaisonofficers
 
 import play.api.i18n.Messages
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficer
+import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.LiaisonOfficerCheckYourAnswersController
 import uk.gov.hmrc.govukfrontend.views.Aliases.{ActionItem, Actions, Key, SummaryList, SummaryListRow, Text, Value}
 
 case class AddedLiaisonOfficersSummary(liaisonOfficers: Seq[LiaisonOfficer], maxOfficers: Int) {
@@ -46,7 +47,7 @@ case class AddedLiaisonOfficersSummary(liaisonOfficers: Seq[LiaisonOfficer], max
         actions = Some(Actions(
           items = Seq(
             ActionItem(
-              href = ???,
+              href = LiaisonOfficerCheckYourAnswersController.onPageLoad(officer.id).url,
               content = Text(messages("site.change")),
               visuallyHiddenText = Some(messages("addedLiaisonOfficer.summary.action.hidden", name)),
               ),

@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.viewmodels.checkAnswers.liaisonofficer
+package uk.gov.hmrc.disaaccountfrontend.viewmodels.checkAnswers.liaisonofficers
 
 import play.api.i18n.Messages
 import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.LiaisonOfficerNameController
-import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficer
 import uk.gov.hmrc.disaaccountfrontend.models.CheckMode
-import uk.gov.hmrc.govukfrontend.views.Aliases.SummaryListRow
-import uk.gov.hmrc.govukfrontend.views.Aliases.{ActionItem, Actions, Key, SummaryListRow, Value}
+import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficer
+import uk.gov.hmrc.govukfrontend.views.Aliases.*
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 
 object LiaisonOfficerNameSummary {

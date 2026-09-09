@@ -21,7 +21,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction, PageGuardAction}
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes.ChangeOfCircumstancesController
 import uk.gov.hmrc.disaaccountfrontend.models.pages.liaisonofficers.LiaisonOfficerCheckYourAnswersPage
-import uk.gov.hmrc.disaaccountfrontend.viewmodels.checkAnswers.liaisonofficer.{LiaisonOfficerEmailSummary, LiaisonOfficerNameSummary, LiaisonOfficerPhoneSummary}
+import uk.gov.hmrc.disaaccountfrontend.viewmodels.checkAnswers.liaisonofficers.{LiaisonOfficerEmailSummary, LiaisonOfficerNameSummary, LiaisonOfficerPhoneSummary}
 import uk.gov.hmrc.govukfrontend.views.Aliases.SummaryList
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.disaaccountfrontend.views.html.liaisonofficers.LiaisonOfficerCheckYourAnswersView

@@ -14,28 +14,28 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.viewmodels.checkAnswers.liaisonofficer
+package uk.gov.hmrc.disaaccountfrontend.viewmodels.checkAnswers.liaisonofficers
 
 import play.api.i18n.Messages
-import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.LiaisonOfficerEmailController
+import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.LiaisonOfficerPhoneNumberController
 import uk.gov.hmrc.disaaccountfrontend.models.CheckMode
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficer
-import uk.gov.hmrc.govukfrontend.views.Aliases.{ActionItem, Actions, Key, SummaryListRow, Value}
+import uk.gov.hmrc.govukfrontend.views.Aliases.*
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 
-object LiaisonOfficerEmailSummary {
+object LiaisonOfficerPhoneSummary {
   def row(officer: LiaisonOfficer)(implicit messages: Messages): Option[SummaryListRow] =
-    officer.email.map { email =>
+    officer.phoneNumber.map { phone =>
       SummaryListRow(
-        key = Key(Text(messages("liaisonOfficerEmail.checkYourAnswersLabel"))),
-        value = Value(Text(email)),
+        key = Key(Text(messages("liaisonOfficerPhoneNumber.checkYourAnswersLabel"))),
+        value = Value(Text(phone)),
         actions = Some(
           Actions(
             items = Seq(
               ActionItem(
-                href = LiaisonOfficerEmailController.onPageLoad(officer.id, CheckMode).url,
+                href = LiaisonOfficerPhoneNumberController.onPageLoad(officer.id, CheckMode).url,
                 content = Text(messages("site.change")),
-                visuallyHiddenText = Some(messages("liaisonOfficerEmail.change.hidden"))
+                visuallyHiddenText = Some(messages("liaisonOfficerPhoneNumber.change.hidden"))
               )
             )
           )
