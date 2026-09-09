@@ -32,19 +32,19 @@ import javax.inject.Inject
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 class AddedLiaisonOfficersController @Inject() (
-                                                 override val messagesApi: MessagesApi,
-                                                 identify: IdentifierAction,
-                                                 getData: DataRetrievalAction,
-                                                 guardPage: PageGuardAction,
-                                                 formProvider: YesNoAnswerFormProvider,
-                                                 navigator: Navigator,
-                                                 appConfig: AppConfig,
-                                                 val controllerComponents: MessagesControllerComponents,
-                                                 view: AddedLiaisonOfficersView
-                                               ) extends FrontendBaseController
-  with I18nSupport {
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  guardPage: PageGuardAction,
+  formProvider: YesNoAnswerFormProvider,
+  navigator: Navigator,
+  appConfig: AppConfig,
+  val controllerComponents: MessagesControllerComponents,
+  view: AddedLiaisonOfficersView
+) extends FrontendBaseController
+    with I18nSupport {
 
-  private val form = formProvider("addedLiaisonOfficer.error.required")
+  private val form       = formProvider("addedLiaisonOfficer.error.required")
   private val pageAction = identify andThen getData andThen guardPage(AddedLiaisonOfficerPage)
 
   def onPageLoad(): Action[AnyContent] = pageAction { implicit request =>

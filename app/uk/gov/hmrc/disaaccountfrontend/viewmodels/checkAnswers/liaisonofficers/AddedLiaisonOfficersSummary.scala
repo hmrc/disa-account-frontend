@@ -25,7 +25,7 @@ case class AddedLiaisonOfficersSummary(liaisonOfficers: Seq[LiaisonOfficer], max
 
   private val completeOfficers = liaisonOfficers.filter(_.isComplete)
 
-  val count:Int = completeOfficers.size
+  val count: Int          = completeOfficers.size
   val canAddMore: Boolean = count < maxOfficers
 
   def title(implicit messages: Messages): String =
@@ -39,25 +39,27 @@ case class AddedLiaisonOfficersSummary(liaisonOfficers: Seq[LiaisonOfficer], max
   def list(implicit messages: Messages): SummaryList =
     SummaryList(rows = completeOfficers.flatMap(row))
 
-  private def row(officer: LiaisonOfficer)(implicit messages: Messages): Option[SummaryListRow] = {
-    officer.fullName.map{name =>
+  private def row(officer: LiaisonOfficer)(implicit messages: Messages): Option[SummaryListRow] =
+    officer.fullName.map { name =>
       SummaryListRow(
         key = Key(Text(name), classes = "govuk-!-font-weight-regular"),
         value = Value(Text(""), classes = "govuk-!-width-one-quarter"),
-        actions = Some(Actions(
-          items = Seq(
-            ActionItem(
-              href = LiaisonOfficerCheckYourAnswersController.onPageLoad(officer.id).url,
-              content = Text(messages("site.change")),
-              visuallyHiddenText = Some(messages("addedLiaisonOfficer.summary.action.hidden", name)),
+        actions = Some(
+          Actions(
+            items = Seq(
+              ActionItem(
+                href = LiaisonOfficerCheckYourAnswersController.onPageLoad(officer.id).url,
+                content = Text(messages("site.change")),
+                visuallyHiddenText = Some(messages("addedLiaisonOfficer.summary.action.hidden", name))
               ),
-            ActionItem(
-              href = ???,
-              content = Text(messages("site.remove")),
-              visuallyHiddenText = Some(messages("addedLiaisonOfficer.summary.action.hidden", name))))
+              ActionItem(
+                href = ???,
+                content = Text(messages("site.remove")),
+                visuallyHiddenText = Some(messages("addedLiaisonOfficer.summary.action.hidden", name))
+              )
+            )
           )
         )
       )
     }
-  }
 }

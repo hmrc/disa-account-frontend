@@ -29,21 +29,25 @@ import uk.gov.hmrc.disaaccountfrontend.views.html.liaisonofficers.LiaisonOfficer
 import javax.inject.Inject
 
 class LiaisonOfficerCheckYourAnswersController @Inject() (
-                                                           override val messagesApi: MessagesApi,
-                                                           identify: IdentifierAction,
-                                                           getData: DataRetrievalAction,
-                                                           guardPage: PageGuardAction,
-                                                           val controllerComponents: MessagesControllerComponents,
-                                                           view: LiaisonOfficerCheckYourAnswersView
-                                                         ) extends FrontendBaseController
-  with I18nSupport {
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  guardPage: PageGuardAction,
+  val controllerComponents: MessagesControllerComponents,
+  view: LiaisonOfficerCheckYourAnswersView
+) extends FrontendBaseController
+    with I18nSupport {
 
   def onPageLoad(id: String): Action[AnyContent] =
     (identify andThen getData andThen guardPage(LiaisonOfficerCheckYourAnswersPage(id))) { implicit request =>
       request.effectiveAnswers.liaisonOfficers
         .flatMap(_.liaisonOfficers.find(_.id == id))
         .fold(Redirect(ChangeOfCircumstancesController.onPageLoad())) { officer =>
-          val rows = Seq(LiaisonOfficerNameSummary.row(officer), LiaisonOfficerPhoneSummary.row(officer),LiaisonOfficerEmailSummary.row(officer)).flatten
+          val rows = Seq(
+            LiaisonOfficerNameSummary.row(officer),
+            LiaisonOfficerPhoneSummary.row(officer),
+            LiaisonOfficerEmailSummary.row(officer)
+          ).flatten
           Ok(view(SummaryList(rows = rows)))
         }
     }

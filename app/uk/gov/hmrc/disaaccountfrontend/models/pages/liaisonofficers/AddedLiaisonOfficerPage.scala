@@ -19,7 +19,7 @@ package uk.gov.hmrc.disaaccountfrontend.models.pages.liaisonofficers
 import uk.gov.hmrc.disaaccountfrontend.models.Answers
 import uk.gov.hmrc.disaaccountfrontend.models.pages.GuardedPage
 
-case object AddedLiaisonOfficerPage  extends GuardedPage {
+case object AddedLiaisonOfficerPage extends GuardedPage {
 
   override def canBeAccessedWith(answers: Answers): Boolean =
     answers.liaisonOfficers.exists(_.liaisonOfficers.exists(_.isComplete))

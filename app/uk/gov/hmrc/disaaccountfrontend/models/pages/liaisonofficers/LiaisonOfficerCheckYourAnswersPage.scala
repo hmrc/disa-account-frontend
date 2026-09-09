@@ -24,11 +24,11 @@ final case class LiaisonOfficerCheckYourAnswersPage(id: String) extends Identifi
     answers.liaisonOfficers.exists { officers =>
       officers.liaisonOfficers.exists { officer =>
         officer.id == id &&
-          officer.fullName.isDefined &&
-          officer.phoneNumber.isDefined &&
-          officer.email.isDefined &&
-          officer.communication.nonEmpty
-          
+        officer.fullName.isDefined &&
+        officer.phoneNumber.isDefined &&
+        officer.email.isDefined &&
+        officer.communication.nonEmpty
+
       }
     }
 }
