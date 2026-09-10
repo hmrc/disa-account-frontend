@@ -195,6 +195,10 @@ liaisonOfficerCommunication.error.required = Select the ways you want HMRC to co
 liaisonOfficerCheckYourAnswers.title = Check liaison officer details
 liaisonOfficerCheckYourAnswers.heading = Check liaison officer details
 
+removeLiaisonOfficer.title = Are you sure you want to remove {0} as a liaison officer?
+removeLiaisonOfficer.heading = Are you sure you want to remove {0} as a liaison officer?
+removeLiaisonOfficer.error.required = Select yes if you want to remove this liaison officer
+
 unauthorised.title = You cannot access this service
 unauthorised.heading = You cannot access this service
 unauthorised.body = You need to be signed in with an organisation that is enrolled to manage ISAs to use this service.

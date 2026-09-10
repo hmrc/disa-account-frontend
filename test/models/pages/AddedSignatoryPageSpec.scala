@@ -17,7 +17,7 @@
 package models.pages
 
 import uk.gov.hmrc.disaaccountfrontend.models.Answers
-import uk.gov.hmrc.disaaccountfrontend.models.pages.AddedSignatoryPage
+import uk.gov.hmrc.disaaccountfrontend.models.pages.signatories.AddedSignatoryPage
 import uk.gov.hmrc.disaaccountfrontend.models.signatories.{Signatories, Signatory}
 import utils.BaseUnitSpec
 

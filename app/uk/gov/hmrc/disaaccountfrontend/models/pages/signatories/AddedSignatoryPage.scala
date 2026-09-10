@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.models.pages
+package uk.gov.hmrc.disaaccountfrontend.models.pages.signatories
 
 import uk.gov.hmrc.disaaccountfrontend.models.Answers
+import uk.gov.hmrc.disaaccountfrontend.models.pages.GuardedPage
 
 case object AddedSignatoryPage extends GuardedPage {
 

@@ -67,6 +67,9 @@ GET		   /check-added-liaison-officer			 uk.gov.hmrc.disaaccountfrontend.controll
 
 GET        /added-liaison-officers               uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.AddedLiaisonOfficersController.onPageLoad()
 POST       /added-liaison-officers               uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.AddedLiaisonOfficersController.onSubmit()
+
+GET 	   /remove-liaison-officer 				 uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.RemoveLiaisonOfficerController.onPageLoad(id: String)
+POST	   /remove-liaison-officer 				 uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.RemoveLiaisonOfficerController.onSubmit(id: String)
 ## Organisation Email
 
 GET        /organisation-email-address         uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.OrganisationEmailAddressController.onPageLoad()

@@ -56,6 +56,9 @@ case class LiaisonOfficers(liaisonOfficers: Seq[LiaisonOfficer] = Seq.empty) {
         case officer                     => officer
       }
     )
+
+  def updatedSectionWithLiaisonOfficerRemoved(id: String): LiaisonOfficers =
+    LiaisonOfficers(this.liaisonOfficers.filterNot(_.id == id))
 }
 
 object LiaisonOfficers {
