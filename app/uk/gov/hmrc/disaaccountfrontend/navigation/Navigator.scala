@@ -39,6 +39,11 @@ class Navigator @Inject() () {
     case No  => ChangeOfCircumstancesController.onPageLoad()
   }
 
+  def nextPageFromAddedLiaisonOfficer(answer: YesNoAnswer): Call = answer match {
+    case Yes => LiaisonOfficerNameController.onPageLoad(None, NormalMode)
+    case No  => ChangeOfCircumstancesController.onPageLoad()
+  }
+
   def nextPage(page: Page, answers: Answers = Answers(), mode: Mode = NormalMode): Call = page match {
     case EnterYourOrganisationAddressPage   => OrganisationTelephoneNumberController.onPageLoad()
     // TODO: replace with the next page in the journey once it exists.
