@@ -18,7 +18,7 @@ package uk.gov.hmrc.disaaccountfrontend.viewmodels.checkAnswers.liaisonofficers
 
 import play.api.i18n.Messages
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficer
-import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.{LiaisonOfficerCheckYourAnswersController,RemoveLiaisonOfficerController}
+import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.{LiaisonOfficerCheckYourAnswersController, RemoveLiaisonOfficerController}
 import uk.gov.hmrc.govukfrontend.views.Aliases.{ActionItem, Actions, Key, SummaryList, SummaryListRow, Text, Value}
 
 case class AddedLiaisonOfficersSummary(liaisonOfficers: Seq[LiaisonOfficer], maxOfficers: Int) {

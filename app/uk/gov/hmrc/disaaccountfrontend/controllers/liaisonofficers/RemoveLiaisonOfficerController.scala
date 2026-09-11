@@ -36,20 +36,20 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class RemoveLiaisonOfficerController @Inject() (
-                                                 override val messagesApi: MessagesApi,
-                                                 identify: IdentifierAction,
-                                                 getData: DataRetrievalAction,
-                                                 userAnswersRepository: UserAnswersRepository,
-                                                 navigator: Navigator,
-                                                 formProvider: YesNoAnswerFormProvider,
-                                                 val controllerComponents: MessagesControllerComponents,
-                                                 view: RemoveLiaisonOfficerView
-                                               )(implicit ec: ExecutionContext)
-  extends PageController(navigator)
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  userAnswersRepository: UserAnswersRepository,
+  navigator: Navigator,
+  formProvider: YesNoAnswerFormProvider,
+  val controllerComponents: MessagesControllerComponents,
+  view: RemoveLiaisonOfficerView
+)(implicit ec: ExecutionContext)
+    extends PageController(navigator)
     with FrontendBaseController
     with I18nSupport {
   private val form: Form[YesNoAnswer] = formProvider("removeSignatory.error.required")
-  private val pageAction = identify andThen getData
+  private val pageAction              = identify andThen getData
 
   def onPageLoad(id: String): Action[AnyContent] = pageAction.async { implicit request =>
     providingName(id, name => Future.successful(Ok(view(id, name, form))))
@@ -78,18 +78,14 @@ class RemoveLiaisonOfficerController @Inject() (
 
   }
 
-
   private def findLiaisonOfficer(id: String)(implicit request: DataRequest[_]): Option[LiaisonOfficer] =
     request.effectiveAnswers.liaisonOfficers.flatMap(_.liaisonOfficers.find(_.id == id))
 
   private def providingName(id: String, block: String => Future[Result])(implicit request: DataRequest[_]) =
     (for {
       officer <- findLiaisonOfficer(id)
-      name <- officer.fullName
+      name    <- officer.fullName
     } yield block(name))
       .getOrElse(Future.successful(Redirect(ChangeOfCircumstancesController.onPageLoad())))
-
-
-
 
 }

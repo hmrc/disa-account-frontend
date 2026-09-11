@@ -23,10 +23,10 @@ import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficers
 import uk.gov.hmrc.disaaccountfrontend.models.pages.PageWithAnswers
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
 
-final case class RemoveLiaisonOfficerPage (id: String) extends PageWithAnswers[YesNoAnswer] {
+final case class RemoveLiaisonOfficerPage(id: String) extends PageWithAnswers[YesNoAnswer] {
   override def saveAnswerAndHandleDependents(request: DataRequest[_], newAnswer: YesNoAnswer): SessionUpdates = {
-    val existingUpdates: SessionUpdates = request.sessionAnswers.fold(SessionUpdates())(_.updates)
-    val existingSection: LiaisonOfficers    = request.effectiveAnswers.liaisonOfficers.getOrElse(LiaisonOfficers())
+    val existingUpdates: SessionUpdates  = request.sessionAnswers.fold(SessionUpdates())(_.updates)
+    val existingSection: LiaisonOfficers = request.effectiveAnswers.liaisonOfficers.getOrElse(LiaisonOfficers())
 
     val updatedSection = newAnswer match {
       case Yes => existingSection.updatedSectionWithLiaisonOfficerRemoved(id)

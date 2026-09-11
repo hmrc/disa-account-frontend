@@ -17,7 +17,7 @@
 package uk.gov.hmrc.disaaccountfrontend.navigation
 
 import play.api.mvc.Call
-import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.{LiaisonOfficerCommunicationController, LiaisonOfficerEmailController, LiaisonOfficerPhoneNumberController}
+import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.{AddedLiaisonOfficersController, LiaisonOfficerCommunicationController, LiaisonOfficerEmailController, LiaisonOfficerNameController, LiaisonOfficerPhoneNumberController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.{OrganisationTelephoneNumberController, TradingNameController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.routes.EmailVerificationCodeController
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, PeerToPeerPlatformController}
@@ -26,7 +26,7 @@ import uk.gov.hmrc.disaaccountfrontend.models.YesNoAnswer.{No, Yes}
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, CheckMode, Mode, NormalMode, YesNoAnswer}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
 import uk.gov.hmrc.disaaccountfrontend.models.pages.*
-import uk.gov.hmrc.disaaccountfrontend.models.pages.liaisonofficers.{LiaisonOfficerCommunicationPage, LiaisonOfficerEmailPage, LiaisonOfficerNamePage, LiaisonOfficerPhoneNumberPage}
+import uk.gov.hmrc.disaaccountfrontend.models.pages.liaisonofficers.{LiaisonOfficerCommunicationPage, LiaisonOfficerEmailPage, LiaisonOfficerNamePage, LiaisonOfficerPhoneNumberPage, RemoveLiaisonOfficerPage}
 import uk.gov.hmrc.disaaccountfrontend.models.pages.signatories.{RemoveSignatoryPage, SignatoryJobTitlePage, SignatoryNamePage}
 
 import javax.inject.{Inject, Singleton}
@@ -58,6 +58,7 @@ class Navigator @Inject() () {
     case LiaisonOfficerEmailPage(id)        => liaisonOfficerEmailNextPage(id, mode)
     case LiaisonOfficerPhoneNumberPage(id)  => liaisonOfficerPhoneNumberNextPage(id, mode)
     case LiaisonOfficerCommunicationPage(_) => liaisonOfficerCommunicationNextPage(mode)
+    case RemoveLiaisonOfficerPage(_)        => removeLiaisonOfficerPageNextPage(answers)
     case unsupportedPage                    =>
       throw new IllegalArgumentException(s"No navigation defined for page: $unsupportedPage")
   }
@@ -125,5 +126,12 @@ class Navigator @Inject() () {
       // TODO: Replace these fallbacks with the liaison officer check-your-answers page once it is implemented.
       case NormalMode => ChangeOfCircumstancesController.onPageLoad()
       case CheckMode  => ChangeOfCircumstancesController.onPageLoad()
+    }
+
+  private def removeLiaisonOfficerPageNextPage(answers: Answers): Call =
+    if (answers.liaisonOfficers.exists(_.liaisonOfficers.exists(_.isComplete))) {
+      AddedLiaisonOfficersController.onPageLoad()
+    } else {
+      LiaisonOfficerNameController.onPageLoad(None, NormalMode)
     }
 }
