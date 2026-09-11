@@ -14,37 +14,42 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.controllers.signatories
+package uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction, PageGuardAction}
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes.ChangeOfCircumstancesController
-import uk.gov.hmrc.disaaccountfrontend.models.pages.signatories.SignatoryCheckYourAnswersPage
-import uk.gov.hmrc.disaaccountfrontend.viewmodels.checkAnswers.signatories.{SignatoryJobTitleSummary, SignatoryNameSummary}
-import uk.gov.hmrc.disaaccountfrontend.views.html.signatories.SignatoryCheckYourAnswersView
+import uk.gov.hmrc.disaaccountfrontend.models.pages.liaisonofficers.LiaisonOfficerCheckYourAnswersPage
+import uk.gov.hmrc.disaaccountfrontend.viewmodels.checkAnswers.liaisonofficers.{LiaisonOfficerEmailSummary, LiaisonOfficerNameSummary, LiaisonOfficerPhoneSummary}
 import uk.gov.hmrc.govukfrontend.views.Aliases.SummaryList
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.disaaccountfrontend.views.html.liaisonofficers.LiaisonOfficerCheckYourAnswersView
 
 import javax.inject.Inject
 
-class SignatoryCheckYourAnswersController @Inject() (
+class LiaisonOfficerCheckYourAnswersController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   guardPage: PageGuardAction,
   val controllerComponents: MessagesControllerComponents,
-  view: SignatoryCheckYourAnswersView
+  view: LiaisonOfficerCheckYourAnswersView
 ) extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad(id: String): Action[AnyContent] =
-    (identify andThen getData andThen guardPage(SignatoryCheckYourAnswersPage(id))) { implicit request =>
-      request.effectiveAnswers.signatories
-        .flatMap(_.signatories.find(_.id == id))
-        .fold(Redirect(ChangeOfCircumstancesController.onPageLoad())) { signatory =>
-          val rows = Seq(SignatoryNameSummary.row(signatory), SignatoryJobTitleSummary.row(signatory)).flatten
+    (identify andThen getData andThen guardPage(LiaisonOfficerCheckYourAnswersPage(id))) { implicit request =>
+      request.effectiveAnswers.liaisonOfficers
+        .flatMap(_.liaisonOfficers.find(_.id == id))
+        .fold(Redirect(ChangeOfCircumstancesController.onPageLoad())) { officer =>
+          val rows = Seq(
+            LiaisonOfficerNameSummary.row(officer),
+            LiaisonOfficerPhoneSummary.row(officer),
+            LiaisonOfficerEmailSummary.row(officer)
+          ).flatten
           Ok(view(SummaryList(rows = rows)))
         }
     }
+
 }

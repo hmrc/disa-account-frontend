@@ -18,7 +18,7 @@ package models.pages
 
 import play.api.test.FakeRequest
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
-import uk.gov.hmrc.disaaccountfrontend.models.pages.SignatoryJobTitlePage
+import uk.gov.hmrc.disaaccountfrontend.models.pages.signatories.SignatoryJobTitlePage
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
 import uk.gov.hmrc.disaaccountfrontend.models.signatories.{Signatories, Signatory}
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, CheckMode, SessionUpdates, UserAnswers}
@@ -30,7 +30,7 @@ class SignatoryJobTitlePageSpec extends BaseUnitSpec {
 
     "update the matching signatory's job title and preserve their name, retaining other session updates" in {
       val existingUpdates   = SessionUpdates(organisationTelephoneNumber = Assign(testOrgTelephoneNumber))
-      val existingSignatory = Signatory(testSignatoryId, fullName = Some(testSignatoryName))
+      val existingSignatory = Signatory(testSignatoryId, fullName = Some(testName))
       val request           = DataRequest(
         FakeRequest(),
         testZref,
@@ -48,7 +48,7 @@ class SignatoryJobTitlePageSpec extends BaseUnitSpec {
 
     "update only the matching signatory while preserving other signatories already in the effective answers" in {
       val otherSignatory    = Signatory("signatory-2", fullName = Some("Other Signatory"), jobTitle = Some("Manager"))
-      val existingSignatory = Signatory(testSignatoryId, fullName = Some(testSignatoryName))
+      val existingSignatory = Signatory(testSignatoryId, fullName = Some(testName))
       val request           = DataRequest(
         FakeRequest(),
         testZref,
@@ -66,7 +66,7 @@ class SignatoryJobTitlePageSpec extends BaseUnitSpec {
     }
 
     "leave the signatories unchanged when the id does not match an existing signatory" in {
-      val existingSignatory = Signatory(testSignatoryId, fullName = Some(testSignatoryName))
+      val existingSignatory = Signatory(testSignatoryId, fullName = Some(testName))
       val request           = DataRequest(
         FakeRequest(),
         testZref,

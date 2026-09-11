@@ -23,8 +23,8 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction}
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes.ChangeOfCircumstancesController
 import uk.gov.hmrc.disaaccountfrontend.forms.SignatoryJobTitleFormProvider
+import uk.gov.hmrc.disaaccountfrontend.models.pages.signatories.SignatoryJobTitlePage
 import uk.gov.hmrc.disaaccountfrontend.models.{Mode, UserAnswers}
-import uk.gov.hmrc.disaaccountfrontend.models.pages.SignatoryJobTitlePage
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
 import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository

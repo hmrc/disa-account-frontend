@@ -23,7 +23,7 @@ import uk.gov.hmrc.disaaccountfrontend.controllers.PageController
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction, PageGuardAction}
 import uk.gov.hmrc.disaaccountfrontend.forms.LiaisonOfficerEmailFormProvider
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficers.findLiaisonOfficer
-import uk.gov.hmrc.disaaccountfrontend.models.pages.LiaisonOfficerEmailPage
+import uk.gov.hmrc.disaaccountfrontend.models.pages.liaisonofficers.LiaisonOfficerEmailPage
 import uk.gov.hmrc.disaaccountfrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository

@@ -30,7 +30,7 @@ import scala.concurrent.Future
 
 class SignatoryNameControllerSpec extends BaseUnitSpec {
 
-  val validFormData: Map[String, String] = Map("value" -> testSignatoryName)
+  val validFormData: Map[String, String] = Map("value" -> testName)
 
   val maxSignatories: Signatories =
     Signatories(
@@ -59,7 +59,7 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
         val result = route(application, FakeRequest(GET, s"$signatoryNameEndpoint?id=$testSignatoryId")).value
 
         status(result)        shouldBe OK
-        contentAsString(result) should include(testSignatoryName)
+        contentAsString(result) should include(testName)
       }
     }
 
@@ -101,7 +101,7 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
         val result = route(application, FakeRequest(GET, s"$signatoryNameEndpoint?id=some-other-id")).value
 
         status(result)        shouldBe OK
-        contentAsString(result) should not include testSignatoryName
+        contentAsString(result) should not include testName
       }
     }
 
@@ -158,8 +158,7 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
         val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
         verify(mockUserAnswersRepository).set(captor.capture())
         captor.getValue.updates shouldBe SessionUpdates(
-          signatories =
-            Assign(Signatories(testSignatories.signatories :+ Signatory(newId, fullName = Some(testSignatoryName))))
+          signatories = Assign(Signatories(testSignatories.signatories :+ Signatory(newId, fullName = Some(testName))))
         )
       }
     }
@@ -185,7 +184,7 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
         val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
         verify(mockUserAnswersRepository).set(captor.capture())
         captor.getValue.updates shouldBe SessionUpdates(
-          signatories = Assign(Signatories(Seq(existingSignatory.copy(fullName = Some(testSignatoryName)))))
+          signatories = Assign(Signatories(Seq(existingSignatory.copy(fullName = Some(testName)))))
         )
       }
     }

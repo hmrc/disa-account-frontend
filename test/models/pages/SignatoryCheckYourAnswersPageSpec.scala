@@ -17,7 +17,7 @@
 package models.pages
 
 import uk.gov.hmrc.disaaccountfrontend.models.Answers
-import uk.gov.hmrc.disaaccountfrontend.models.pages.SignatoryCheckYourAnswersPage
+import uk.gov.hmrc.disaaccountfrontend.models.pages.signatories.SignatoryCheckYourAnswersPage
 import uk.gov.hmrc.disaaccountfrontend.models.signatories.{Signatories, Signatory}
 import utils.BaseUnitSpec
 
@@ -26,7 +26,7 @@ class SignatoryCheckYourAnswersPageSpec extends BaseUnitSpec {
   private val page = SignatoryCheckYourAnswersPage(testSignatoryId)
 
   private val completeSignatory =
-    Signatory(testSignatoryId, Some(testSignatoryName), Some(testSignatoryJobTitle))
+    Signatory(testSignatoryId, Some(testName), Some(testSignatoryJobTitle))
 
   "SignatoryCheckYourAnswersPage" should {
 

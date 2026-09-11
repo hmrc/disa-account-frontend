@@ -43,26 +43,33 @@ POST       /remove-signatory                   uk.gov.hmrc.disaaccountfrontend.c
 
 ## Liaison officers
 
-GET        /liaison-officer-name               uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerNameController.onPageLoad(id: Option[String], mode: Mode = NormalMode)
-POST       /liaison-officer-name               uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerNameController.onSubmit(id: String, mode: Mode = NormalMode)
-GET        /change-liaison-officer-name        uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerNameController.onPageLoad(id: Option[String], mode: Mode = CheckMode)
-POST       /change-liaison-officer-name        uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerNameController.onSubmit(id: String, mode: Mode = CheckMode)
+GET        /liaison-officer-name                 uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerNameController.onPageLoad(id: Option[String], mode: Mode = NormalMode)
+POST       /liaison-officer-name                 uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerNameController.onSubmit(id: String, mode: Mode = NormalMode)
+GET        /change-liaison-officer-name          uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerNameController.onPageLoad(id: Option[String], mode: Mode = CheckMode)
+POST       /change-liaison-officer-name          uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerNameController.onSubmit(id: String, mode: Mode = CheckMode)
 
-GET        /liaison-officer-email              uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerEmailController.onPageLoad(id: String, mode: Mode = NormalMode)
-POST       /liaison-officer-email              uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerEmailController.onSubmit(id: String, mode: Mode = NormalMode)
-GET        /change-liaison-officer-email       uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerEmailController.onPageLoad(id: String, mode: Mode = CheckMode)
-POST       /change-liaison-officer-email       uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerEmailController.onSubmit(id: String, mode: Mode = CheckMode)
+GET        /liaison-officer-email                uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerEmailController.onPageLoad(id: String, mode: Mode = NormalMode)
+POST       /liaison-officer-email                uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerEmailController.onSubmit(id: String, mode: Mode = NormalMode)
+GET        /change-liaison-officer-email         uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerEmailController.onPageLoad(id: String, mode: Mode = CheckMode)
+POST       /change-liaison-officer-email         uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerEmailController.onSubmit(id: String, mode: Mode = CheckMode)
 
-GET        /liaison-officer-phone-number       uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerPhoneNumberController.onPageLoad(id: String, mode: Mode = NormalMode)
-POST       /liaison-officer-phone-number       uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerPhoneNumberController.onSubmit(id: String, mode: Mode = NormalMode)
-GET        /change-liaison-officer-phone-number uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerPhoneNumberController.onPageLoad(id: String, mode: Mode = CheckMode)
-POST       /change-liaison-officer-phone-number uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerPhoneNumberController.onSubmit(id: String, mode: Mode = CheckMode)
+GET        /liaison-officer-phone-number         uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerPhoneNumberController.onPageLoad(id: String, mode: Mode = NormalMode)
+POST       /liaison-officer-phone-number         uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerPhoneNumberController.onSubmit(id: String, mode: Mode = NormalMode)
+GET        /change-liaison-officer-phone-number  uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerPhoneNumberController.onPageLoad(id: String, mode: Mode = CheckMode)
+POST       /change-liaison-officer-phone-number  uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerPhoneNumberController.onSubmit(id: String, mode: Mode = CheckMode)
 
 GET        /liaison-officer-communication        uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerCommunicationController.onPageLoad(id: String, mode: Mode = NormalMode)
 POST       /liaison-officer-communication        uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerCommunicationController.onSubmit(id: String, mode: Mode = NormalMode)
 GET        /change-liaison-officer-communication uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerCommunicationController.onPageLoad(id: String, mode: Mode = CheckMode)
 POST       /change-liaison-officer-communication uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerCommunicationController.onSubmit(id: String, mode: Mode = CheckMode)
 
+GET		   /check-added-liaison-officer			 uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.LiaisonOfficerCheckYourAnswersController.onPageLoad(id: String)
+
+GET        /added-liaison-officers               uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.AddedLiaisonOfficersController.onPageLoad()
+POST       /added-liaison-officers               uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.AddedLiaisonOfficersController.onSubmit()
+
+GET 	   /remove-liaison-officer 				 uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.RemoveLiaisonOfficerController.onPageLoad(id: String)
+POST	   /remove-liaison-officer 				 uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.RemoveLiaisonOfficerController.onSubmit(id: String)
 ## Organisation Email
 
 GET        /organisation-email-address         uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.OrganisationEmailAddressController.onPageLoad()

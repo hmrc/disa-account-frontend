@@ -25,7 +25,7 @@ import utils.BaseUnitSpec
 
 class SignatoryCheckYourAnswersControllerSpec extends BaseUnitSpec {
 
-  private val signatory = Signatory(testSignatoryId, Some(testSignatoryName), Some(testSignatoryJobTitle))
+  private val signatory = Signatory(testSignatoryId, Some(testName), Some(testSignatoryJobTitle))
   private val url       = s"$checkSignatoryDetailsEndpoint?id=$testSignatoryId"
 
   "SignatoryCheckYourAnswersController.onPageLoad" should {
@@ -42,7 +42,7 @@ class SignatoryCheckYourAnswersControllerSpec extends BaseUnitSpec {
         status(result)                         shouldBe OK
         doc.title()                            shouldBe "Check signatory details - Manage ISAs - GOV.UK"
         doc.select("h1").text()                shouldBe "Check signatory details"
-        doc.text()                               should include(testSignatoryName)
+        doc.text()                               should include(testName)
         doc.text()                               should include(testSignatoryJobTitle)
         doc.text()                               should include("Name")
         doc.text()                               should include("Job title within organisation")

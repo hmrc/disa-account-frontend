@@ -14,18 +14,21 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.models.pages
+package uk.gov.hmrc.disaaccountfrontend.models.pages.liaisonofficers
 
 import uk.gov.hmrc.disaaccountfrontend.models.Answers
+import uk.gov.hmrc.disaaccountfrontend.models.pages.{GuardedPage, IdentifiedPage}
 
-final case class SignatoryCheckYourAnswersPage(id: String) extends IdentifiedPage with GuardedPage {
-
+final case class LiaisonOfficerCheckYourAnswersPage(id: String) extends IdentifiedPage with GuardedPage {
   override def canBeAccessedWith(answers: Answers): Boolean =
-    answers.signatories.exists { signatories =>
-      signatories.signatories.exists { signatory =>
-        signatory.id == id &&
-        signatory.fullName.isDefined &&
-        signatory.jobTitle.isDefined
+    answers.liaisonOfficers.exists { officers =>
+      officers.liaisonOfficers.exists { officer =>
+        officer.id == id &&
+        officer.fullName.isDefined &&
+        officer.phoneNumber.isDefined &&
+        officer.email.isDefined &&
+        officer.communication.nonEmpty
+
       }
     }
 }
