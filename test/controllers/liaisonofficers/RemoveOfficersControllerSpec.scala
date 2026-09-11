@@ -105,7 +105,7 @@ class RemoveOfficersControllerSpec extends BaseUnitSpec {
         captor.getValue.id                      shouldBe testSessionId
         captor.getValue.updates.liaisonOfficers shouldBe Assign(
           LiaisonOfficers(Seq(otherOfficer))
-        ) // Assign(LiaisonOfficers(Seq(otherOfficer)))
+        )
       }
     }
 
@@ -146,7 +146,7 @@ class RemoveOfficersControllerSpec extends BaseUnitSpec {
 
         status(result)                          shouldBe BAD_REQUEST
         doc.select(".govuk-error-message").text() should include(
-          "Select yes if you want to remove this signatory"
+          "Select yes if you want to remove this liaison officer"
         )
         doc.title()                               should startWith("Error:")
         verify(mockUserAnswersRepository, never).set(any())
