@@ -22,7 +22,7 @@ import uk.gov.hmrc.disaaccountfrontend.config.AppConfig
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction, PageGuardAction}
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes.ChangeOfCircumstancesController
 import uk.gov.hmrc.disaaccountfrontend.forms.generic.YesNoAnswerFormProvider
-import uk.gov.hmrc.disaaccountfrontend.models.pages.AddedSignatoryPage
+import uk.gov.hmrc.disaaccountfrontend.models.pages.signatories.AddedSignatoryPage
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
 import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator
 import uk.gov.hmrc.disaaccountfrontend.viewmodels.checkAnswers.signatories.AddedSignatoriesSummary

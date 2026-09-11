@@ -86,12 +86,13 @@ trait TestData {
 
   val testFinancialOrganisationSelections: Seq[FinancialOrganisation] =
     Seq(BuildingSociety, InsuranceCompany)
-
-  val testLiaisonOfficers: LiaisonOfficers = LiaisonOfficers(
+  val testName: String                                                = "Jane Smith"
+  val testLiaisonOfficerId: String                                    = "liaison-officer-1"
+  val testLiaisonOfficers: LiaisonOfficers                            = LiaisonOfficers(
     Seq(
       LiaisonOfficer(
-        id = "liaison-officer-1",
-        fullName = Some("Jane Smith"),
+        id = testLiaisonOfficerId,
+        fullName = Some(testName),
         phoneNumber = Some("07777777777"),
         communication = Set(ByEmail),
         email = Some("jane.smith@example.com")
@@ -100,12 +101,11 @@ trait TestData {
   )
 
   val testSignatoryId: String       = "signatory-1"
-  val testSignatoryName: String     = "Jane Smith"
   val testSignatoryJobTitle: String = "Director"
 
   val testSignatories: Signatories = Signatories(
     Seq(
-      Signatory(id = testSignatoryId, fullName = Some(testSignatoryName), jobTitle = Some(testSignatoryJobTitle))
+      Signatory(id = testSignatoryId, fullName = Some(testName), jobTitle = Some(testSignatoryJobTitle))
     )
   )
 

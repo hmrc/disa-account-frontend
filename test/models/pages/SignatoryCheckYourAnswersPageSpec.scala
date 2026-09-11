@@ -26,7 +26,7 @@ class SignatoryCheckYourAnswersPageSpec extends BaseUnitSpec {
   private val page = SignatoryCheckYourAnswersPage(testSignatoryId)
 
   private val completeSignatory =
-    Signatory(testSignatoryId, Some(testSignatoryName), Some(testSignatoryJobTitle))
+    Signatory(testSignatoryId, Some(testName), Some(testSignatoryJobTitle))
 
   "SignatoryCheckYourAnswersPage" should {
 

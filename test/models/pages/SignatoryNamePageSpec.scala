@@ -39,9 +39,9 @@ class SignatoryNamePageSpec extends BaseUnitSpec {
         Answers()
       )
 
-      SignatoryNamePage(testSignatoryId).saveAnswerAndHandleDependents(request, testSignatoryName) shouldBe
+      SignatoryNamePage(testSignatoryId).saveAnswerAndHandleDependents(request, testName) shouldBe
         existingUpdates.copy(signatories =
-          Assign(Signatories(Seq(Signatory(testSignatoryId, fullName = Some(testSignatoryName)))))
+          Assign(Signatories(Seq(Signatory(testSignatoryId, fullName = Some(testName)))))
         )
     }
 
@@ -74,14 +74,12 @@ class SignatoryNamePageSpec extends BaseUnitSpec {
         Answers(signatories = Some(Signatories(Seq(existingSignatory))))
       )
 
-      SignatoryNamePage(testSignatoryId).saveAnswerAndHandleDependents(request, testSignatoryName) shouldBe
-        SessionUpdates(signatories =
-          Assign(Signatories(Seq(existingSignatory.copy(fullName = Some(testSignatoryName)))))
-        )
+      SignatoryNamePage(testSignatoryId).saveAnswerAndHandleDependents(request, testName) shouldBe
+        SessionUpdates(signatories = Assign(Signatories(Seq(existingSignatory.copy(fullName = Some(testName))))))
     }
 
     "leave the signatories unchanged when the id does not match an existing signatory" in {
-      val existingSignatory = Signatory(testSignatoryId, fullName = Some(testSignatoryName))
+      val existingSignatory = Signatory(testSignatoryId, fullName = Some(testName))
       val request           = DataRequest(
         FakeRequest(),
         testZref,
@@ -92,7 +90,7 @@ class SignatoryNamePageSpec extends BaseUnitSpec {
       )
 
       SignatoryNamePage("some-other-id", CheckMode)
-        .saveAnswerAndHandleDependents(request, testSignatoryName) shouldBe
+        .saveAnswerAndHandleDependents(request, testName) shouldBe
         SessionUpdates(signatories = Assign(Signatories(Seq(existingSignatory))))
     }
   }
