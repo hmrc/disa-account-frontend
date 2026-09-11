@@ -24,7 +24,7 @@ import utils.BaseUnitSpec
 class AddedSignatoryPageSpec extends BaseUnitSpec {
 
   private val completeSignatory =
-    Signatory(testSignatoryId, Some(testSignatoryName), Some(testSignatoryJobTitle))
+    Signatory(testSignatoryId, Some(testName), Some(testSignatoryJobTitle))
 
   "AddedSignatoryPage" should {
 
