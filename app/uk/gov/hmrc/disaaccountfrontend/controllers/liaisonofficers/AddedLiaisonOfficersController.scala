@@ -61,7 +61,7 @@ class AddedLiaisonOfficersController @Inject() (
         .bindFromRequest()
         .fold(
           formWithErrors => BadRequest(view(formWithErrors, pageSummary)),
-          answer => Redirect(navigator.nextPageFromAddedSignatories(answer))
+          answer => Redirect(navigator.nextPageFromAddedLiaisonOfficer(answer))
         )
     }
   }

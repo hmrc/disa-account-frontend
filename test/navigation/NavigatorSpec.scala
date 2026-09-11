@@ -16,7 +16,7 @@
 
 package navigation
 
-import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.{LiaisonOfficerCommunicationController, LiaisonOfficerEmailController, LiaisonOfficerPhoneNumberController}
+import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.{LiaisonOfficerCommunicationController, LiaisonOfficerEmailController, LiaisonOfficerNameController, LiaisonOfficerPhoneNumberController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, PeerToPeerPlatformController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.OrganisationTelephoneNumberController
 import uk.gov.hmrc.disaaccountfrontend.controllers.signatories.routes.{AddedSignatoryController, SignatoryCheckYourAnswersController, SignatoryJobTitleController, SignatoryNameController}
@@ -129,6 +129,14 @@ class NavigatorSpec extends BaseUnitSpec {
 
     "go from FcaArticlesPage to change of circumstances" in {
       navigator.nextPage(FcaArticlesPage) shouldBe ChangeOfCircumstancesController.onPageLoad()
+    }
+
+    "go from added liaison officer to the officer name page when Yes is selected" in {
+      navigator.nextPageFromAddedLiaisonOfficer(Yes) shouldBe LiaisonOfficerNameController.onPageLoad(None, NormalMode)
+    }
+
+    "go from  added liaison officer to change of circumstances when No is selected" in {
+      navigator.nextPageFromAddedLiaisonOfficer(No) shouldBe ChangeOfCircumstancesController.onPageLoad()
     }
 
     "go from LiaisonOfficerNamePage to the email page in normal mode" in {

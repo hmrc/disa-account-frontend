@@ -17,7 +17,7 @@
 package uk.gov.hmrc.disaaccountfrontend.navigation
 
 import play.api.mvc.Call
-import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.{LiaisonOfficerCommunicationController, LiaisonOfficerEmailController, LiaisonOfficerPhoneNumberController}
+import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.{LiaisonOfficerCommunicationController, LiaisonOfficerEmailController, LiaisonOfficerNameController, LiaisonOfficerPhoneNumberController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.{OrganisationTelephoneNumberController, TradingNameController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.routes.EmailVerificationCodeController
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, PeerToPeerPlatformController}
@@ -36,6 +36,11 @@ class Navigator @Inject() () {
 
   def nextPageFromAddedSignatories(answer: YesNoAnswer): Call = answer match {
     case Yes => SignatoryNameController.onPageLoad(None, NormalMode)
+    case No  => ChangeOfCircumstancesController.onPageLoad()
+  }
+
+  def nextPageFromAddedLiaisonOfficer(answer: YesNoAnswer): Call = answer match {
+    case Yes => LiaisonOfficerNameController.onPageLoad(None, NormalMode)
     case No  => ChangeOfCircumstancesController.onPageLoad()
   }
 
