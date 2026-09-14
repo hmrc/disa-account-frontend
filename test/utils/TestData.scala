@@ -87,17 +87,17 @@ trait TestData {
   val testFinancialOrganisationSelections: Seq[FinancialOrganisation] =
     Seq(BuildingSociety, InsuranceCompany)
   val testName: String                                                = "Jane Smith"
+  val testEmail: String                                               = "Jane Smith"
   val testLiaisonOfficerId: String                                    = "liaison-officer-1"
+  val testLiaisonOfficer                                              = LiaisonOfficer(
+    id = testLiaisonOfficerId,
+    fullName = Some(testName),
+    phoneNumber = Some("07777777777"),
+    communication = Set(ByEmail),
+    email = Some(testEmail)
+  )
   val testLiaisonOfficers: LiaisonOfficers                            = LiaisonOfficers(
-    Seq(
-      LiaisonOfficer(
-        id = testLiaisonOfficerId,
-        fullName = Some(testName),
-        phoneNumber = Some("07777777777"),
-        communication = Set(ByEmail),
-        email = Some("jane.smith@example.com")
-      )
-    )
+    Seq(testLiaisonOfficer)
   )
 
   val testSignatoryId: String       = "signatory-1"
