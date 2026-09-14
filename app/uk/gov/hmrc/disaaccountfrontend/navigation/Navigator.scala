@@ -17,7 +17,7 @@
 package uk.gov.hmrc.disaaccountfrontend.navigation
 
 import play.api.mvc.Call
-import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.{AddedLiaisonOfficersController, LiaisonOfficerCommunicationController, LiaisonOfficerEmailController, LiaisonOfficerNameController, LiaisonOfficerPhoneNumberController}
+import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.{AddedLiaisonOfficersController, LiaisonOfficerCheckYourAnswersController, LiaisonOfficerCommunicationController, LiaisonOfficerEmailController, LiaisonOfficerNameController, LiaisonOfficerPhoneNumberController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.{OrganisationTelephoneNumberController, TradingNameController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.routes.EmailVerificationCodeController
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, PeerToPeerPlatformController}
@@ -26,7 +26,7 @@ import uk.gov.hmrc.disaaccountfrontend.models.YesNoAnswer.{No, Yes}
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, CheckMode, Mode, NormalMode, YesNoAnswer}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
 import uk.gov.hmrc.disaaccountfrontend.models.pages.*
-import uk.gov.hmrc.disaaccountfrontend.models.pages.liaisonofficers.{LiaisonOfficerCommunicationPage, LiaisonOfficerEmailPage, LiaisonOfficerNamePage, LiaisonOfficerPhoneNumberPage, RemoveLiaisonOfficerPage}
+import uk.gov.hmrc.disaaccountfrontend.models.pages.liaisonofficers.{LiaisonOfficerCheckYourAnswersPage, LiaisonOfficerCommunicationPage, LiaisonOfficerEmailPage, LiaisonOfficerNamePage, LiaisonOfficerPhoneNumberPage, RemoveLiaisonOfficerPage}
 import uk.gov.hmrc.disaaccountfrontend.models.pages.signatories.{RemoveSignatoryPage, SignatoryJobTitlePage, SignatoryNamePage}
 
 import javax.inject.{Inject, Singleton}
@@ -45,26 +45,27 @@ class Navigator @Inject() () {
   }
 
   def nextPage(page: Page, answers: Answers = Answers(), mode: Mode = NormalMode): Call = page match {
-    case EnterYourOrganisationAddressPage   => OrganisationTelephoneNumberController.onPageLoad()
+    case EnterYourOrganisationAddressPage      => OrganisationTelephoneNumberController.onPageLoad()
     // TODO: replace with the next page in the journey once it exists.
-    case OrganisationTelephoneNumberPage    => OrganisationTelephoneNumberController.onPageLoad()
-    case TradingNamePage                    => TradingNameController.onPageLoad()
-    case InnovativeFinancialProductsPage    => innovativeFinancialProductsNextPage(answers)
-    case PeerToPeerPlatformPage             => peerToPeerPlatformNextPage(answers)
-    case FcaArticlesPage                    => fcaArticlesNextPage()
-    case OrganisationEmailAddressPage       => EmailVerificationCodeController.onPageLoad()
-    case EmailVerificationCodePage          => ChangeOfCircumstancesController.onPageLoad()
+    case OrganisationTelephoneNumberPage       => OrganisationTelephoneNumberController.onPageLoad()
+    case TradingNamePage                       => TradingNameController.onPageLoad()
+    case InnovativeFinancialProductsPage       => innovativeFinancialProductsNextPage(answers)
+    case PeerToPeerPlatformPage                => peerToPeerPlatformNextPage(answers)
+    case FcaArticlesPage                       => fcaArticlesNextPage()
+    case OrganisationEmailAddressPage          => EmailVerificationCodeController.onPageLoad()
+    case EmailVerificationCodePage             => ChangeOfCircumstancesController.onPageLoad()
     // TODO: replace with the organisation email check-your-answers page once it exists.
-    case FinancialOrganisationPage          => ChangeOfCircumstancesController.onPageLoad()
-    case SignatoryNamePage(id, mode)        => signatoryNameNextPage(id, mode)
-    case SignatoryJobTitlePage(id, mode)    => SignatoryCheckYourAnswersController.onPageLoad(id)
-    case RemoveSignatoryPage(_)             => removeSignatoryNextPage(answers)
-    case LiaisonOfficerNamePage(id)         => liaisonOfficerNameNextPage(id, mode)
-    case LiaisonOfficerEmailPage(id)        => liaisonOfficerEmailNextPage(id, mode)
-    case LiaisonOfficerPhoneNumberPage(id)  => liaisonOfficerPhoneNumberNextPage(id, mode)
-    case LiaisonOfficerCommunicationPage(_) => liaisonOfficerCommunicationNextPage(mode)
-    case RemoveLiaisonOfficerPage(_)        => removeLiaisonOfficerPageNextPage(answers)
-    case unsupportedPage                    =>
+    case FinancialOrganisationPage             => ChangeOfCircumstancesController.onPageLoad()
+    case SignatoryNamePage(id, mode)           => signatoryNameNextPage(id, mode)
+    case SignatoryJobTitlePage(id, mode)       => SignatoryCheckYourAnswersController.onPageLoad(id)
+    case RemoveSignatoryPage(_)                => removeSignatoryNextPage(answers)
+    case LiaisonOfficerNamePage(id)            => liaisonOfficerNameNextPage(id, mode)
+    case LiaisonOfficerEmailPage(id)           => liaisonOfficerEmailNextPage(id, mode)
+    case LiaisonOfficerPhoneNumberPage(id)     => liaisonOfficerPhoneNumberNextPage(id, mode)
+    case LiaisonOfficerCommunicationPage(id)   => LiaisonOfficerCheckYourAnswersController.onPageLoad(id)
+    case LiaisonOfficerCheckYourAnswersPage(_) => AddedLiaisonOfficersController.onPageLoad()
+    case RemoveLiaisonOfficerPage(_)           => removeLiaisonOfficerPageNextPage(answers)
+    case unsupportedPage                       =>
       throw new IllegalArgumentException(s"No navigation defined for page: $unsupportedPage")
   }
 
@@ -123,13 +124,6 @@ class Navigator @Inject() () {
     mode match {
       case NormalMode => LiaisonOfficerCommunicationController.onPageLoad(id, NormalMode)
       // TODO: Replace this fallback with the liaison officer check-your-answers page once it is implemented.
-      case CheckMode  => ChangeOfCircumstancesController.onPageLoad()
-    }
-
-  private def liaisonOfficerCommunicationNextPage(mode: Mode): Call =
-    mode match {
-      // TODO: Replace these fallbacks with the liaison officer check-your-answers page once it is implemented.
-      case NormalMode => ChangeOfCircumstancesController.onPageLoad()
       case CheckMode  => ChangeOfCircumstancesController.onPageLoad()
     }
 

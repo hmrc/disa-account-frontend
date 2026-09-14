@@ -20,7 +20,7 @@ import org.jsoup.Jsoup
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.disaaccountfrontend.models.Answers
-import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
+import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficers
 import utils.BaseUnitSpec
 
 class LiaisonOfficerCheckYourAnswersControllerSpec extends BaseUnitSpec {
@@ -58,5 +58,32 @@ class LiaisonOfficerCheckYourAnswersControllerSpec extends BaseUnitSpec {
         doc.text()              should include("Is this page not working properly?")
       }
     }
+
+    "redirect when the liaison officer cannot be found" in {
+      val application =
+        applicationBuilder(effectiveAnswers = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq.empty)))).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, url)).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
+      }
+    }
+
+    "redirect when the signatory details are incomplete" in {
+      val incomplete  = testLiaisonOfficer.copy(communication = Set.empty)
+      val application = applicationBuilder(
+        effectiveAnswers = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(incomplete))))
+      ).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, url)).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
+      }
+    }
+
   }
 }

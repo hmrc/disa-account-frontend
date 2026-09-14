@@ -26,7 +26,7 @@ import uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority.{Certifica
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.{CrowdFundedDebentures, PeertopeerLoansAndHave36hPermissions}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct.{CashIsas, InnovativeFinanceIsas}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
-import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficerCommunication.ByEmail
+import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficerCommunication.{ByEmail, ByPhone}
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
 import uk.gov.hmrc.disaaccountfrontend.models.registration.{OrganisationDetails, OrganisationEmail, RegistrationDetails}
 import uk.gov.hmrc.disaaccountfrontend.models.signatories.{Signatories, Signatory}
@@ -87,13 +87,13 @@ trait TestData {
   val testFinancialOrganisationSelections: Seq[FinancialOrganisation] =
     Seq(BuildingSociety, InsuranceCompany)
   val testName: String                                                = "Jane Smith"
-  val testEmail: String                                               = "Jane Smith"
+  val testEmail: String                                               = "jane.smith@example.com"
   val testLiaisonOfficerId: String                                    = "liaison-officer-1"
   val testLiaisonOfficer                                              = LiaisonOfficer(
     id = testLiaisonOfficerId,
     fullName = Some(testName),
     phoneNumber = Some("07777777777"),
-    communication = Set(ByEmail),
+    communication = Set(ByEmail, ByPhone),
     email = Some(testEmail)
   )
   val testLiaisonOfficers: LiaisonOfficers                            = LiaisonOfficers(

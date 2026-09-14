@@ -16,7 +16,7 @@
 
 package navigation
 
-import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.{AddedLiaisonOfficersController, LiaisonOfficerCommunicationController, LiaisonOfficerEmailController, LiaisonOfficerNameController, LiaisonOfficerPhoneNumberController}
+import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.{AddedLiaisonOfficersController, LiaisonOfficerCheckYourAnswersController, LiaisonOfficerCommunicationController, LiaisonOfficerEmailController, LiaisonOfficerNameController, LiaisonOfficerPhoneNumberController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, PeerToPeerPlatformController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.OrganisationTelephoneNumberController
 import uk.gov.hmrc.disaaccountfrontend.controllers.signatories.routes.{AddedSignatoryController, SignatoryCheckYourAnswersController, SignatoryJobTitleController, SignatoryNameController}
@@ -164,7 +164,7 @@ class NavigatorSpec extends BaseUnitSpec {
 
     "temporarily go from LiaisonOfficerCommunicationPage to change of circumstances in normal mode" in {
       navigator.nextPage(LiaisonOfficerCommunicationPage("liaison-officer-1"), mode = NormalMode) shouldBe
-        ChangeOfCircumstancesController.onPageLoad()
+        LiaisonOfficerCheckYourAnswersController.onPageLoad("liaison-officer-1")
     }
 
     "go from RemoveLiaisonOfficerPage to add a officers when none remain" in {
@@ -194,7 +194,7 @@ class NavigatorSpec extends BaseUnitSpec {
 
     "temporarily go from LiaisonOfficerCommunicationPage to change of circumstances in check mode" in {
       navigator.nextPage(LiaisonOfficerCommunicationPage("liaison-officer-1"), mode = CheckMode) shouldBe
-        ChangeOfCircumstancesController.onPageLoad()
+        LiaisonOfficerCheckYourAnswersController.onPageLoad("liaison-officer-1")
     }
 
     "fail fast when navigation has not been defined for a page" in {
