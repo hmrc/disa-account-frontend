@@ -111,17 +111,17 @@ class AddedLiaisonOfficersControllerSpec extends BaseUnitSpec {
     }
 
     "allow another officers when incomplete records bring the stored collection to the maximum" in {
-      val officers = completedOfficers(14) :+ LiaisonOfficer("incomplete-id", Some("Incomplete Officers"), None)
+      val officers    = completedOfficers(14) :+ LiaisonOfficer("incomplete-id", Some("Incomplete Officers"), None)
       val application = applicationBuilder(
         effectiveAnswers = Answers(liaisonOfficers = Some(LiaisonOfficers(officers)))
       ).build()
 
       running(application) {
         val result = route(application, FakeRequest(GET, addedLiaisonOfficerEndpoint)).value
-        val doc = Jsoup.parse(contentAsString(result))
+        val doc    = Jsoup.parse(contentAsString(result))
 
-        status(result) shouldBe OK
-        doc.select("h1").text() shouldBe "You have 14 liaison officers"
+        status(result)                         shouldBe OK
+        doc.select("h1").text()                shouldBe "You have 14 liaison officers"
         doc.select("input[type=radio]").size() shouldBe 2
       }
     }
@@ -133,12 +133,12 @@ class AddedLiaisonOfficersControllerSpec extends BaseUnitSpec {
 
       running(application) {
         val result = route(application, FakeRequest(GET, addedLiaisonOfficerEndpoint)).value
-        val doc = Jsoup.parse(contentAsString(result))
+        val doc    = Jsoup.parse(contentAsString(result))
 
-        status(result) shouldBe OK
-        doc.select("h1").text() shouldBe "You have 15 liaison officers"
-        doc.text() should include("You must have at least one liaison officer. The maximum is 15.")
-        doc.text() should not include "Do you want to add another liaison officer?"
+        status(result)                          shouldBe OK
+        doc.select("h1").text()                 shouldBe "You have 15 liaison officers"
+        doc.text()                                should include("You must have at least one liaison officer. The maximum is 15.")
+        doc.text()                                should not include "Do you want to add another liaison officer?"
         doc.select("input[type=radio]").isEmpty shouldBe true
       }
     }
@@ -171,14 +171,13 @@ class AddedLiaisonOfficersControllerSpec extends BaseUnitSpec {
         running(application) {
           val result = route(application, FakeRequest(GET, addedLiaisonOfficerEndpoint)).value
 
-          status(result) shouldBe SEE_OTHER
+          status(result)                 shouldBe SEE_OTHER
           redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
         }
       }
     }
 
   }
-
 
   "AddedLiaisonOfficersController.onSubmit" should {
 
@@ -191,9 +190,9 @@ class AddedLiaisonOfficersControllerSpec extends BaseUnitSpec {
         val request = FakeRequest(POST, addedLiaisonOfficerEndpoint)
           .withFormUrlEncodedBody("value" -> "yes")
           .withHeaders("Csrf-Token" -> "nocheck")
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
-        status(result) shouldBe SEE_OTHER
+        status(result)                 shouldBe SEE_OTHER
         redirectLocation(result).value shouldBe liaisonOfficerNameEndpoint
         verify(mockUserAnswersRepository, never).set(any())
       }
@@ -207,13 +206,17 @@ class AddedLiaisonOfficersControllerSpec extends BaseUnitSpec {
       running(application) {
         val request = FakeRequest(POST, addedLiaisonOfficerEndpoint)
           .withHeaders("Csrf-Token" -> "nocheck")
-        val result = route(application, request).value
-        val doc = Jsoup.parse(contentAsString(result))
+        val result  = route(application, request).value
+        val doc     = Jsoup.parse(contentAsString(result))
 
-        status(result) shouldBe BAD_REQUEST
+        status(result)                                    shouldBe BAD_REQUEST
         doc.select(".govuk-error-summary a").attr("href") shouldBe "#value_0"
-        doc.select(".govuk-error-summary").text() should include("Select yes if you’d like to add another liaison officer")
-        doc.select(".govuk-error-message").text() should include("Select yes if you’d like to add another liaison officer")
+        doc.select(".govuk-error-summary").text()           should include(
+          "Select yes if you’d like to add another liaison officer"
+        )
+        doc.select(".govuk-error-message").text()           should include(
+          "Select yes if you’d like to add another liaison officer"
+        )
         verify(mockUserAnswersRepository, never).set(any())
       }
     }
@@ -226,17 +229,14 @@ class AddedLiaisonOfficersControllerSpec extends BaseUnitSpec {
       running(application) {
         val request = FakeRequest(POST, addedLiaisonOfficerEndpoint)
           .withHeaders("Csrf-Token" -> "nocheck")
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
-        status(result) shouldBe SEE_OTHER
+        status(result)                 shouldBe SEE_OTHER
         redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
         verify(mockUserAnswersRepository, never).set(any())
       }
     }
 
-
-
   }
-
 
 }
