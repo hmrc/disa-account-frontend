@@ -18,6 +18,9 @@ POST       /innovative-financial-products      uk.gov.hmrc.disaaccountfrontend.c
 GET        /peer-to-peer-loans                 uk.gov.hmrc.disaaccountfrontend.controllers.PeerToPeerPlatformController.onPageLoad()
 POST       /peer-to-peer-loans                 uk.gov.hmrc.disaaccountfrontend.controllers.PeerToPeerPlatformController.onSubmit()
 
+GET        /fca-platform-number                uk.gov.hmrc.disaaccountfrontend.controllers.PeerToPeerPlatformNumberController.onPageLoad()
+POST       /fca-platform-number                uk.gov.hmrc.disaaccountfrontend.controllers.PeerToPeerPlatformNumberController.onSubmit()
+
 GET        /financial-organisation              uk.gov.hmrc.disaaccountfrontend.controllers.FinancialOrganisationController.onPageLoad()
 POST       /financial-organisation              uk.gov.hmrc.disaaccountfrontend.controllers.FinancialOrganisationController.onSubmit()
 

@@ -20,7 +20,7 @@ import play.api.mvc.Call
 import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.{LiaisonOfficerCommunicationController, LiaisonOfficerEmailController, LiaisonOfficerPhoneNumberController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.{OrganisationTelephoneNumberController, TradingNameController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.routes.EmailVerificationCodeController
-import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, PeerToPeerPlatformController}
+import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, PeerToPeerPlatformController, PeerToPeerPlatformNumberController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.signatories.routes.{AddedSignatoryController, SignatoryCheckYourAnswersController, SignatoryJobTitleController, SignatoryNameController}
 import uk.gov.hmrc.disaaccountfrontend.models.YesNoAnswer.{No, Yes}
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, CheckMode, Mode, NormalMode, YesNoAnswer}
@@ -45,6 +45,7 @@ class Navigator @Inject() () {
     case TradingNamePage                    => TradingNameController.onPageLoad()
     case InnovativeFinancialProductsPage    => innovativeFinancialProductsNextPage(answers)
     case PeerToPeerPlatformPage             => peerToPeerPlatformNextPage(answers)
+    case PeerToPeerPlatformNumberPage       => peerToPeerPlatformNumberNextPage()
     case FcaArticlesPage                    => fcaArticlesNextPage()
     case OrganisationEmailAddressPage       => EmailVerificationCodeController.onPageLoad()
     case EmailVerificationCodePage          => ChangeOfCircumstancesController.onPageLoad()
@@ -79,7 +80,10 @@ class Navigator @Inject() () {
     }
 
   private def peerToPeerPlatformNumberQuestionPage: Call =
-    // TODO: Replace this fallback with the FCA/FRN question (NOT FCA Articles!) when that page is implemented.
+    PeerToPeerPlatformNumberController.onPageLoad()
+
+  private def peerToPeerPlatformNumberNextPage(): Call =
+    // TODO: Replace this fallback with the FCA Articles question when that page is wired into the journey.
     ChangeOfCircumstancesController.onPageLoad()
 
   private def fcaArticlesNextPage(): Call =
