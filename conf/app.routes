@@ -12,6 +12,8 @@ POST       /organisation-telephone-number      uk.gov.hmrc.disaaccountfrontend.c
 GET        /trading-name                       uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.TradingNameController.onPageLoad()
 POST       /trading-name                       uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.TradingNameController.onSubmit()
 
+## ISA Products
+
 GET        /innovative-financial-products      uk.gov.hmrc.disaaccountfrontend.controllers.InnovativeFinancialProductsController.onPageLoad()
 POST       /innovative-financial-products      uk.gov.hmrc.disaaccountfrontend.controllers.InnovativeFinancialProductsController.onSubmit()
 
@@ -20,6 +22,8 @@ POST       /peer-to-peer-loans                 uk.gov.hmrc.disaaccountfrontend.c
 
 GET        /fca-platform-number                uk.gov.hmrc.disaaccountfrontend.controllers.PeerToPeerPlatformNumberController.onPageLoad()
 POST       /fca-platform-number                uk.gov.hmrc.disaaccountfrontend.controllers.PeerToPeerPlatformNumberController.onSubmit()
+
+## Certificates Of Authority
 
 GET        /financial-organisation              uk.gov.hmrc.disaaccountfrontend.controllers.FinancialOrganisationController.onPageLoad()
 POST       /financial-organisation              uk.gov.hmrc.disaaccountfrontend.controllers.FinancialOrganisationController.onSubmit()
