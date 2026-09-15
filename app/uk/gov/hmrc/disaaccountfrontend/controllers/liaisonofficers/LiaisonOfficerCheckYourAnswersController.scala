@@ -45,8 +45,8 @@ class LiaisonOfficerCheckYourAnswersController @Inject() (
         .fold(Redirect(ChangeOfCircumstancesController.onPageLoad())) { officer =>
           val rows = Seq(
             LiaisonOfficerNameSummary.row(officer),
-            LiaisonOfficerPhoneSummary.row(officer),
             LiaisonOfficerEmailSummary.row(officer),
+            LiaisonOfficerPhoneSummary.row(officer),
             LiaisonOfficerCommunicationSummary.row(officer)
           ).flatten
           Ok(view(SummaryList(rows = rows)))

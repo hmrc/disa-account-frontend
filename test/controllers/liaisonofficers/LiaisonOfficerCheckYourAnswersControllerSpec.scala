@@ -49,8 +49,8 @@ class LiaisonOfficerCheckYourAnswersControllerSpec extends BaseUnitSpec {
         val links = doc.select(".govuk-summary-list__actions a")
         links.get(0).attr("href") shouldBe s"$changeLiaisonOfficerNameEndpoint?id=$testLiaisonOfficerId"
         links.get(0).text()       shouldBe "Change name of liaison officer"
-        links.get(1).attr("href") shouldBe s"$changeLiaisonOfficerPhoneNumberEndpoint?id=$testLiaisonOfficerId"
-        links.get(1).text()       shouldBe "Change uk phone number"
+        links.get(2).attr("href") shouldBe s"$changeLiaisonOfficerPhoneNumberEndpoint?id=$testLiaisonOfficerId"
+        links.get(2).text()       shouldBe "Change uk phone number"
 
         val continue = doc.select("a.govuk-button")
         continue.text()       shouldBe "Continue"
