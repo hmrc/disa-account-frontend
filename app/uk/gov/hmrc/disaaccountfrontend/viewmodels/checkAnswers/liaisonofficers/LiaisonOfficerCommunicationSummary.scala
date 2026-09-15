@@ -17,7 +17,7 @@
 package uk.gov.hmrc.disaaccountfrontend.viewmodels.checkAnswers.liaisonofficers
 
 import play.api.i18n.Messages
-import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.LiaisonOfficerEmailController
+import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.LiaisonOfficerCommunicationController
 import uk.gov.hmrc.disaaccountfrontend.models.CheckMode
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.{LiaisonOfficer, LiaisonOfficerCommunication}
 import uk.gov.hmrc.govukfrontend.views.Aliases.*
@@ -34,7 +34,7 @@ object LiaisonOfficerCommunicationSummary {
           Actions(
             items = Seq(
               ActionItem(
-                href = LiaisonOfficerEmailController.onPageLoad(officer.id, CheckMode).url,
+                href = LiaisonOfficerCommunicationController.onPageLoad(officer.id, CheckMode).url,
                 content = Text(messages("site.change")),
                 visuallyHiddenText = Some(messages("liaisonOfficerCommunication.change.hidden"))
               )
