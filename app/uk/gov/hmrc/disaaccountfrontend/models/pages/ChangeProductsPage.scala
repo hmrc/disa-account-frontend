@@ -28,8 +28,8 @@ case object ChangeProductsPage extends PageWithAnswers[Set[IsaProduct]] {
     request: DataRequest[_],
     newAnswer: Set[IsaProduct]
   ): SessionUpdates = {
-    val existingUpdates           = request.sessionAnswers.fold(SessionUpdates())(_.updates)
-    val orderedAnswer             = IsaProduct.values.filter(newAnswer.contains)
+    val existingUpdates              = request.sessionAnswers.fold(SessionUpdates())(_.updates)
+    val orderedAnswer                = IsaProduct.values.filter(newAnswer.contains)
     val innovativeFinanceWasSelected =
       request.effectiveAnswers.isaProducts.exists(_.contains(InnovativeFinanceIsas))
     val innovativeFinanceIsSelected  = newAnswer.contains(InnovativeFinanceIsas)
@@ -37,14 +37,14 @@ case object ChangeProductsPage extends PageWithAnswers[Set[IsaProduct]] {
       request.originalAnswers.isaProducts.exists(_.contains(InnovativeFinanceIsas))
 
     (innovativeFinanceWasSelected, innovativeFinanceIsSelected, innovativeFinanceWasOriginal) match {
-      case (true, false, _) =>
+      case (true, false, _)     =>
         existingUpdates.copy(
           isaProducts = Assign(orderedAnswer),
           innovativeFinancialProducts = Clear,
           p2pPlatform = Clear,
           p2pPlatformNumber = Clear
         )
-      case (false, true, true) =>
+      case (false, true, true)  =>
         existingUpdates.copy(
           isaProducts = Assign(orderedAnswer),
           innovativeFinancialProducts = Unchanged,
@@ -58,7 +58,7 @@ case object ChangeProductsPage extends PageWithAnswers[Set[IsaProduct]] {
           p2pPlatform = Clear,
           p2pPlatformNumber = Clear
         )
-      case _ =>
+      case _                    =>
         existingUpdates.copy(isaProducts = Assign(orderedAnswer))
     }
   }

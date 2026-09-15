@@ -62,8 +62,8 @@ class ChangeProductsControllerSpec extends BaseUnitSpec {
 
         status(result)                                                  shouldBe OK
         doc.title()                                                       should startWith("Change ISA products")
-        doc.select("h1").text()                                        shouldBe "Change ISA products"
-        doc.select("form p.govuk-body").eachText().asScala.toSeq       shouldBe Seq(
+        doc.select("h1").text()                                         shouldBe "Change ISA products"
+        doc.select("form p.govuk-body").eachText().asScala.toSeq        shouldBe Seq(
           "Any changes to ISA products will require manual processing by HMRC.",
           "Once you have submitted your ISA product changes, you will be unable to update or change your:",
           "Once the changes to the ISA products have been checked and approved you will be able to carry out other updates as required."
@@ -73,9 +73,9 @@ class ChangeProductsControllerSpec extends BaseUnitSpec {
           "further ISA products amendments",
           "authorised users"
         )
-        doc.select("legend").text()                                    shouldBe
+        doc.select("legend").text()                                     shouldBe
           "Which ISA products does your organisation offer?"
-        doc.select(".govuk-hint").text()                               shouldBe
+        doc.select(".govuk-hint").text()                                shouldBe
           "Select or remove the ISA products your organisation offers"
         doc.select(".govuk-checkboxes__label").eachText().asScala.toSeq shouldBe Seq(
           "Cash ISAs",
@@ -172,7 +172,7 @@ class ChangeProductsControllerSpec extends BaseUnitSpec {
           .withHeaders("Csrf-Token" -> "nocheck")
         val result  = route(application, request).value
 
-        status(result)                 shouldBe SEE_OTHER
+        status(result)               shouldBe SEE_OTHER
         redirectLocation(result).value should endWith(changeOfCircumstancesEndpoint)
 
         val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
@@ -185,14 +185,14 @@ class ChangeProductsControllerSpec extends BaseUnitSpec {
     }
 
     "save selections, preserve unrelated updates and clear dependent answers when Innovative Finance is removed" in {
-      val originalAnswers = Answers(
+      val originalAnswers  = Answers(
         isaProducts = Some(Seq(CashIsas, InnovativeFinanceIsas)),
         innovativeFinancialProducts = Some(Seq(CrowdFundedDebentures))
       )
       val effectiveAnswers = originalAnswers
-      val existingUpdates = SessionUpdates(tradingName = Assign("Existing trading name"))
+      val existingUpdates  = SessionUpdates(tradingName = Assign("Existing trading name"))
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
-      val application = signatoryApplicationBuilder(
+      val application      = signatoryApplicationBuilder(
         effectiveAnswers,
         Some(originalAnswers),
         Some(UserAnswers(testSessionId, existingUpdates))
@@ -222,19 +222,19 @@ class ChangeProductsControllerSpec extends BaseUnitSpec {
     }
 
     "restore ETMP dependent answers and return to change of circumstances when Innovative Finance is reticked" in {
-      val originalAnswers = Answers(
+      val originalAnswers  = Answers(
         isaProducts = Some(Seq(CashIsas, InnovativeFinanceIsas)),
         innovativeFinancialProducts = Some(Seq(CrowdFundedDebentures))
       )
       val effectiveAnswers = Answers(isaProducts = Some(Seq(CashIsas)))
-      val existingUpdates = SessionUpdates(
+      val existingUpdates  = SessionUpdates(
         isaProducts = Assign(Seq(CashIsas)),
         innovativeFinancialProducts = Clear,
         p2pPlatform = Clear,
         p2pPlatformNumber = Clear
       )
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
-      val application = signatoryApplicationBuilder(
+      val application      = signatoryApplicationBuilder(
         effectiveAnswers,
         Some(originalAnswers),
         Some(UserAnswers(testSessionId, existingUpdates))
@@ -264,7 +264,7 @@ class ChangeProductsControllerSpec extends BaseUnitSpec {
     }
 
     "clear dependent answers and enter the Innovative Finance journey when the product is newly selected" in {
-      val answers = Answers(isaProducts = Some(Seq(CashIsas)))
+      val answers     = Answers(isaProducts = Some(Seq(CashIsas)))
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
       val application = signatoryApplicationBuilder(answers).build()
 
@@ -316,7 +316,7 @@ class ChangeProductsControllerSpec extends BaseUnitSpec {
           .withHeaders("Csrf-Token" -> "nocheck")
         val result  = route(application, request).value
 
-        status(result)                 shouldBe SEE_OTHER
+        status(result)               shouldBe SEE_OTHER
         redirectLocation(result).value should endWith(innovativeFinancialProductsEndpoint)
       }
     }
@@ -347,7 +347,7 @@ class ChangeProductsControllerSpec extends BaseUnitSpec {
           .withHeaders("Csrf-Token" -> "nocheck")
         val result  = route(application, request).value
 
-        status(result)                 shouldBe SEE_OTHER
+        status(result)               shouldBe SEE_OTHER
         redirectLocation(result).value should endWith(changeOfCircumstancesEndpoint)
       }
     }
