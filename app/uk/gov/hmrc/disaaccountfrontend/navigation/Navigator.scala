@@ -109,22 +109,19 @@ class Navigator @Inject() () {
   private def liaisonOfficerNameNextPage(id: String, mode: Mode): Call =
     mode match {
       case NormalMode => LiaisonOfficerEmailController.onPageLoad(id, NormalMode)
-      // TODO: Replace this fallback with the liaison officer check-your-answers page once it is implemented.
-      case CheckMode  => ChangeOfCircumstancesController.onPageLoad()
+      case CheckMode  => LiaisonOfficerCheckYourAnswersController.onPageLoad(id)
     }
 
   private def liaisonOfficerEmailNextPage(id: String, mode: Mode): Call =
     mode match {
       case NormalMode => LiaisonOfficerPhoneNumberController.onPageLoad(id, NormalMode)
-      // TODO: Replace this fallback with the liaison officer check-your-answers page once it is implemented.
-      case CheckMode  => ChangeOfCircumstancesController.onPageLoad()
+      case CheckMode  => LiaisonOfficerCheckYourAnswersController.onPageLoad(id)
     }
 
   private def liaisonOfficerPhoneNumberNextPage(id: String, mode: Mode): Call =
     mode match {
       case NormalMode => LiaisonOfficerCommunicationController.onPageLoad(id, NormalMode)
-      // TODO: Replace this fallback with the liaison officer check-your-answers page once it is implemented.
-      case CheckMode  => ChangeOfCircumstancesController.onPageLoad()
+      case CheckMode  => LiaisonOfficerCheckYourAnswersController.onPageLoad(id)
     }
 
   private def removeLiaisonOfficerPageNextPage(answers: Answers): Call =

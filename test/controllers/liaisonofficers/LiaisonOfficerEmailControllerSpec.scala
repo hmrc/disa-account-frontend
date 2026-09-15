@@ -23,7 +23,6 @@ import org.mockito.Mockito.{never, verify, when}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
-import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficerCommunication.{ByEmail, ByPhone}
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates, UserAnswers}
 import utils.BaseUnitSpec
@@ -32,24 +31,13 @@ import scala.concurrent.Future
 
 class LiaisonOfficerEmailControllerSpec extends BaseUnitSpec {
 
-  private val existingId   = "existing-id"
-  private val existingName = "Joe Bloggs"
-
-  private val existingOfficer = LiaisonOfficer(
-    id = existingId,
-    fullName = Some(existingName),
-    phoneNumber = Some("07777777777"),
-    communication = Set(ByEmail, ByPhone),
-    email = Some("old@example.com")
-  )
-
   private val otherOfficer = LiaisonOfficer(
     id = "other-id",
     fullName = Some("Other Person"),
     email = Some("other@example.com")
   )
 
-  private val answers = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(otherOfficer, existingOfficer))))
+  private val answers = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(otherOfficer, testLiaisonOfficer))))
 
   "LiaisonOfficerEmailController.onPageLoad" should {
 
@@ -57,15 +45,15 @@ class LiaisonOfficerEmailControllerSpec extends BaseUnitSpec {
       val application = applicationBuilder(effectiveAnswers = answers).build()
 
       running(application) {
-        val result = route(application, FakeRequest(GET, liaisonOfficerEmailEndpointFor(existingId))).value
+        val result = route(application, FakeRequest(GET, liaisonOfficerEmailEndpointFor(testLiaisonOfficerId))).value
         val doc    = Jsoup.parse(contentAsString(result))
 
         status(result)                    shouldBe OK
         doc.title()                       shouldBe
-          "What is the email address of Joe Bloggs? - Manage ISAs - GOV.UK"
-        doc.select("h1").text()             should include("What is the email address of Joe Bloggs?")
+          "What is the email address of Jane Smith? - Manage ISAs - GOV.UK"
+        doc.select("h1").text()             should include("What is the email address of Jane Smith?")
         doc.text()                          should include("This is the email address that HMRC will use to contact the liaison officer")
-        doc.select("form").attr("action") shouldBe liaisonOfficerEmailEndpointFor(existingId)
+        doc.select("form").attr("action") shouldBe liaisonOfficerEmailEndpointFor(testLiaisonOfficerId)
         doc.select("button").text()       shouldBe "Continue"
       }
     }
@@ -74,11 +62,12 @@ class LiaisonOfficerEmailControllerSpec extends BaseUnitSpec {
       val application = applicationBuilder(effectiveAnswers = answers).build()
 
       running(application) {
-        val result = route(application, FakeRequest(GET, changeLiaisonOfficerEmailEndpointFor(existingId))).value
+        val result =
+          route(application, FakeRequest(GET, changeLiaisonOfficerEmailEndpointFor(testLiaisonOfficerId))).value
         val doc    = Jsoup.parse(contentAsString(result))
 
         status(result)                    shouldBe OK
-        doc.select("form").attr("action") shouldBe changeLiaisonOfficerEmailEndpointFor(existingId)
+        doc.select("form").attr("action") shouldBe changeLiaisonOfficerEmailEndpointFor(testLiaisonOfficerId)
       }
     }
 
@@ -86,22 +75,22 @@ class LiaisonOfficerEmailControllerSpec extends BaseUnitSpec {
       val application = applicationBuilder(effectiveAnswers = answers).build()
 
       running(application) {
-        val result = route(application, FakeRequest(GET, liaisonOfficerEmailEndpointFor(existingId))).value
+        val result = route(application, FakeRequest(GET, liaisonOfficerEmailEndpointFor(testLiaisonOfficerId))).value
         val doc    = Jsoup.parse(contentAsString(result))
 
         status(result)                                shouldBe OK
-        doc.select("input[name=value]").attr("value") shouldBe "old@example.com"
+        doc.select("input[name=value]").attr("value") shouldBe "jane.smith@example.com"
       }
     }
 
     "render an empty field when the liaison officer has no saved email" in {
       val answersWithoutEmail = Answers(
-        liaisonOfficers = Some(LiaisonOfficers(Seq(existingOfficer.copy(email = None))))
+        liaisonOfficers = Some(LiaisonOfficers(Seq(testLiaisonOfficer.copy(email = None))))
       )
       val application         = applicationBuilder(effectiveAnswers = answersWithoutEmail).build()
 
       running(application) {
-        val result = route(application, FakeRequest(GET, liaisonOfficerEmailEndpointFor(existingId))).value
+        val result = route(application, FakeRequest(GET, liaisonOfficerEmailEndpointFor(testLiaisonOfficerId))).value
         val doc    = Jsoup.parse(contentAsString(result))
 
         status(result)                                shouldBe OK
@@ -115,7 +104,7 @@ class LiaisonOfficerEmailControllerSpec extends BaseUnitSpec {
       ).build()
 
       running(application) {
-        val result = route(application, FakeRequest(GET, liaisonOfficerEmailEndpointFor(existingId))).value
+        val result = route(application, FakeRequest(GET, liaisonOfficerEmailEndpointFor(testLiaisonOfficerId))).value
 
         status(result)                 shouldBe SEE_OTHER
         redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
@@ -123,13 +112,13 @@ class LiaisonOfficerEmailControllerSpec extends BaseUnitSpec {
     }
 
     "redirect to change of circumstances when the identified liaison officer has no name" in {
-      val officerWithoutName = existingOfficer.copy(fullName = None)
+      val officerWithoutName = testLiaisonOfficer.copy(fullName = None)
       val application        = applicationBuilder(
         effectiveAnswers = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(officerWithoutName))))
       ).build()
 
       running(application) {
-        val result = route(application, FakeRequest(GET, liaisonOfficerEmailEndpointFor(existingId))).value
+        val result = route(application, FakeRequest(GET, liaisonOfficerEmailEndpointFor(testLiaisonOfficerId))).value
 
         status(result)                 shouldBe SEE_OTHER
         redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
@@ -149,20 +138,20 @@ class LiaisonOfficerEmailControllerSpec extends BaseUnitSpec {
       ).build()
 
       running(application) {
-        val request = FakeRequest(POST, liaisonOfficerEmailEndpointFor(existingId))
+        val request = FakeRequest(POST, liaisonOfficerEmailEndpointFor(testLiaisonOfficerId))
           .withFormUrlEncodedBody("value" -> "  updated@example.com  ")
           .withHeaders("Csrf-Token" -> "nocheck")
         val result  = route(application, request).value
 
         status(result)                 shouldBe SEE_OTHER
-        redirectLocation(result).value shouldBe liaisonOfficerPhoneNumberEndpointFor(existingId)
+        redirectLocation(result).value shouldBe liaisonOfficerPhoneNumberEndpointFor(testLiaisonOfficerId)
 
         val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
         verify(mockUserAnswersRepository).set(captor.capture())
         captor.getValue.id      shouldBe testSessionId
         captor.getValue.updates shouldBe existingUpdates.copy(
           liaisonOfficers = Assign(
-            LiaisonOfficers(Seq(otherOfficer, existingOfficer.copy(email = Some("updated@example.com"))))
+            LiaisonOfficers(Seq(otherOfficer, testLiaisonOfficer.copy(email = Some("updated@example.com"))))
           )
         )
       }
@@ -173,13 +162,13 @@ class LiaisonOfficerEmailControllerSpec extends BaseUnitSpec {
       val application = applicationBuilder(effectiveAnswers = answers).build()
 
       running(application) {
-        val request = FakeRequest(POST, changeLiaisonOfficerEmailEndpointFor(existingId))
+        val request = FakeRequest(POST, changeLiaisonOfficerEmailEndpointFor(testLiaisonOfficerId))
           .withFormUrlEncodedBody("value" -> "updated@example.com")
           .withHeaders("Csrf-Token" -> "nocheck")
         val result  = route(application, request).value
 
         status(result)                 shouldBe SEE_OTHER
-        redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
+        redirectLocation(result).value shouldBe s"$checkLiaisonOfficerDetailsEndpoint?id=$testLiaisonOfficerId"
         verify(mockUserAnswersRepository).set(any())
       }
     }
@@ -188,7 +177,7 @@ class LiaisonOfficerEmailControllerSpec extends BaseUnitSpec {
       val application = applicationBuilder(effectiveAnswers = answers).build()
 
       running(application) {
-        val request = FakeRequest(POST, liaisonOfficerEmailEndpointFor(existingId))
+        val request = FakeRequest(POST, liaisonOfficerEmailEndpointFor(testLiaisonOfficerId))
           .withFormUrlEncodedBody("value" -> "   ")
           .withHeaders("Csrf-Token" -> "nocheck")
         val result  = route(application, request).value
@@ -207,7 +196,7 @@ class LiaisonOfficerEmailControllerSpec extends BaseUnitSpec {
       val application = applicationBuilder(effectiveAnswers = answers).build()
 
       running(application) {
-        val request = FakeRequest(POST, liaisonOfficerEmailEndpointFor(existingId))
+        val request = FakeRequest(POST, liaisonOfficerEmailEndpointFor(testLiaisonOfficerId))
           .withFormUrlEncodedBody("value" -> "not-an-email")
           .withHeaders("Csrf-Token" -> "nocheck")
         val result  = route(application, request).value
@@ -226,7 +215,7 @@ class LiaisonOfficerEmailControllerSpec extends BaseUnitSpec {
       val application = applicationBuilder(effectiveAnswers = Answers()).build()
 
       running(application) {
-        val request = FakeRequest(POST, liaisonOfficerEmailEndpointFor(existingId))
+        val request = FakeRequest(POST, liaisonOfficerEmailEndpointFor(testLiaisonOfficerId))
           .withFormUrlEncodedBody("value" -> "updated@example.com")
           .withHeaders("Csrf-Token" -> "nocheck")
         val result  = route(application, request).value

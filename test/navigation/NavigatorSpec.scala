@@ -139,7 +139,7 @@ class NavigatorSpec extends BaseUnitSpec {
 
     "temporarily go from LiaisonOfficerNamePage to change of circumstances in check mode" in {
       navigator.nextPage(LiaisonOfficerNamePage("liaison-officer-1"), mode = CheckMode) shouldBe
-        ChangeOfCircumstancesController.onPageLoad()
+        LiaisonOfficerCheckYourAnswersController.onPageLoad("liaison-officer-1")
     }
 
     "go from LiaisonOfficerEmailPage to the phone number page in normal mode" in {
@@ -149,7 +149,7 @@ class NavigatorSpec extends BaseUnitSpec {
 
     "temporarily go from LiaisonOfficerEmailPage to change of circumstances in check mode" in {
       navigator.nextPage(LiaisonOfficerEmailPage("liaison-officer-1"), mode = CheckMode) shouldBe
-        ChangeOfCircumstancesController.onPageLoad()
+        LiaisonOfficerCheckYourAnswersController.onPageLoad("liaison-officer-1")
     }
 
     "go from LiaisonOfficerPhoneNumberPage to the communication page in normal mode" in {
@@ -159,7 +159,7 @@ class NavigatorSpec extends BaseUnitSpec {
 
     "temporarily go from LiaisonOfficerPhoneNumberPage to change of circumstances in check mode" in {
       navigator.nextPage(LiaisonOfficerPhoneNumberPage("liaison-officer-1"), mode = CheckMode) shouldBe
-        ChangeOfCircumstancesController.onPageLoad()
+        LiaisonOfficerCheckYourAnswersController.onPageLoad("liaison-officer-1")
     }
 
     "temporarily go from LiaisonOfficerCommunicationPage to change of circumstances in normal mode" in {
