@@ -83,7 +83,6 @@ class Navigator @Inject() () {
     PeerToPeerPlatformNumberController.onPageLoad()
 
   private def peerToPeerPlatformNumberNextPage(): Call =
-    // TODO: Replace this fallback with the FCA Articles question when that page is wired into the journey.
     ChangeOfCircumstancesController.onPageLoad()
 
   private def fcaArticlesNextPage(): Call =

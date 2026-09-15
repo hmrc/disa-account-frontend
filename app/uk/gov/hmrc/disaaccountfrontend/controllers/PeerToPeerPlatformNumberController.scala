@@ -49,7 +49,6 @@ class PeerToPeerPlatformNumberController @Inject() (
 
   private val pageAction = identify andThen getData andThen guardPage(PeerToPeerPlatformNumberPage)
 
-  // Guarded by PeerToPeerPlatformNumberPage.canBeAccessedWith, so p2pPlatform is guaranteed to be defined here.
   private def platformName(implicit request: DataRequest[_]): String =
     request.effectiveAnswers.p2pPlatform.get
 

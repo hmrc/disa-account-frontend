@@ -22,13 +22,13 @@ import utils.BaseUnitSpec
 
 class PeerToPeerPlatformNumberFormProviderSpec extends BaseUnitSpec {
 
-  private val formProvider              = new PeerToPeerPlatformNumberFormProvider()
-  private def form: Form[String]        = formProvider(testP2pPlatform)
+  private val formProvider       = new PeerToPeerPlatformNumberFormProvider()
+  private def form: Form[String] = formProvider(testP2pPlatform)
 
-  private val requiredErrorMessage           = s"Enter the FCA number of $testP2pPlatform"
-  private val invalidCharactersErrorMessage  =
+  private val requiredErrorMessage          = s"Enter the FCA number of $testP2pPlatform"
+  private val invalidCharactersErrorMessage =
     "The FCA must not include letters a to z, hyphens, spaces or apostrophes"
-  private val patternErrorMessage            =
+  private val patternErrorMessage           =
     "The FCA should be 6 or 7 digits without letters, hyphens, spaces or other characters"
 
   "PeerToPeerPlatformNumberFormProvider" should {
@@ -53,11 +53,10 @@ class PeerToPeerPlatformNumberFormProviderSpec extends BaseUnitSpec {
       form.bind(Map("value" -> "12A4567")).errors.map(_.message) should contain(invalidCharactersErrorMessage)
     }
 
-    "return the invalid characters error for a value containing a hyphen, space or apostrophe" in {
+    "return the invalid characters error for a value containing a hyphen, space or apostrophe" in
       Seq("123-4567", "123 4567", "123'4567").foreach { value =>
         form.bind(Map("value" -> value)).errors.map(_.message) should contain(invalidCharactersErrorMessage)
       }
-    }
 
     "return the pattern error for a value that is too short" in {
       form.bind(Map("value" -> "12345")).errors.map(_.message) should contain(patternErrorMessage)
