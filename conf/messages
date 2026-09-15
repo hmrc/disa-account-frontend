@@ -218,6 +218,19 @@ unauthorised.body = You need to be signed in with an organisation that is enroll
 changeOfCircumstances.title = Change of circumstances
 changeOfCircumstances.heading = Change of circumstances
 
+declarationForChanges.title = Declaration for changes
+declarationForChanges.title.isaProducts = Declaration for changes, including ISA products
+declarationForChanges.introduction = Do you agree to the following statements:
+declarationForChanges.introduction.isaProducts = Before you submit your changes, you must agree to the following statements:
+declarationForChanges.statement.isaProducts = the ISA products and investments will meet the qualifying criteria as described in the ISA regulations and ISA managers'' guidance
+declarationForChanges.statement.subscriptions = the ISAs opened and subscriptions made under my management will comply with the ISA regulations
+declarationForChanges.statement.reporting = all HMRC ISA returns and reporting obligations will be accurate and made in accordance with the ISA regulations and ISA managers'' guidance
+declarationForChanges.statement.fca = I''m not subject to any requirement or prohibition imposed by or under any rules made by the Financial Conduct Authority or the Prudential Regulation Authority under Part 4A of FISMA 2000 which would prevent me from acting as an account manager
+declarationForChanges.statement.information = the information I''ve provided in this change request is, to the best of my knowledge and belief, correct and true
+declarationForChanges.statement.notifyHmrc = I understand that if my circumstances change I''ll notify HM Revenue and Customs immediately
+declarationForChanges.confirmation = By continuing, I confirm that I understand and agree to these statements.
+declarationForChanges.submit = I agree - submit
+
 changesCompleted.title = Changes completed
 changesCompleted.heading = Changes completed
 changesCompleted.completed = You have completed your changes.

@@ -19,11 +19,13 @@ package uk.gov.hmrc.disaaccountfrontend.connectors
 import com.typesafe.config.Config
 import org.apache.pekko.actor.ActorSystem
 import play.api.Logging
+import play.api.libs.json.Json
+import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.disaaccountfrontend.config.AppConfig
-import uk.gov.hmrc.disaaccountfrontend.models.registration.RegistrationDetails
+import uk.gov.hmrc.disaaccountfrontend.models.registration.{RegistrationDetails, UpdateRegistrationDetailsRequest}
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, Retries, StringContextOps, UpstreamErrorResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, Retries, StringContextOps, UpstreamErrorResponse}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -59,5 +61,22 @@ class RegistrationConnector @Inject() (
           )
           None
       }
+  }
+
+  def updateRegistrationDetails(
+    zref: String,
+    details: UpdateRegistrationDetailsRequest
+  )(implicit hc: HeaderCarrier): Future[Unit] = {
+    val url = s"${appConfig.disaAccountBaseUrl}/disa-account/registration/$zref"
+    retryFor[HttpResponse]("update disa-account registration details")(retryCondition) {
+      http
+        .put(url"$url")
+        .withBody(Json.toJson(details))
+        .execute[Either[UpstreamErrorResponse, HttpResponse]]
+        .flatMap {
+          case Right(response) => Future.successful(response)
+          case Left(error)     => Future.failed(error)
+        }
+    }.map(_ => ())
   }
 }

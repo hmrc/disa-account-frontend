@@ -1,0 +1,62 @@
+/*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package uk.gov.hmrc.disaaccountfrontend.models.registration
+
+import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.disaaccountfrontend.models.articles.FcaArticles
+import uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority.FinancialOrganisation
+import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.{InnovativeFinancialProduct, IsaProduct}
+import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficers
+import uk.gov.hmrc.disaaccountfrontend.models.signatories.Signatories
+import uk.gov.hmrc.disaaccountfrontend.models.{Answers, CorrespondenceAddress}
+
+case class UpdateRegistrationDetailsRequest(
+  correspondenceAddress: Option[CorrespondenceAddress] = None,
+  organisationTelephoneNumber: Option[String] = None,
+  tradingName: Option[String] = None,
+  isaProducts: Option[Seq[IsaProduct]] = None,
+  innovativeFinancialProducts: Option[Seq[InnovativeFinancialProduct]] = None,
+  p2pPlatform: Option[String] = None,
+  p2pPlatformNumber: Option[String] = None,
+  fcaArticles: Option[Seq[FcaArticles]] = None,
+  organisationEmailAddress: Option[String] = None,
+  organisationEmailVerified: Option[Boolean] = None,
+  financialOrganisation: Option[Seq[FinancialOrganisation]] = None,
+  signatories: Option[Signatories] = None,
+  liaisonOfficers: Option[LiaisonOfficers] = None
+)
+
+object UpdateRegistrationDetailsRequest {
+  implicit val format: OFormat[UpdateRegistrationDetailsRequest] = Json.format[UpdateRegistrationDetailsRequest]
+
+  def apply(answers: Answers): UpdateRegistrationDetailsRequest =
+    UpdateRegistrationDetailsRequest(
+      correspondenceAddress = answers.correspondenceAddress,
+      organisationTelephoneNumber = answers.organisationTelephoneNumber,
+      tradingName = answers.tradingName,
+      isaProducts = answers.isaProducts,
+      innovativeFinancialProducts = answers.innovativeFinancialProducts,
+      p2pPlatform = answers.p2pPlatform,
+      p2pPlatformNumber = answers.p2pPlatformNumber,
+      fcaArticles = answers.fcaArticles,
+      organisationEmailAddress = answers.organisationEmailAddress,
+      organisationEmailVerified = answers.organisationEmailVerified,
+      financialOrganisation = answers.financialOrganisation,
+      signatories = answers.signatories,
+      liaisonOfficers = answers.liaisonOfficers
+    )
+}
