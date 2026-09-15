@@ -24,11 +24,20 @@ import javax.inject.Inject
 
 class PeerToPeerPlatformNumberFormProvider @Inject() extends Mappings {
 
-  private val validPattern = """^[0-9]{6,7}$"""
+  private val noLettersHyphensSpacesOrApostrophesPattern = """^[^A-Za-z\-\s']*$"""
+  private val validPattern                               = """^[0-9]{6,7}$"""
 
   def apply(platformName: String)(implicit messages: Messages): Form[String] =
     Form(
       "value" -> text(messages("peerToPeerPlatformNumber.error.required", platformName))
-        .verifying(regexp(validPattern, messages("peerToPeerPlatformNumber.error.pattern", platformName)))
+        .verifying(
+          firstError(
+            regexp(
+              noLettersHyphensSpacesOrApostrophesPattern,
+              messages("peerToPeerPlatformNumber.error.invalidCharacters")
+            ),
+            regexp(validPattern, messages("peerToPeerPlatformNumber.error.pattern"))
+          )
+        )
     )
 }

@@ -68,7 +68,8 @@ peerToPeerPlatformNumber.title = What is the FCA, FRN of {0}?
 peerToPeerPlatformNumber.heading = What is the FCA, FRN of {0}?
 peerToPeerPlatformNumber.hint = The FCA, FRN is usually a 6 or 7 digit number
 peerToPeerPlatformNumber.error.required = Enter the FCA number of {0}
-peerToPeerPlatformNumber.error.pattern = Enter the {0} reference number in the correct format. It’s usually 6 or 7 numbers
+peerToPeerPlatformNumber.error.invalidCharacters = The FCA must not include letters a to z, hyphens, spaces or apostrophes
+peerToPeerPlatformNumber.error.pattern = The FCA should be 6 or 7 digits without letters, hyphens, spaces or other characters
 peerToPeerPlatformNumber.change.hidden = platform FCA FRN
 peerToPeerPlatformNumber.checkYourAnswersLabel = Platform FCA FRN
 
