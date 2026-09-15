@@ -54,8 +54,10 @@ class LiaisonOfficerNamePageSpec extends BaseUnitSpec {
         FakeRequest(),
         testZref,
         testCredentialId,
+        None,
         testSessionId,
         Some(UserAnswers(testSessionId, existingUpdates)),
+        Answers(),
         Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(otherOfficer, targetOfficer))))
       )
 

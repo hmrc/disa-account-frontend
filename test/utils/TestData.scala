@@ -87,6 +87,8 @@ trait TestData {
   val testFinancialOrganisationSelections: Seq[FinancialOrganisation] =
     Seq(BuildingSociety, InsuranceCompany)
 
+  val testFcaArticlesCheckedBoxes: Seq[FcaArticles] = Seq(FcaArticle14, FcaArticle64)
+
   val testLiaisonOfficers: LiaisonOfficers = LiaisonOfficers(
     Seq(
       LiaisonOfficer(
@@ -102,17 +104,26 @@ trait TestData {
   val testSignatoryId: String       = "signatory-1"
   val testSignatoryName: String     = "Jane Smith"
   val testSignatoryJobTitle: String = "Director"
+  val testSignatoryEmail: String    = "signatory@example.com"
 
   val testSignatories: Signatories = Signatories(
     Seq(
-      Signatory(id = testSignatoryId, fullName = Some(testSignatoryName), jobTitle = Some(testSignatoryJobTitle))
+      Signatory(
+        id = testSignatoryId,
+        fullName = Some(testSignatoryName),
+        jobTitle = Some(testSignatoryJobTitle),
+        email = Some(testSignatoryEmail)
+      )
     )
   )
 
   val testRegistrationDetailsWithFinancialOrganisation: RegistrationDetails =
     testRegistrationDetailsWithInnovativeFinanceIsa.copy(
       certificatesOfAuthority = Some(
-        CertificatesOfAuthority(financialOrganisation = Some(testFinancialOrganisationSelections))
+        CertificatesOfAuthority(
+          fcaArticles = Some(testFcaArticlesCheckedBoxes),
+          financialOrganisation = Some(testFinancialOrganisationSelections)
+        )
       ),
       liaisonOfficers = Some(testLiaisonOfficers),
       signatories = Some(testSignatories)
@@ -122,6 +133,4 @@ trait TestData {
     testRegistrationDetailsWithFinancialOrganisation.copy(
       signatories = Some(testSignatories)
     )
-
-  val testFcaArticlesCheckedBoxes: Seq[FcaArticles] = Seq(FcaArticle14, FcaArticle64)
 }

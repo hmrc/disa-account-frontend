@@ -34,8 +34,10 @@ class SignatoryNamePageSpec extends BaseUnitSpec {
         FakeRequest(),
         testZref,
         testCredentialId,
+        None,
         testSessionId,
         Some(UserAnswers(testSessionId, existingUpdates)),
+        Answers(),
         Answers()
       )
 
@@ -50,8 +52,10 @@ class SignatoryNamePageSpec extends BaseUnitSpec {
         FakeRequest(),
         testZref,
         testCredentialId,
+        None,
         testSessionId,
         None,
+        Answers(),
         Answers(signatories = Some(testSignatories))
       )
 
@@ -69,8 +73,10 @@ class SignatoryNamePageSpec extends BaseUnitSpec {
         FakeRequest(),
         testZref,
         testCredentialId,
+        None,
         testSessionId,
         None,
+        Answers(),
         Answers(signatories = Some(Signatories(Seq(existingSignatory))))
       )
 
@@ -86,8 +92,10 @@ class SignatoryNamePageSpec extends BaseUnitSpec {
         FakeRequest(),
         testZref,
         testCredentialId,
+        None,
         testSessionId,
         None,
+        Answers(),
         Answers(signatories = Some(Signatories(Seq(existingSignatory))))
       )
 

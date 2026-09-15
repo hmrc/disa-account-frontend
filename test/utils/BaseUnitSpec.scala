@@ -107,17 +107,21 @@ abstract class BaseUnitSpec
   // (that's covered by IdentifierActionSpec/DataRetrievalActionSpec instead).
   def applicationBuilder(
     effectiveAnswers: Answers = Answers(),
+    originalAnswers: Option[Answers] = None,
     sessionAnswers: Option[UserAnswers] = None,
     zReference: String = testZref,
     credentialId: String = testCredentialId,
-    sessionId: String = testSessionId
+    sessionId: String = testSessionId,
+    email: Option[String] = None
   ): GuiceApplicationBuilder = {
     val bodyParsers = stubControllerComponents().parsers
     GuiceApplicationBuilder()
       .configure("play.filters.csrf.header.bypassHeaders.Csrf-Token" -> "nocheck")
       .overrides(
-        bind[IdentifierAction].toInstance(new FakeIdentifierAction(bodyParsers, zReference, credentialId, sessionId)),
-        bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(effectiveAnswers, sessionAnswers)),
+        bind[IdentifierAction]
+          .toInstance(new FakeIdentifierAction(bodyParsers, zReference, credentialId, sessionId, email)),
+        bind[DataRetrievalAction]
+          .toInstance(new FakeDataRetrievalAction(effectiveAnswers, sessionAnswers, originalAnswers)),
         bind[UserAnswersRepository].toInstance(mockUserAnswersRepository),
         bind[EmailVerificationConnector].toInstance(mockEmailVerificationConnector)
       )

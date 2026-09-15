@@ -18,6 +18,7 @@ package models
 
 import play.api.libs.json.{JsNull, JsSuccess, Json}
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.{Assign, Clear, Unchanged}
+import uk.gov.hmrc.disaaccountfrontend.models.ChangeInformationSelection.{AuthorisedUsers, OrganisationInformation}
 import uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority.FinancialOrganisation.{Bank, BuildingSociety}
 import uk.gov.hmrc.disaaccountfrontend.models.signatories.{Signatories, Signatory}
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
@@ -37,6 +38,7 @@ class SessionUpdatesSpec extends BaseUnitSpec {
         financialOrganisation = Assign(Seq(Bank)),
         signatories = Assign(testSignatories),
         liaisonOfficers = Assign(testLiaisonOfficers),
+        changeInformationSelections = Assign(Seq(OrganisationInformation, AuthorisedUsers)),
         p2pPlatform = Clear
       )
 
