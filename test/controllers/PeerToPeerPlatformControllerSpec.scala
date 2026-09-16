@@ -125,7 +125,7 @@ class PeerToPeerPlatformControllerSpec extends BaseUnitSpec {
         ).value
 
         status(result)               shouldBe SEE_OTHER
-        redirectLocation(result).value should endWith(changeOfCircumstancesEndpoint)
+        redirectLocation(result).value should endWith(peerToPeerPlatformNumberEndpoint)
 
         val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
         verify(mockUserAnswersRepository).set(captor.capture())
