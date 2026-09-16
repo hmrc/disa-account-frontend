@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,17 +12,22 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@this(layout: Layout)
+package uk.gov.hmrc.disaaccountfrontend.forms
 
-@()(implicit request: RequestHeader, messages: Messages)
+import play.api.data.Form
+import play.api.data.Forms.set
+import uk.gov.hmrc.disaaccountfrontend.forms.mappings.Mappings
+import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct
 
-@layout(pageTitle = Some("disa-account-frontend")) {
-    <h1 class="govuk-heading-xl">disa-account-frontend</h1>
-    <p class="govuk-body">@{messages("service.text")}</p>
-}
+import javax.inject.Inject
 
-@{
-    //$COVERAGE-OFF$
+class ChangeProductsFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[Set[IsaProduct]] =
+    Form(
+      "value" -> set(enumerable[IsaProduct]("changeProducts.error.required"))
+        .verifying(nonEmptySet("changeProducts.error.required"))
+    )
 }

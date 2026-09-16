@@ -20,11 +20,12 @@ import play.api.mvc.Call
 import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.{AddedLiaisonOfficersController, LiaisonOfficerCheckYourAnswersController, LiaisonOfficerCommunicationController, LiaisonOfficerEmailController, LiaisonOfficerNameController, LiaisonOfficerPhoneNumberController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.{OrganisationTelephoneNumberController, TradingNameController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.routes.EmailVerificationCodeController
-import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, PeerToPeerPlatformController}
+import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, InnovativeFinancialProductsController, PeerToPeerPlatformController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.signatories.routes.{AddedSignatoryController, SignatoryCheckYourAnswersController, SignatoryJobTitleController, SignatoryNameController}
 import uk.gov.hmrc.disaaccountfrontend.models.YesNoAnswer.{No, Yes}
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, CheckMode, Mode, NormalMode, YesNoAnswer}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
+import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct.InnovativeFinanceIsas
 import uk.gov.hmrc.disaaccountfrontend.models.pages.*
 import uk.gov.hmrc.disaaccountfrontend.models.pages.liaisonofficers.{LiaisonOfficerCheckYourAnswersPage, LiaisonOfficerCommunicationPage, LiaisonOfficerEmailPage, LiaisonOfficerNamePage, LiaisonOfficerPhoneNumberPage, RemoveLiaisonOfficerPage}
 import uk.gov.hmrc.disaaccountfrontend.models.pages.signatories.{RemoveSignatoryPage, SignatoryJobTitlePage, SignatoryNamePage}
@@ -42,6 +43,18 @@ class Navigator @Inject() () {
   def nextPageFromAddedLiaisonOfficer(answer: YesNoAnswer): Call = answer match {
     case Yes => LiaisonOfficerNameController.onPageLoad(None, NormalMode)
     case No  => ChangeOfCircumstancesController.onPageLoad()
+  }
+
+  def nextPageFromChangeProducts(answers: Answers): Call = {
+    val innovativeFinanceIsSelected     = answers.isaProducts.exists(_.contains(InnovativeFinanceIsas))
+    val innovativeFinanceIsAnswered     = answers.innovativeFinancialProducts.exists(_.nonEmpty)
+    val innovativeFinanceAnswerRequired = innovativeFinanceIsSelected && !innovativeFinanceIsAnswered
+
+    if (innovativeFinanceAnswerRequired) {
+      InnovativeFinancialProductsController.onPageLoad()
+    } else {
+      ChangeOfCircumstancesController.onPageLoad()
+    }
   }
 
   def nextPage(page: Page, answers: Answers = Answers(), mode: Mode = NormalMode): Call = page match {

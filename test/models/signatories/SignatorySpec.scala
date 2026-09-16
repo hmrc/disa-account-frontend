@@ -16,6 +16,7 @@
 
 package models.signatories
 
+import play.api.libs.json.Json
 import uk.gov.hmrc.disaaccountfrontend.models.signatories.Signatory
 import utils.BaseUnitSpec
 
@@ -30,6 +31,20 @@ class SignatorySpec extends BaseUnitSpec {
     "return false when a required detail is absent" in {
       Signatory("id", None, Some("Director")).isComplete   shouldBe false
       Signatory("id", Some("Jane Smith"), None).isComplete shouldBe false
+    }
+  }
+
+  "Signatory JSON format" should {
+
+    "preserve the email address" in {
+      val signatory = Signatory("id", Some("Jane Smith"), Some("Director"), Some("jane.smith@example.com"))
+
+      Json.toJson(signatory).as[Signatory]          shouldBe signatory
+      (Json.toJson(signatory) \ "email").as[String] shouldBe "jane.smith@example.com"
+    }
+
+    "read an existing payload without an email address" in {
+      Json.obj("id" -> "id").as[Signatory] shouldBe Signatory("id")
     }
   }
 }

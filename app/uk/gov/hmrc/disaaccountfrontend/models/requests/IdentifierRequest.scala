@@ -22,5 +22,6 @@ case class IdentifierRequest[A](
   request: Request[A],
   zReference: String,
   credentialId: String,
-  sessionId: String
+  sessionId: String,
+  email: Option[String] = None
 ) extends WrappedRequest[A](request)

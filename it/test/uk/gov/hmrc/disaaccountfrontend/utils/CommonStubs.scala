@@ -24,7 +24,7 @@ trait CommonStubs {
 
   val testHeaders: Seq[(String, String)] = Seq("Authorization" -> "mock-bearer-token")
 
-  def stubAuth(zref: String, credentialId: String): Unit =
+  def stubAuth(zref: String, credentialId: String, email: Option[String] = Some("signatory@example.com")): Unit =
     stubPost(
       url = "/auth/authorise",
       status = OK,
@@ -42,7 +42,8 @@ trait CommonStubs {
               ),
               "state"       -> "Activated"
             )
-          )
+          ),
+          "email"                -> email
         )
         .toString()
     )
