@@ -56,6 +56,7 @@ trait TestEndpoints {
   val changeLiaisonOfficerCommunicationEndpoint: String =
     s"$accountFrontendRoutePrefix/change-liaison-officer-communication"
   val changeOfCircumstancesEndpoint: String             = s"$accountFrontendRoutePrefix/change-of-circumstances"
+  val changesCompletedEndpoint: String                  = s"$accountFrontendRoutePrefix/changes-completed"
   val fcaArticlesEndpoint: String                       = s"$accountFrontendRoutePrefix/fca-articles"
   val keepAliveEndpoint: String                         = s"$accountFrontendRoutePrefix/refresh-session"
   val signOutEndpoint: String                           = s"$accountFrontendRoutePrefix/sign-out"
