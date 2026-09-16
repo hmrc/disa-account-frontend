@@ -43,10 +43,10 @@ class DeclarationForChangesControllerSpec extends BaseUnitSpec {
         val result = route(application, FakeRequest(GET, declarationForChangesEndpoint)).value
         val doc    = Jsoup.parse(contentAsString(result))
 
-        status(result)                 shouldBe OK
-        doc.select("h1").text()        shouldBe "Declaration for changes, including ISA products"
-        doc.select("title").text()     should startWith("Declaration for changes, including ISA products")
-        doc.select("h1 + p").text() shouldBe
+        status(result)                                  shouldBe OK
+        doc.select("h1").text()                         shouldBe "Declaration for changes, including ISA products"
+        doc.select("title").text()                        should startWith("Declaration for changes, including ISA products")
+        doc.select("h1 + p").text()                     shouldBe
           "Before you submit your changes, you must agree to the following statements:"
         doc.select("ul.govuk-list--bullet li").eachText() should contain theSameElementsInOrderAs Seq(
           "the ISA products and investments will meet the qualifying criteria as described in the ISA regulations and ISA managers' guidance",
@@ -56,11 +56,11 @@ class DeclarationForChangesControllerSpec extends BaseUnitSpec {
           "the information I've provided in this change request is, to the best of my knowledge and belief, correct and true",
           "I understand that if my circumstances change I'll notify HM Revenue and Customs immediately"
         )
-        doc.select("ul + p").text() shouldBe
+        doc.select("ul + p").text()                     shouldBe
           "By continuing, I confirm that I understand and agree to these statements."
-        doc.select("form").attr("method") shouldBe "POST"
-        doc.select("form").attr("action") should endWith(declarationForChangesEndpoint)
-        doc.select("button").text()        shouldBe "I agree - submit"
+        doc.select("form").attr("method")               shouldBe "POST"
+        doc.select("form").attr("action")                 should endWith(declarationForChangesEndpoint)
+        doc.select("button").text()                     shouldBe "I agree - submit"
       }
     }
 
@@ -72,17 +72,17 @@ class DeclarationForChangesControllerSpec extends BaseUnitSpec {
         val result = route(application, FakeRequest(GET, declarationForChangesEndpoint)).value
         val doc    = Jsoup.parse(contentAsString(result))
 
-        status(result)                 shouldBe OK
-        doc.select("h1").text()        shouldBe "Declaration for changes"
-        doc.select("title").text()     should startWith("Declaration for changes -")
-        doc.select("h1 + p").text() shouldBe "Do you agree to the following statements:"
+        status(result)                                  shouldBe OK
+        doc.select("h1").text()                         shouldBe "Declaration for changes"
+        doc.select("title").text()                        should startWith("Declaration for changes -")
+        doc.select("h1 + p").text()                     shouldBe "Do you agree to the following statements:"
         doc.select("ul.govuk-list--bullet li").eachText() should contain theSameElementsInOrderAs Seq(
           "the ISA products and investments will meet the qualifying criteria as described in the ISA regulations and ISA managers' guidance",
           "the ISAs opened and subscriptions made under my management will comply with the ISA regulations",
           "I'm not subject to any requirement or prohibition imposed by or under any rules made by the Financial Conduct Authority or the Prudential Regulation Authority under Part 4A of FISMA 2000 which would prevent me from acting as an account manager",
           "the information I've provided in this change request is, to the best of my knowledge and belief, correct and true"
         )
-        doc.select("ul + p").text() shouldBe
+        doc.select("ul + p").text()                     shouldBe
           "By continuing, I confirm that I understand and agree to these statements."
       }
     }
@@ -93,13 +93,13 @@ class DeclarationForChangesControllerSpec extends BaseUnitSpec {
       val effectiveAnswers = Answers(tradingName = Some("Updated name"))
       when(mockRegistrationConnector.updateRegistrationDetails(any[String], any[UpdateRegistrationDetailsRequest])(any))
         .thenReturn(Future.successful(()))
-      val application = applicationBuilder(effectiveAnswers = effectiveAnswers).build()
+      val application      = applicationBuilder(effectiveAnswers = effectiveAnswers).build()
 
       running(application) {
         val request = FakeRequest(POST, declarationForChangesEndpoint).withHeaders("Csrf-Token" -> "nocheck")
         val result  = route(application, request).value
 
-        status(result)                 shouldBe SEE_OTHER
+        status(result)               shouldBe SEE_OTHER
         redirectLocation(result).value should endWith(changesCompletedEndpoint)
         verify(mockRegistrationConnector)
           .updateRegistrationDetails(eqTo(testZref), eqTo(UpdateRegistrationDetailsRequest(effectiveAnswers)))(any)
@@ -107,7 +107,7 @@ class DeclarationForChangesControllerSpec extends BaseUnitSpec {
     }
 
     "propagate the failure instead of redirecting when the update fails" in {
-      val exception = new RuntimeException("boom")
+      val exception   = new RuntimeException("boom")
       when(mockRegistrationConnector.updateRegistrationDetails(any[String], any[UpdateRegistrationDetailsRequest])(any))
         .thenReturn(Future.failed(exception))
       val application = applicationBuilder().build()
