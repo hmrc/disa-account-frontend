@@ -83,6 +83,15 @@ peerToPeerPlatform.details.content.p2 = These parties are brought together by an
 peerToPeerPlatform.details.content.p3 = It then manages the payment of interest and repayment of the principal according to the terms agreed between the parties.
 peerToPeerPlatform.details.content.link = Find out more about peer-to-peer loans
 
+peerToPeerPlatformNumber.title = What is the FCA, FRN of {0}?
+peerToPeerPlatformNumber.heading = What is the FCA, FRN of {0}?
+peerToPeerPlatformNumber.hint = The FCA, FRN is usually a 6 or 7 digit number
+peerToPeerPlatformNumber.error.required = Enter the FCA number of {0}
+peerToPeerPlatformNumber.error.invalidCharacters = The FCA must not include letters a to z, hyphens, spaces or apostrophes
+peerToPeerPlatformNumber.error.pattern = The FCA should be 6 or 7 digits without letters, hyphens, spaces or other characters
+peerToPeerPlatformNumber.change.hidden = platform FCA FRN
+peerToPeerPlatformNumber.checkYourAnswersLabel = Platform FCA FRN
+
 FcaArticles.title = FCA Articles that apply to your organisation
 FcaArticles.heading = FCA Articles that apply to your organisation
 FcaArticles.p1 = We need to know which of the FCA Articles apply to your organisation, as set out by the Financial Service and Markets Act 2000.

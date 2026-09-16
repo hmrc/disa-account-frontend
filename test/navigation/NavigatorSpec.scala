@@ -17,7 +17,7 @@
 package navigation
 
 import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.{AddedLiaisonOfficersController, LiaisonOfficerCheckYourAnswersController, LiaisonOfficerCommunicationController, LiaisonOfficerEmailController, LiaisonOfficerNameController, LiaisonOfficerPhoneNumberController}
-import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, InnovativeFinancialProductsController, PeerToPeerPlatformController}
+import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, InnovativeFinancialProductsController, PeerToPeerPlatformController, PeerToPeerPlatformNumberController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.OrganisationTelephoneNumberController
 import uk.gov.hmrc.disaaccountfrontend.controllers.signatories.routes.{AddedSignatoryController, SignatoryCheckYourAnswersController, SignatoryJobTitleController, SignatoryNameController}
 import uk.gov.hmrc.disaaccountfrontend.models.YesNoAnswer.{No, Yes}
@@ -101,15 +101,20 @@ class NavigatorSpec extends BaseUnitSpec {
         ChangeOfCircumstancesController.onPageLoad()
     }
 
-    "temporarily go from PeerToPeerPlatformPage to change of circumstances when the FCA/FRN page is not built" in {
+    "go from PeerToPeerPlatformPage to the FCA/FRN page when an FCA/FRN is not already present" in {
       navigator.nextPage(PeerToPeerPlatformPage, Answers()) shouldBe
-        ChangeOfCircumstancesController.onPageLoad()
+        PeerToPeerPlatformNumberController.onPageLoad()
     }
 
     "go from PeerToPeerPlatformPage to change of circumstances when an FCA/FRN is already present" in {
       val answers = Answers(p2pPlatformNumber = Some(testP2pPlatformNumber))
 
       navigator.nextPage(PeerToPeerPlatformPage, answers) shouldBe
+        ChangeOfCircumstancesController.onPageLoad()
+    }
+
+    "temporarily go from PeerToPeerPlatformNumberPage to change of circumstances until the FCA Articles page is wired in" in {
+      navigator.nextPage(PeerToPeerPlatformNumberPage, Answers()) shouldBe
         ChangeOfCircumstancesController.onPageLoad()
     }
 

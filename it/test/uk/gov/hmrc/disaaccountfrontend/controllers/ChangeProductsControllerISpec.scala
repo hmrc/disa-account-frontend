@@ -68,8 +68,8 @@ class ChangeProductsControllerISpec extends BaseIntegrationSpec {
       if (includeDependents) {
         Json.obj(
           "innovativeFinancialProducts" -> Json.arr(CrowdFundedDebentures.toString),
-          "p2pPlatform"                  -> testP2pPlatform,
-          "p2pPlatformNumber"            -> testP2pPlatformNumber
+          "p2pPlatform"                 -> testP2pPlatform,
+          "p2pPlatformNumber"           -> testP2pPlatformNumber
         )
       } else {
         Json.obj()
@@ -125,8 +125,8 @@ class ChangeProductsControllerISpec extends BaseIntegrationSpec {
       val result = route(app, authenticatedGet()).get
       val html   = contentAsString(result)
 
-      status(result)                                      shouldBe OK
-      checkboxIsChecked(html, CashIsas.toString)          shouldBe true
+      status(result)                                          shouldBe OK
+      checkboxIsChecked(html, CashIsas.toString)              shouldBe true
       checkboxIsChecked(html, InnovativeFinanceIsas.toString) shouldBe true
       checkboxIsChecked(html, StocksAndSharesIsas.toString)   shouldBe false
     }
@@ -137,7 +137,7 @@ class ChangeProductsControllerISpec extends BaseIntegrationSpec {
 
       val result = route(app, authenticatedGet()).get
 
-      status(result)                 shouldBe SEE_OTHER
+      status(result)             shouldBe SEE_OTHER
       redirectLocation(result).get should endWith("/change-of-circumstances")
     }
 
@@ -146,7 +146,7 @@ class ChangeProductsControllerISpec extends BaseIntegrationSpec {
 
       val result = route(app, FakeRequest(GET, endpoint)).get
 
-      status(result)                 shouldBe SEE_OTHER
+      status(result)             shouldBe SEE_OTHER
       redirectLocation(result).get should include("auth-login-stub")
     }
   }
@@ -169,8 +169,8 @@ class ChangeProductsControllerISpec extends BaseIntegrationSpec {
         )
       ).get
 
-      status(postResult)                 shouldBe SEE_OTHER
-      redirectLocation(postResult).get should endWith("/change-of-circumstances")
+      status(postResult)                            shouldBe SEE_OTHER
+      redirectLocation(postResult).get                should endWith("/change-of-circumstances")
       await(repo.get(testSessionId)).map(_.updates) shouldBe Some(
         SessionUpdates(
           isaProducts = Assign(Seq(CashIsas, StocksAndSharesIsas)),
@@ -183,7 +183,7 @@ class ChangeProductsControllerISpec extends BaseIntegrationSpec {
       val getResult = route(app, authenticatedGet()).get
       val html      = contentAsString(getResult)
 
-      status(getResult)                                      shouldBe OK
+      status(getResult)                                       shouldBe OK
       checkboxIsChecked(html, CashIsas.toString)              shouldBe true
       checkboxIsChecked(html, StocksAndSharesIsas.toString)   shouldBe true
       checkboxIsChecked(html, InnovativeFinanceIsas.toString) shouldBe false
@@ -200,13 +200,13 @@ class ChangeProductsControllerISpec extends BaseIntegrationSpec {
 
       val firstResult = route(app, authenticatedPost(selectedProducts: _*)).get
 
-      status(firstResult)                 shouldBe SEE_OTHER
-      redirectLocation(firstResult).get should endWith("/innovative-financial-products")
+      status(firstResult)                                                       shouldBe SEE_OTHER
+      redirectLocation(firstResult).get                                           should endWith("/innovative-financial-products")
       await(repo.get(testSessionId)).map(_.updates.innovativeFinancialProducts) shouldBe Some(Clear)
 
       val browserBackResult = route(app, authenticatedPost(selectedProducts: _*)).get
 
-      status(browserBackResult)                 shouldBe SEE_OTHER
+      status(browserBackResult)             shouldBe SEE_OTHER
       redirectLocation(browserBackResult).get should endWith("/innovative-financial-products")
 
       val innovativeResult = route(
@@ -221,7 +221,7 @@ class ChangeProductsControllerISpec extends BaseIntegrationSpec {
 
       val answeredResult = route(app, authenticatedPost(selectedProducts: _*)).get
 
-      status(answeredResult)                 shouldBe SEE_OTHER
+      status(answeredResult)             shouldBe SEE_OTHER
       redirectLocation(answeredResult).get should endWith("/change-of-circumstances")
     }
 
@@ -254,8 +254,8 @@ class ChangeProductsControllerISpec extends BaseIntegrationSpec {
         )
       ).get
 
-      status(result)                 shouldBe SEE_OTHER
-      redirectLocation(result).get should endWith("/change-of-circumstances")
+      status(result)                                shouldBe SEE_OTHER
+      redirectLocation(result).get                    should endWith("/change-of-circumstances")
       await(repo.get(testSessionId)).map(_.updates) shouldBe Some(
         SessionUpdates(
           isaProducts = Assign(Seq(CashIsas, InnovativeFinanceIsas)),
@@ -267,7 +267,7 @@ class ChangeProductsControllerISpec extends BaseIntegrationSpec {
 
       val innovativeResult = route(app, authenticatedGet(innovativeProductsEndpoint)).get
 
-      status(innovativeResult) shouldBe OK
+      status(innovativeResult)                                                             shouldBe OK
       checkboxIsChecked(contentAsString(innovativeResult), CrowdFundedDebentures.toString) shouldBe true
     }
 
@@ -277,8 +277,8 @@ class ChangeProductsControllerISpec extends BaseIntegrationSpec {
 
       val result = route(app, authenticatedPost()).get
 
-      status(result)          shouldBe BAD_REQUEST
-      contentAsString(result) should include("Select the ISA products your organisation offers")
+      status(result)                 shouldBe BAD_REQUEST
+      contentAsString(result)          should include("Select the ISA products your organisation offers")
       await(repo.get(testSessionId)) shouldBe None
     }
 
@@ -289,7 +289,7 @@ class ChangeProductsControllerISpec extends BaseIntegrationSpec {
       val result = route(app, authenticatedPost("value[0]" -> CashIsas.toString)).get
 
       status(result)                 shouldBe SEE_OTHER
-      redirectLocation(result).get should endWith("/change-of-circumstances")
+      redirectLocation(result).get     should endWith("/change-of-circumstances")
       await(repo.get(testSessionId)) shouldBe None
     }
   }

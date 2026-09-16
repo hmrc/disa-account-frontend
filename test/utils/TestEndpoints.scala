@@ -30,6 +30,7 @@ trait TestEndpoints {
   val innovativeFinancialProductsEndpoint: String       =
     s"$accountFrontendRoutePrefix/innovative-financial-products"
   val peerToPeerPlatformEndpoint: String                = s"$accountFrontendRoutePrefix/peer-to-peer-loans"
+  val peerToPeerPlatformNumberEndpoint: String          = s"$accountFrontendRoutePrefix/fca-platform-number"
   val organisationEmailAddressEndpoint: String          = s"$accountFrontendRoutePrefix/organisation-email-address"
   val emailVerificationCodeEndpoint: String             = s"$accountFrontendRoutePrefix/email-verification-code"
   val requestNewCodeEndpoint: String                    = s"$accountFrontendRoutePrefix/request-new-code"
