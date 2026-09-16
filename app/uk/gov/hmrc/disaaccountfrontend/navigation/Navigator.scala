@@ -68,13 +68,6 @@ class Navigator @Inject() () {
     case FcaArticlesPage                       => fcaArticlesNextPage()
     case OrganisationEmailAddressPage          => EmailVerificationCodeController.onPageLoad()
     case EmailVerificationCodePage             => ChangeOfCircumstancesController.onPageLoad()
-    case OrganisationTelephoneNumberPage       => OrganisationTelephoneNumberController.onPageLoad()
-    case TradingNamePage                       => TradingNameController.onPageLoad()
-    case InnovativeFinancialProductsPage       => innovativeFinancialProductsNextPage(answers)
-    case PeerToPeerPlatformPage                => peerToPeerPlatformNextPage(answers)
-    case FcaArticlesPage                       => fcaArticlesNextPage()
-    case OrganisationEmailAddressPage          => EmailVerificationCodeController.onPageLoad()
-    case EmailVerificationCodePage             => ChangeOfCircumstancesController.onPageLoad()
     // TODO: replace with the organisation email check-your-answers page once it exists.
     case FinancialOrganisationPage             => ChangeOfCircumstancesController.onPageLoad()
     case SignatoryNamePage(id, mode)           => signatoryNameNextPage(id, mode)
