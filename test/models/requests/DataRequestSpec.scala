@@ -18,6 +18,7 @@ package models.requests
 
 import play.api.test.FakeRequest
 import uk.gov.hmrc.disaaccountfrontend.models.Answers
+import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct.{CashIsas, StocksAndSharesIsas}
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
 import utils.BaseUnitSpec
 
@@ -25,7 +26,8 @@ class DataRequestSpec extends BaseUnitSpec {
 
   private def request(
     email: Option[String],
-    effectiveAnswers: Answers = Answers(signatories = Some(testSignatories))
+    effectiveAnswers: Answers = Answers(signatories = Some(testSignatories)),
+    originalAnswers: Answers = Answers(signatories = Some(testSignatories))
   ): DataRequest[_] =
     DataRequest(
       FakeRequest(),
@@ -34,7 +36,7 @@ class DataRequestSpec extends BaseUnitSpec {
       loggedInEmail = email,
       sessionId = testSessionId,
       sessionAnswers = None,
-      originalAnswers = Answers(signatories = Some(testSignatories)),
+      originalAnswers = originalAnswers,
       effectiveAnswers = effectiveAnswers
     )
 
@@ -55,6 +57,33 @@ class DataRequestSpec extends BaseUnitSpec {
     "return false when the authenticated email is missing or blank" in {
       request(None).isSignatory        shouldBe false
       request(Some("   ")).isSignatory shouldBe false
+    }
+  }
+
+  "DataRequest.isaProductsUpdated" should {
+
+    "return true when an ISA product was added or removed" in {
+      val cashIsas = Answers(isaProducts = Some(Seq(CashIsas)))
+      val both     = Answers(isaProducts = Some(Seq(CashIsas, StocksAndSharesIsas)))
+
+      request(None, effectiveAnswers = both, originalAnswers = cashIsas).isaProductsUpdated shouldBe true
+      request(None, effectiveAnswers = cashIsas, originalAnswers = both).isaProductsUpdated shouldBe true
+    }
+
+    "return false when ISA products are unchanged or only reordered" in {
+      val original  = Answers(isaProducts = Some(Seq(CashIsas, StocksAndSharesIsas)))
+      val reordered = Answers(isaProducts = Some(Seq(StocksAndSharesIsas, CashIsas)))
+
+      request(None, effectiveAnswers = original, originalAnswers = original).isaProductsUpdated  shouldBe false
+      request(None, effectiveAnswers = reordered, originalAnswers = original).isaProductsUpdated shouldBe false
+    }
+
+    "treat absent and empty ISA products as unchanged" in {
+      request(
+        None,
+        effectiveAnswers = Answers(isaProducts = Some(Seq.empty)),
+        originalAnswers = Answers()
+      ).isaProductsUpdated shouldBe false
     }
   }
 }

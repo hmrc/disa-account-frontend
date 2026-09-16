@@ -27,6 +27,8 @@ POST       /peer-to-peer-loans                 uk.gov.hmrc.disaaccountfrontend.c
 GET        /financial-organisation              uk.gov.hmrc.disaaccountfrontend.controllers.FinancialOrganisationController.onPageLoad()
 POST       /financial-organisation              uk.gov.hmrc.disaaccountfrontend.controllers.FinancialOrganisationController.onSubmit()
 
+GET        /changes-completed                  uk.gov.hmrc.disaaccountfrontend.controllers.ChangesCompletedController.onPageLoad()
+
 ## Signatories
 
 GET        /signatory-name                      uk.gov.hmrc.disaaccountfrontend.controllers.signatories.SignatoryNameController.onPageLoad(id: Option[String], mode: Mode = NormalMode)

@@ -36,4 +36,7 @@ case class DataRequest[A](
         _.signatories.exists(_.email.exists(_.trim.equalsIgnoreCase(authenticatedEmail)))
       )
     }
+
+  def isaProductsUpdated: Boolean =
+    originalAnswers.isaProducts.getOrElse(Seq.empty).toSet != effectiveAnswers.isaProducts.getOrElse(Seq.empty).toSet
 }

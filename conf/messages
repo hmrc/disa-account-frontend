@@ -209,6 +209,19 @@ unauthorised.body = You need to be signed in with an organisation that is enroll
 changeOfCircumstances.title = Change of circumstances
 changeOfCircumstances.heading = Change of circumstances
 
+changesCompleted.title = Changes completed
+changesCompleted.heading = Changes completed
+changesCompleted.completed = You have completed your changes.
+changesCompleted.whatHappensNext.heading = What happens next
+changesCompleted.whatHappensNext.beforeLink = The changes you have made will appear on your account. If you need to manage further changes you can from the
+changesCompleted.manageIsasStartPage = manage ISAs start page
+changesCompleted.updatedIsaProducts.heading = Updated ISA products
+changesCompleted.updatedIsaProducts.p1 = If you have updated any ISA products using the service, it will now need to be manually checked by HMRC.
+changesCompleted.updatedIsaProducts.p2 = You will not be able to make any further changes until this is done and you receive a letter from HMRC.
+changesCompleted.returnToManageIsas = Go back to manage ISAs start page
+changesCompleted.guidance.beforeLink = If you need to find out more you can
+changesCompleted.guidance.link = read the guidance in the ISA managers guidance collection (opens in new tab)
+
 changeInformation.title = What would you like to change?
 changeInformation.heading = What would you like to change?
 changeInformation.caption = Select all sections that apply
