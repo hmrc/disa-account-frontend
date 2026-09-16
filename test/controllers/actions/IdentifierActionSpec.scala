@@ -39,15 +39,27 @@ class IdentifierActionSpec extends BaseUnitSpec {
 
   "AuthenticatedIdentifierAction" should {
 
-    "call the block with the zref, credential id and session id when authorised" in {
+    "call the block with the zref, credential id, session id and email when authorised" in {
       val result = action(successfulAuthConnector()).invokeBlock(
         sessionRequest,
         (request: IdentifierRequest[_]) =>
-          Future.successful(Ok(s"${request.zReference}-${request.credentialId}-${request.sessionId}"))
+          Future.successful(
+            Ok(s"${request.zReference}-${request.credentialId}-${request.sessionId}-${request.email.value}")
+          )
       )
 
       status(result)          shouldBe OK
-      contentAsString(result) shouldBe s"$testZref-$testCredentialId-$testSessionId"
+      contentAsString(result) shouldBe s"$testZref-$testCredentialId-$testSessionId-$testSignatoryEmail"
+    }
+
+    "call the block when the email retrieval is empty" in {
+      val result = action(successfulAuthConnector(email = None)).invokeBlock(
+        sessionRequest,
+        (request: IdentifierRequest[_]) => Future.successful(Ok(request.email.toString))
+      )
+
+      status(result)          shouldBe OK
+      contentAsString(result) shouldBe "None"
     }
 
     "redirect to unauthorised when the enrolment has no ZREF identifier" in {
