@@ -49,12 +49,12 @@ class DeclarationForChangesControllerSpec extends BaseUnitSpec {
         doc.select("h1 + p").text()                     shouldBe
           "Before you submit your changes, you must agree to the following statements:"
         doc.select("ul.govuk-list--bullet li").eachText() should contain theSameElementsInOrderAs Seq(
-          "the ISA products and investments will meet the qualifying criteria as described in the ISA regulations and ISA managers' guidance",
+          "the ISA products and investments will meet the qualifying criteria as described in the ISA regulations and ISA managers’ guidance",
           "the ISAs opened and subscriptions made under my management will comply with the ISA regulations",
-          "all HMRC ISA returns and reporting obligations will be accurate and made in accordance with the ISA regulations and ISA managers' guidance",
-          "I'm not subject to any requirement or prohibition imposed by or under any rules made by the Financial Conduct Authority or the Prudential Regulation Authority under Part 4A of FISMA 2000 which would prevent me from acting as an account manager",
-          "the information I've provided in this change request is, to the best of my knowledge and belief, correct and true",
-          "I understand that if my circumstances change I'll notify HM Revenue and Customs immediately"
+          "all HMRC ISA returns and reporting obligations will be accurate and made in accordance with the ISA regulations and ISA managers’ guidance",
+          "I’m not subject to any requirement or prohibition imposed by or under any rules made by the Financial Conduct Authority or the Prudential Regulation Authority under Part 4A of FISMA 2000 which would prevent me from acting as an account manager",
+          "the information I’ve provided in this change request is, to the best of my knowledge and belief, correct and true",
+          "I understand that if my circumstances change I’ll notify HM Revenue and Customs immediately"
         )
         doc.select("ul + p").text()                     shouldBe
           "By continuing, I confirm that I understand and agree to these statements."
@@ -77,10 +77,10 @@ class DeclarationForChangesControllerSpec extends BaseUnitSpec {
         doc.select("title").text()                        should startWith("Declaration for changes -")
         doc.select("h1 + p").text()                     shouldBe "Do you agree to the following statements:"
         doc.select("ul.govuk-list--bullet li").eachText() should contain theSameElementsInOrderAs Seq(
-          "the ISA products and investments will meet the qualifying criteria as described in the ISA regulations and ISA managers' guidance",
+          "the ISA products and investments will meet the qualifying criteria as described in the ISA regulations and ISA managers’ guidance",
           "the ISAs opened and subscriptions made under my management will comply with the ISA regulations",
-          "I'm not subject to any requirement or prohibition imposed by or under any rules made by the Financial Conduct Authority or the Prudential Regulation Authority under Part 4A of FISMA 2000 which would prevent me from acting as an account manager",
-          "the information I've provided in this change request is, to the best of my knowledge and belief, correct and true"
+          "I’m not subject to any requirement or prohibition imposed by or under any rules made by the Financial Conduct Authority or the Prudential Regulation Authority under Part 4A of FISMA 2000 which would prevent me from acting as an account manager",
+          "the information I’ve provided in this change request is, to the best of my knowledge and belief, correct and true"
         )
         doc.select("ul + p").text()                     shouldBe
           "By continuing, I confirm that I understand and agree to these statements."
