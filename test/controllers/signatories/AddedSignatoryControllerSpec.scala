@@ -28,7 +28,7 @@ import utils.BaseUnitSpec
 class AddedSignatoryControllerSpec extends BaseUnitSpec {
 
   private val completeSignatory =
-    Signatory(testSignatoryId, Some(testSignatoryName), Some(testSignatoryJobTitle))
+    Signatory(testSignatoryId, Some(testName), Some(testSignatoryJobTitle))
 
   private def completeSignatories(count: Int): Seq[Signatory] =
     (1 to count).map(number => Signatory(s"signatory-$number", Some(s"Signatory $number"), Some("Director")))
@@ -49,14 +49,14 @@ class AddedSignatoryControllerSpec extends BaseUnitSpec {
         doc.select("h1").text()                shouldBe "You currently have a signatory"
         doc.select(".govuk-caption-l").isEmpty shouldBe true
         doc.text()                               should include("Add or remove signatories, but you must have at least 1 and no more than 25.")
-        doc.text()                               should include(testSignatoryName)
+        doc.text()                               should include(testName)
 
         val actions = doc.select(".govuk-summary-list__actions a")
         actions.size()              shouldBe 2
         actions.get(0).attr("href") shouldBe s"$checkSignatoryDetailsEndpoint?id=$testSignatoryId"
-        actions.get(0).text()       shouldBe s"Change $testSignatoryName details"
+        actions.get(0).text()       shouldBe s"Change $testName details"
         actions.get(1).attr("href") shouldBe s"$removeSignatoryEndpoint?id=$testSignatoryId"
-        actions.get(1).text()       shouldBe s"Remove $testSignatoryName details"
+        actions.get(1).text()       shouldBe s"Remove $testName details"
 
         doc.select("input[type=radio][name=value]").size() shouldBe 2
         doc.select("input[type=radio][checked]").isEmpty   shouldBe true

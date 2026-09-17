@@ -55,6 +55,9 @@ trait TestEndpoints {
     s"$accountFrontendRoutePrefix/liaison-officer-communication"
   val changeLiaisonOfficerCommunicationEndpoint: String =
     s"$accountFrontendRoutePrefix/change-liaison-officer-communication"
+  val addedLiaisonOfficerEndpoint: String               = s"$accountFrontendRoutePrefix/added-liaison-officers"
+  val removeLiaisonOfficerEndpoint: String              = s"$accountFrontendRoutePrefix/remove-liaison-officer"
+  val checkLiaisonOfficerDetailsEndpoint: String        = s"$accountFrontendRoutePrefix/check-added-liaison-officer"
   val changeOfCircumstancesEndpoint: String             = s"$accountFrontendRoutePrefix/change-of-circumstances"
   val changesCompletedEndpoint: String                  = s"$accountFrontendRoutePrefix/changes-completed"
   val fcaArticlesEndpoint: String                       = s"$accountFrontendRoutePrefix/fca-articles"

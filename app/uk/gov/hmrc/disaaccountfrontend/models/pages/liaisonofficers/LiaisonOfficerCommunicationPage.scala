@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.models.pages
+package uk.gov.hmrc.disaaccountfrontend.models.pages.liaisonofficers
 
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.{LiaisonOfficerCommunication, LiaisonOfficers}
+import uk.gov.hmrc.disaaccountfrontend.models.pages.{GuardedPage, IdentifiedPage, PageWithAnswers}
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates}
 

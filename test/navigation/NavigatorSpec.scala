@@ -16,16 +16,18 @@
 
 package navigation
 
-import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.{LiaisonOfficerCommunicationController, LiaisonOfficerEmailController, LiaisonOfficerPhoneNumberController}
+import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.{AddedLiaisonOfficersController, LiaisonOfficerCheckYourAnswersController, LiaisonOfficerCommunicationController, LiaisonOfficerEmailController, LiaisonOfficerNameController, LiaisonOfficerPhoneNumberController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, InnovativeFinancialProductsController, PeerToPeerPlatformController, PeerToPeerPlatformNumberController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.OrganisationTelephoneNumberController
 import uk.gov.hmrc.disaaccountfrontend.controllers.signatories.routes.{AddedSignatoryController, SignatoryCheckYourAnswersController, SignatoryJobTitleController, SignatoryNameController}
 import uk.gov.hmrc.disaaccountfrontend.models.YesNoAnswer.{No, Yes}
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, CheckMode, NormalMode, SessionUpdates}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.{CrowdFundedDebentures, PeertopeerLoansUsingAPlatformWith36hPermissions}
+import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct.{CashIsas, InnovativeFinanceIsas}
 import uk.gov.hmrc.disaaccountfrontend.models.pages.*
-import uk.gov.hmrc.disaaccountfrontend.models.pages.signatories.RemoveSignatoryPage
+import uk.gov.hmrc.disaaccountfrontend.models.pages.liaisonofficers.{LiaisonOfficerCommunicationPage, LiaisonOfficerEmailPage, LiaisonOfficerNamePage, LiaisonOfficerPhoneNumberPage, RemoveLiaisonOfficerPage}
+import uk.gov.hmrc.disaaccountfrontend.models.pages.signatories.{RemoveSignatoryPage, SignatoryJobTitlePage, SignatoryNamePage}
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
 import uk.gov.hmrc.disaaccountfrontend.models.signatories.{Signatories, Signatory}
 import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator
@@ -173,7 +175,7 @@ class NavigatorSpec extends BaseUnitSpec {
 
     "temporarily go from LiaisonOfficerNamePage to change of circumstances in check mode" in {
       navigator.nextPage(LiaisonOfficerNamePage("liaison-officer-1"), mode = CheckMode) shouldBe
-        ChangeOfCircumstancesController.onPageLoad()
+        LiaisonOfficerCheckYourAnswersController.onPageLoad("liaison-officer-1")
     }
 
     "go from LiaisonOfficerEmailPage to the phone number page in normal mode" in {
@@ -183,7 +185,7 @@ class NavigatorSpec extends BaseUnitSpec {
 
     "temporarily go from LiaisonOfficerEmailPage to change of circumstances in check mode" in {
       navigator.nextPage(LiaisonOfficerEmailPage("liaison-officer-1"), mode = CheckMode) shouldBe
-        ChangeOfCircumstancesController.onPageLoad()
+        LiaisonOfficerCheckYourAnswersController.onPageLoad("liaison-officer-1")
     }
 
     "go from LiaisonOfficerPhoneNumberPage to the communication page in normal mode" in {
@@ -193,17 +195,42 @@ class NavigatorSpec extends BaseUnitSpec {
 
     "temporarily go from LiaisonOfficerPhoneNumberPage to change of circumstances in check mode" in {
       navigator.nextPage(LiaisonOfficerPhoneNumberPage("liaison-officer-1"), mode = CheckMode) shouldBe
-        ChangeOfCircumstancesController.onPageLoad()
+        LiaisonOfficerCheckYourAnswersController.onPageLoad("liaison-officer-1")
     }
 
     "temporarily go from LiaisonOfficerCommunicationPage to change of circumstances in normal mode" in {
       navigator.nextPage(LiaisonOfficerCommunicationPage("liaison-officer-1"), mode = NormalMode) shouldBe
-        ChangeOfCircumstancesController.onPageLoad()
+        LiaisonOfficerCheckYourAnswersController.onPageLoad("liaison-officer-1")
+    }
+
+    "go from RemoveLiaisonOfficerPage to add a officers when none remain" in {
+      navigator.nextPage(
+        RemoveLiaisonOfficerPage(testLiaisonOfficerId),
+        Answers(liaisonOfficers = Some(LiaisonOfficers(Seq.empty)))
+      ) shouldBe
+        LiaisonOfficerNameController.onPageLoad(None, NormalMode)
+    }
+
+    "go from RemoveLiaisonOfficerPage to added liaison officers when a complete officer remains" in {
+      navigator.nextPage(
+        RemoveLiaisonOfficerPage(testLiaisonOfficerId),
+        Answers(liaisonOfficers = Some(testLiaisonOfficers))
+      ) shouldBe
+        AddedLiaisonOfficersController.onPageLoad()
+    }
+
+    "go from RemoveLiaisonOfficerPage to add a liaison officer when only incomplete records remain" in {
+      val incomplete = LiaisonOfficer("incomplete", fullName = Some("Incomplete"))
+
+      navigator.nextPage(
+        RemoveLiaisonOfficerPage(testLiaisonOfficerId),
+        Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(incomplete))))
+      ) shouldBe LiaisonOfficerNameController.onPageLoad(None, NormalMode)
     }
 
     "temporarily go from LiaisonOfficerCommunicationPage to change of circumstances in check mode" in {
       navigator.nextPage(LiaisonOfficerCommunicationPage("liaison-officer-1"), mode = CheckMode) shouldBe
-        ChangeOfCircumstancesController.onPageLoad()
+        LiaisonOfficerCheckYourAnswersController.onPageLoad("liaison-officer-1")
     }
 
     "fail fast when navigation has not been defined for a page" in {

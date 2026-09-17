@@ -24,7 +24,7 @@ import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction,
 import uk.gov.hmrc.disaaccountfrontend.forms.LiaisonOfficerCommunicationFormProvider
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficerCommunication
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficers.findLiaisonOfficer
-import uk.gov.hmrc.disaaccountfrontend.models.pages.LiaisonOfficerCommunicationPage
+import uk.gov.hmrc.disaaccountfrontend.models.pages.liaisonofficers.LiaisonOfficerCommunicationPage
 import uk.gov.hmrc.disaaccountfrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository

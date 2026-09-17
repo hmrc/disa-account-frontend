@@ -182,17 +182,30 @@ removeSignatory.title = Are you sure you want to remove {0} as a signatory?
 removeSignatory.heading = Are you sure you want to remove {0} as a signatory?
 removeSignatory.error.required = Select yes if you want to remove this signatory
 
+
+addedLiaisonOfficer.title = You currently have a liaison officer
+addedLiaisonOfficer.title.plural = You have {0} liaison officers
+addedLiaisonOfficer.guidance = Add or remove liaison officers, but you must have at least 1 and no more than {0}.
+addedLiaisonOfficer.guidance.max = You must have at least one liaison officer. The maximum is {0}.
+addedLiaisonOfficer.addAnother = Do you want to add another liaison officer?
+addedLiaisonOfficer.error.required = Select yes if you’d like to add another liaison officer
+addedLiaisonOfficer.summary.action.hidden = {0} details
+
 liaisonOfficerName.title = What is the full name of the liaison officer?
 liaisonOfficerName.heading = What is the full name of the liaison officer?
 liaisonOfficerName.hint = You must have at least 1 liaison officer to register your organisation as an ISA manager. You can add up to {0} liaison officers.
 liaisonOfficerName.error.required = Enter the full name of the liaison officer you’re adding
 liaisonOfficerName.error.invalid = The full name must only include letters a to z, hyphens, spaces and apostrophes
+liaisonOfficerName.checkYourAnswersLabel = Name
+liaisonOfficerName.change.hidden = name of liaison officer
 
 liaisonOfficerEmail.title = What is the email address of {0}?
 liaisonOfficerEmail.heading = What is the email address of {0}?
 liaisonOfficerEmail.hint = This is the email address that HMRC will use to contact the liaison officer
 liaisonOfficerEmail.error.required = Enter the email address of the liaison officer you’re adding. Use a name, @ symbol and a domain name, like yourname@example.com
 liaisonOfficerEmail.error.invalid = Enter an email address in the correct format. Use a name, @ symbol and a domain name, like yourname@example.com
+liaisonOfficerEmail.checkYourAnswersLabel = Email address
+liaisonOfficerEmail.change.hidden = email address
 
 liaisonOfficerPhoneNumber.title = What is {0}’s phone number?
 liaisonOfficerPhoneNumber.heading = What is {0}’s phone number?
@@ -202,6 +215,8 @@ liaisonOfficerPhoneNumber.error.required = Enter the phone number of the liaison
 liaisonOfficerPhoneNumber.error.invalid = The phone number must not include letters a to z, hyphens or apostrophes and must be a UK phone number, like 01642 123 456 or 07777 777 777
 liaisonOfficerPhoneNumber.error.tooLong = The phone number you have entered is too long. Enter a UK phone number, like 01642 123 456 or 07777 777 777
 liaisonOfficerPhoneNumber.error.tooShort = The phone number you have entered is too short. Enter a UK phone number, like 01642 123 456 or 07777 777 777
+liaisonOfficerPhoneNumber.checkYourAnswersLabel = UK phone number
+liaisonOfficerPhoneNumber.change.hidden = uk phone number
 
 liaisonOfficerCommunication.title = How should we communicate with {0}?
 liaisonOfficerCommunication.heading = How should we communicate with {0}?
@@ -210,6 +225,14 @@ liaisonOfficerCommunication.byEmail = By email
 liaisonOfficerCommunication.byPhone = By phone
 liaisonOfficerCommunication.byPost = By post
 liaisonOfficerCommunication.error.required = Select the ways you want HMRC to communicate with this liaison officer
+liaisonOfficerCommunication.checkYourAnswersLabel = Communication preferences
+liaisonOfficerCommunication.change.hidden = communication preferences
+liaisonOfficerCheckYourAnswers.title = Check liaison officer details
+liaisonOfficerCheckYourAnswers.heading = Check liaison officer details
+
+removeLiaisonOfficer.title = Are you sure you want to remove {0} as a liaison officer?
+removeLiaisonOfficer.heading = Are you sure you want to remove {0} as a liaison officer?
+removeLiaisonOfficer.error.required = Select yes if you want to remove this liaison officer
 
 unauthorised.title = You cannot access this service
 unauthorised.heading = You cannot access this service

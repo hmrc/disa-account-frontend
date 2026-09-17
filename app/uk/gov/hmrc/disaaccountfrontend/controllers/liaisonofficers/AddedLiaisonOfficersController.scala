@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.controllers.signatories
+package uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.disaaccountfrontend.config.AppConfig
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction, PageGuardAction}
-import uk.gov.hmrc.disaaccountfrontend.controllers.routes.ChangeOfCircumstancesController
 import uk.gov.hmrc.disaaccountfrontend.forms.generic.YesNoAnswerFormProvider
-import uk.gov.hmrc.disaaccountfrontend.models.pages.signatories.AddedSignatoryPage
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
 import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator
-import uk.gov.hmrc.disaaccountfrontend.viewmodels.checkAnswers.signatories.AddedSignatoriesSummary
-import uk.gov.hmrc.disaaccountfrontend.views.html.signatories.AddedSignatoryView
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.disaaccountfrontend.viewmodels.checkAnswers.liaisonofficers.AddedLiaisonOfficersSummary
+import uk.gov.hmrc.disaaccountfrontend.controllers.routes.ChangeOfCircumstancesController
+import uk.gov.hmrc.disaaccountfrontend.models.pages.liaisonofficers.AddedLiaisonOfficerPage
+import uk.gov.hmrc.disaaccountfrontend.views.html.liaisonofficers.AddedLiaisonOfficersView
 
 import javax.inject.Inject
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
-class AddedSignatoryController @Inject() (
+class AddedLiaisonOfficersController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
@@ -40,12 +40,12 @@ class AddedSignatoryController @Inject() (
   navigator: Navigator,
   appConfig: AppConfig,
   val controllerComponents: MessagesControllerComponents,
-  view: AddedSignatoryView
+  view: AddedLiaisonOfficersView
 ) extends FrontendBaseController
     with I18nSupport {
 
-  private val form       = formProvider("addedSignatory.error.required")
-  private val pageAction = identify andThen getData andThen guardPage(AddedSignatoryPage)
+  private val form       = formProvider("addedLiaisonOfficer.error.required")
+  private val pageAction = identify andThen getData andThen guardPage(AddedLiaisonOfficerPage)
 
   def onPageLoad(): Action[AnyContent] = pageAction { implicit request =>
     Ok(view(form, summary))
@@ -61,14 +61,14 @@ class AddedSignatoryController @Inject() (
         .bindFromRequest()
         .fold(
           formWithErrors => BadRequest(view(formWithErrors, pageSummary)),
-          answer => Redirect(navigator.nextPageFromAddedSignatories(answer))
+          answer => Redirect(navigator.nextPageFromAddedLiaisonOfficer(answer))
         )
     }
   }
 
-  private def summary(implicit request: DataRequest[_]): AddedSignatoriesSummary =
-    AddedSignatoriesSummary(
-      signatories = request.effectiveAnswers.signatories.fold(Seq.empty)(_.signatories),
-      maxSignatories = appConfig.maxSignatories
+  private def summary(implicit request: DataRequest[_]): AddedLiaisonOfficersSummary =
+    AddedLiaisonOfficersSummary(
+      liaisonOfficers = request.effectiveAnswers.liaisonOfficers.fold(Seq.empty)(_.liaisonOfficers),
+      maxOfficers = appConfig.maxLiaisonOfficers
     )
 }
