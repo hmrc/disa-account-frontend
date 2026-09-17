@@ -37,7 +37,7 @@ object ChangeInformationSelection extends Enumerable.Implicits {
     ViewAllInformation
   )
 
-  val viewAllInformationFormValue = ViewAllInformation.toString
+  val viewAllInformationFormValue: String = ViewAllInformation.toString
 
   def availableValues(isSignatory: Boolean): Seq[ChangeInformationSelection] =
     values.filterNot(selection =>

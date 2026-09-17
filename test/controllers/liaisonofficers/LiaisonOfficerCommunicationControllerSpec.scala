@@ -32,17 +32,6 @@ import scala.concurrent.Future
 
 class LiaisonOfficerCommunicationControllerSpec extends BaseUnitSpec {
 
-  private val existingId   = "existing-id"
-  private val existingName = "Joe Bloggs"
-
-  private val existingOfficer = LiaisonOfficer(
-    id = existingId,
-    fullName = Some(existingName),
-    phoneNumber = Some("07777777777"),
-    communication = Set(ByEmail, ByPhone),
-    email = Some("old@example.com")
-  )
-
   private val otherOfficer = LiaisonOfficer(
     id = "other-id",
     fullName = Some("Other Person"),
@@ -51,7 +40,7 @@ class LiaisonOfficerCommunicationControllerSpec extends BaseUnitSpec {
     email = Some("other@example.com")
   )
 
-  private val answers = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(otherOfficer, existingOfficer))))
+  private val answers = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(otherOfficer, testLiaisonOfficer))))
 
   "LiaisonOfficerCommunicationController.onPageLoad" should {
 
@@ -59,18 +48,19 @@ class LiaisonOfficerCommunicationControllerSpec extends BaseUnitSpec {
       val application = applicationBuilder(effectiveAnswers = answers).build()
 
       running(application) {
-        val result = route(application, FakeRequest(GET, liaisonOfficerCommunicationEndpointFor(existingId))).value
+        val result =
+          route(application, FakeRequest(GET, liaisonOfficerCommunicationEndpointFor(testLiaisonOfficerId))).value
         val doc    = Jsoup.parse(contentAsString(result))
 
         status(result)                            shouldBe OK
-        doc.title()                               shouldBe "How should we communicate with Joe Bloggs? - Manage ISAs - GOV.UK"
-        doc.select("h1").text()                   shouldBe "How should we communicate with Joe Bloggs?"
+        doc.title()                               shouldBe "How should we communicate with Jane Smith? - Manage ISAs - GOV.UK"
+        doc.select("h1").text()                   shouldBe "How should we communicate with Jane Smith?"
         doc.text()                                  should include("Select all that apply")
         doc.text()                                  should include("By email")
         doc.text()                                  should include("By phone")
         doc.text()                                  should include("By post")
         doc.text()                                  should not include "Liaison officers"
-        doc.select("form").attr("action")         shouldBe liaisonOfficerCommunicationEndpointFor(existingId)
+        doc.select("form").attr("action")         shouldBe liaisonOfficerCommunicationEndpointFor(testLiaisonOfficerId)
         doc.select("form").attr("autocomplete")   shouldBe "off"
         doc.select("button").text()               shouldBe "Continue"
         doc.select("input[type=checkbox]").size() shouldBe 3
@@ -82,11 +72,11 @@ class LiaisonOfficerCommunicationControllerSpec extends BaseUnitSpec {
 
       running(application) {
         val result =
-          route(application, FakeRequest(GET, changeLiaisonOfficerCommunicationEndpointFor(existingId))).value
+          route(application, FakeRequest(GET, changeLiaisonOfficerCommunicationEndpointFor(testLiaisonOfficerId))).value
         val doc    = Jsoup.parse(contentAsString(result))
 
         status(result)                    shouldBe OK
-        doc.select("form").attr("action") shouldBe changeLiaisonOfficerCommunicationEndpointFor(existingId)
+        doc.select("form").attr("action") shouldBe changeLiaisonOfficerCommunicationEndpointFor(testLiaisonOfficerId)
       }
     }
 
@@ -94,7 +84,8 @@ class LiaisonOfficerCommunicationControllerSpec extends BaseUnitSpec {
       val application = applicationBuilder(effectiveAnswers = answers).build()
 
       running(application) {
-        val result         = route(application, FakeRequest(GET, liaisonOfficerCommunicationEndpointFor(existingId))).value
+        val result         =
+          route(application, FakeRequest(GET, liaisonOfficerCommunicationEndpointFor(testLiaisonOfficerId))).value
         val doc            = Jsoup.parse(contentAsString(result))
         val selectedValues = doc.select("input[type=checkbox][checked]").eachAttr("value")
 
@@ -105,12 +96,13 @@ class LiaisonOfficerCommunicationControllerSpec extends BaseUnitSpec {
 
     "render all options unselected when no communication options have been saved" in {
       val answersWithoutCommunication = Answers(
-        liaisonOfficers = Some(LiaisonOfficers(Seq(existingOfficer.copy(communication = Set.empty))))
+        liaisonOfficers = Some(LiaisonOfficers(Seq(testLiaisonOfficer.copy(communication = Set.empty))))
       )
       val application                 = applicationBuilder(effectiveAnswers = answersWithoutCommunication).build()
 
       running(application) {
-        val result = route(application, FakeRequest(GET, liaisonOfficerCommunicationEndpointFor(existingId))).value
+        val result =
+          route(application, FakeRequest(GET, liaisonOfficerCommunicationEndpointFor(testLiaisonOfficerId))).value
         val doc    = Jsoup.parse(contentAsString(result))
 
         status(result)                                     shouldBe OK
@@ -126,7 +118,8 @@ class LiaisonOfficerCommunicationControllerSpec extends BaseUnitSpec {
       ).build()
 
       running(application) {
-        val result = route(application, FakeRequest(GET, liaisonOfficerCommunicationEndpointFor(existingId))).value
+        val result =
+          route(application, FakeRequest(GET, liaisonOfficerCommunicationEndpointFor(testLiaisonOfficerId))).value
 
         status(result)                 shouldBe SEE_OTHER
         redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
@@ -134,13 +127,14 @@ class LiaisonOfficerCommunicationControllerSpec extends BaseUnitSpec {
     }
 
     "redirect to change of circumstances when the identified liaison officer has no phone number" in {
-      val officerWithoutPhoneNumber = existingOfficer.copy(phoneNumber = None)
+      val officerWithoutPhoneNumber = testLiaisonOfficer.copy(phoneNumber = None)
       val application               = applicationBuilder(
         effectiveAnswers = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(officerWithoutPhoneNumber))))
       ).build()
 
       running(application) {
-        val result = route(application, FakeRequest(GET, liaisonOfficerCommunicationEndpointFor(existingId))).value
+        val result =
+          route(application, FakeRequest(GET, liaisonOfficerCommunicationEndpointFor(testLiaisonOfficerId))).value
 
         status(result)                 shouldBe SEE_OTHER
         redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
@@ -160,20 +154,20 @@ class LiaisonOfficerCommunicationControllerSpec extends BaseUnitSpec {
       ).build()
 
       running(application) {
-        val request = FakeRequest(POST, liaisonOfficerCommunicationEndpointFor(existingId))
+        val request = FakeRequest(POST, liaisonOfficerCommunicationEndpointFor(testLiaisonOfficerId))
           .withFormUrlEncodedBody("value[0]" -> "byEmail", "value[1]" -> "byPost")
           .withHeaders("Csrf-Token" -> "nocheck")
         val result  = route(application, request).value
 
         status(result)                 shouldBe SEE_OTHER
-        redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
+        redirectLocation(result).value shouldBe s"$checkLiaisonOfficerDetailsEndpoint?id=$testLiaisonOfficerId"
 
         val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
         verify(mockUserAnswersRepository).set(captor.capture())
         captor.getValue.id      shouldBe testSessionId
         captor.getValue.updates shouldBe existingUpdates.copy(
           liaisonOfficers = Assign(
-            LiaisonOfficers(Seq(otherOfficer, existingOfficer.copy(communication = Set(ByEmail, ByPost))))
+            LiaisonOfficers(Seq(otherOfficer, testLiaisonOfficer.copy(communication = Set(ByEmail, ByPost))))
           )
         )
       }
@@ -184,7 +178,7 @@ class LiaisonOfficerCommunicationControllerSpec extends BaseUnitSpec {
       val application = applicationBuilder(effectiveAnswers = answers).build()
 
       running(application) {
-        val request = FakeRequest(POST, liaisonOfficerCommunicationEndpointFor(existingId))
+        val request = FakeRequest(POST, liaisonOfficerCommunicationEndpointFor(testLiaisonOfficerId))
           .withFormUrlEncodedBody(
             "value[0]" -> "byEmail",
             "value[1]" -> "byPhone",
@@ -194,12 +188,12 @@ class LiaisonOfficerCommunicationControllerSpec extends BaseUnitSpec {
         val result  = route(application, request).value
 
         status(result)                 shouldBe SEE_OTHER
-        redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
+        redirectLocation(result).value shouldBe s"$checkLiaisonOfficerDetailsEndpoint?id=$testLiaisonOfficerId"
 
         val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
         verify(mockUserAnswersRepository).set(captor.capture())
         captor.getValue.updates.liaisonOfficers shouldBe Assign(
-          LiaisonOfficers(Seq(otherOfficer, existingOfficer.copy(communication = Set(ByEmail, ByPhone, ByPost))))
+          LiaisonOfficers(Seq(otherOfficer, testLiaisonOfficer.copy(communication = Set(ByEmail, ByPhone, ByPost))))
         )
       }
     }
@@ -209,13 +203,13 @@ class LiaisonOfficerCommunicationControllerSpec extends BaseUnitSpec {
       val application = applicationBuilder(effectiveAnswers = answers).build()
 
       running(application) {
-        val request = FakeRequest(POST, changeLiaisonOfficerCommunicationEndpointFor(existingId))
+        val request = FakeRequest(POST, changeLiaisonOfficerCommunicationEndpointFor(testLiaisonOfficerId))
           .withFormUrlEncodedBody("value[0]" -> "byPhone")
           .withHeaders("Csrf-Token" -> "nocheck")
         val result  = route(application, request).value
 
         status(result)                 shouldBe SEE_OTHER
-        redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
+        redirectLocation(result).value shouldBe s"$checkLiaisonOfficerDetailsEndpoint?id=$testLiaisonOfficerId"
         verify(mockUserAnswersRepository).set(any())
       }
     }
@@ -224,7 +218,7 @@ class LiaisonOfficerCommunicationControllerSpec extends BaseUnitSpec {
       val application = applicationBuilder(effectiveAnswers = answers).build()
 
       running(application) {
-        val request = FakeRequest(POST, liaisonOfficerCommunicationEndpointFor(existingId))
+        val request = FakeRequest(POST, liaisonOfficerCommunicationEndpointFor(testLiaisonOfficerId))
           .withHeaders("Csrf-Token" -> "nocheck")
         val result  = route(application, request).value
         val doc     = Jsoup.parse(contentAsString(result))
@@ -242,7 +236,7 @@ class LiaisonOfficerCommunicationControllerSpec extends BaseUnitSpec {
       val application = applicationBuilder(effectiveAnswers = Answers()).build()
 
       running(application) {
-        val request = FakeRequest(POST, liaisonOfficerCommunicationEndpointFor(existingId))
+        val request = FakeRequest(POST, liaisonOfficerCommunicationEndpointFor(testLiaisonOfficerId))
           .withFormUrlEncodedBody("value[0]" -> "byEmail")
           .withHeaders("Csrf-Token" -> "nocheck")
         val result  = route(application, request).value

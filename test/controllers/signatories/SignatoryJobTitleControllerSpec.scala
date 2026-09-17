@@ -33,7 +33,7 @@ class SignatoryJobTitleControllerSpec extends BaseUnitSpec {
 
   val validFormData: Map[String, String] = Map("value" -> testSignatoryJobTitle)
 
-  val existingSignatory: Signatory = Signatory(testSignatoryId, fullName = Some(testSignatoryName))
+  val existingSignatory: Signatory = Signatory(testSignatoryId, fullName = Some(testName))
 
   "SignatoryJobTitleController.onPageLoad" should {
 
@@ -46,7 +46,7 @@ class SignatoryJobTitleControllerSpec extends BaseUnitSpec {
         val result = route(application, FakeRequest(GET, s"$signatoryJobTitleEndpoint?id=$testSignatoryId")).value
 
         status(result)        shouldBe OK
-        contentAsString(result) should include(testSignatoryName)
+        contentAsString(result) should include(testName)
       }
     }
 
@@ -63,7 +63,7 @@ class SignatoryJobTitleControllerSpec extends BaseUnitSpec {
 
         status(result)                         shouldBe OK
         contentAsString(result)                  should include(testSignatoryJobTitle)
-        doc.title()                            shouldBe s"What is the job title of $testSignatoryName within the organisation? - Manage ISAs - GOV.UK"
+        doc.title()                            shouldBe s"What is the job title of $testName within the organisation? - Manage ISAs - GOV.UK"
         doc.select(".govuk-caption-l").isEmpty shouldBe true
       }
     }
@@ -175,7 +175,7 @@ class SignatoryJobTitleControllerSpec extends BaseUnitSpec {
         val result = route(application, request).value
 
         status(result)        shouldBe BAD_REQUEST
-        contentAsString(result) should include(testSignatoryName)
+        contentAsString(result) should include(testName)
         verify(mockUserAnswersRepository, never).set(any())
       }
     }

@@ -24,7 +24,7 @@ import play.api.inject.bind
 import play.api.test.Helpers.*
 import play.api.test.FakeRequest
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
-import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficerCommunication.{ByEmail, ByPhone}
+import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficerCommunication.ByEmail
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates, UserAnswers}
 import uk.gov.hmrc.disaaccountfrontend.utils.UuidGenerator
@@ -33,16 +33,6 @@ import utils.BaseUnitSpec
 import scala.concurrent.Future
 
 class LiaisonOfficerNameControllerSpec extends BaseUnitSpec {
-
-  private val existingId = "existing-id"
-
-  private val existingOfficer = LiaisonOfficer(
-    id = existingId,
-    fullName = Some("Old Name"),
-    phoneNumber = Some("07777777777"),
-    communication = Set(ByEmail, ByPhone),
-    email = Some("old.name@example.com")
-  )
 
   private val otherOfficers = (1 until 15).map { index =>
     LiaisonOfficer(
@@ -54,7 +44,7 @@ class LiaisonOfficerNameControllerSpec extends BaseUnitSpec {
     )
   }
 
-  private val officersAtLimit = LiaisonOfficers(otherOfficers :+ existingOfficer)
+  private val officersAtLimit = LiaisonOfficers(otherOfficers :+ testLiaisonOfficer)
 
   "LiaisonOfficerNameController.onPageLoad" should {
 
@@ -135,7 +125,7 @@ class LiaisonOfficerNameControllerSpec extends BaseUnitSpec {
       val application = applicationBuilder().build()
 
       running(application) {
-        val result = route(application, FakeRequest(GET, liaisonOfficerNameEndpointFor(existingId))).value
+        val result = route(application, FakeRequest(GET, liaisonOfficerNameEndpointFor(testLiaisonOfficerId))).value
         val doc    = Jsoup.parse(contentAsString(result))
 
         status(result)              shouldBe OK
@@ -156,25 +146,26 @@ class LiaisonOfficerNameControllerSpec extends BaseUnitSpec {
       ).build()
 
       running(application) {
-        val result = route(application, FakeRequest(GET, liaisonOfficerNameEndpointFor(existingId))).value
+        val result = route(application, FakeRequest(GET, liaisonOfficerNameEndpointFor(testLiaisonOfficerId))).value
         val doc    = Jsoup.parse(contentAsString(result))
 
         status(result)                                shouldBe OK
-        doc.select("input[name=value]").attr("value") shouldBe "Old Name"
+        doc.select("input[name=value]").attr("value") shouldBe "Jane Smith"
       }
     }
 
     "use the check-mode form action when arriving from check your answers" in {
       val application = applicationBuilder(
-        effectiveAnswers = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(existingOfficer))))
+        effectiveAnswers = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(testLiaisonOfficer))))
       ).build()
 
       running(application) {
-        val result = route(application, FakeRequest(GET, changeLiaisonOfficerNameEndpointFor(existingId))).value
+        val result =
+          route(application, FakeRequest(GET, changeLiaisonOfficerNameEndpointFor(testLiaisonOfficerId))).value
         val doc    = Jsoup.parse(contentAsString(result))
 
         status(result)                    shouldBe OK
-        doc.select("form").attr("action") shouldBe changeLiaisonOfficerNameEndpointFor(existingId)
+        doc.select("form").attr("action") shouldBe changeLiaisonOfficerNameEndpointFor(testLiaisonOfficerId)
       }
     }
 
@@ -205,13 +196,13 @@ class LiaisonOfficerNameControllerSpec extends BaseUnitSpec {
       ).build()
 
       running(application) {
-        val request = FakeRequest(POST, liaisonOfficerNameEndpointFor(existingId))
+        val request = FakeRequest(POST, liaisonOfficerNameEndpointFor(testLiaisonOfficerId))
           .withFormUrlEncodedBody("value" -> "  Updated Name  ")
           .withHeaders("Csrf-Token" -> "nocheck")
         val result  = route(application, request).value
 
         status(result)                 shouldBe SEE_OTHER
-        redirectLocation(result).value shouldBe liaisonOfficerEmailEndpointFor(existingId)
+        redirectLocation(result).value shouldBe liaisonOfficerEmailEndpointFor(testLiaisonOfficerId)
 
         val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
         verify(mockUserAnswersRepository).set(captor.capture())
@@ -220,8 +211,8 @@ class LiaisonOfficerNameControllerSpec extends BaseUnitSpec {
           liaisonOfficers = Assign(
             officersAtLimit.copy(
               liaisonOfficers = officersAtLimit.liaisonOfficers.map {
-                case officer if officer.id == existingId => officer.copy(fullName = Some("Updated Name"))
-                case officer                             => officer
+                case officer if officer.id == testLiaisonOfficerId => officer.copy(fullName = Some("Updated Name"))
+                case officer                                       => officer
               }
             )
           )
@@ -259,17 +250,17 @@ class LiaisonOfficerNameControllerSpec extends BaseUnitSpec {
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
 
       val application = applicationBuilder(
-        effectiveAnswers = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(existingOfficer))))
+        effectiveAnswers = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(testLiaisonOfficer))))
       ).build()
 
       running(application) {
-        val request = FakeRequest(POST, changeLiaisonOfficerNameEndpointFor(existingId))
+        val request = FakeRequest(POST, changeLiaisonOfficerNameEndpointFor(testLiaisonOfficerId))
           .withFormUrlEncodedBody("value" -> "Updated Name")
           .withHeaders("Csrf-Token" -> "nocheck")
         val result  = route(application, request).value
 
         status(result)                 shouldBe SEE_OTHER
-        redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
+        redirectLocation(result).value shouldBe s"$checkLiaisonOfficerDetailsEndpoint?id=$testLiaisonOfficerId"
         verify(mockUserAnswersRepository).set(any())
       }
     }
@@ -295,7 +286,7 @@ class LiaisonOfficerNameControllerSpec extends BaseUnitSpec {
       val application = applicationBuilder().build()
 
       running(application) {
-        val request = FakeRequest(POST, liaisonOfficerNameEndpointFor(existingId))
+        val request = FakeRequest(POST, liaisonOfficerNameEndpointFor(testLiaisonOfficerId))
           .withFormUrlEncodedBody("value" -> "   ")
           .withHeaders("Csrf-Token" -> "nocheck")
         val result  = route(application, request).value
@@ -310,7 +301,7 @@ class LiaisonOfficerNameControllerSpec extends BaseUnitSpec {
       val application = applicationBuilder().build()
 
       running(application) {
-        val request = FakeRequest(POST, liaisonOfficerNameEndpointFor(existingId))
+        val request = FakeRequest(POST, liaisonOfficerNameEndpointFor(testLiaisonOfficerId))
           .withFormUrlEncodedBody("value" -> "Jane Smith 2")
           .withHeaders("Csrf-Token" -> "nocheck")
         val result  = route(application, request).value

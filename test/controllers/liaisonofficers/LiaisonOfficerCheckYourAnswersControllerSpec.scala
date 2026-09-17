@@ -14,25 +14,23 @@
  * limitations under the License.
  */
 
-package controllers.signatories
+package controllers.liaisonofficers
 
 import org.jsoup.Jsoup
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.disaaccountfrontend.models.Answers
-import uk.gov.hmrc.disaaccountfrontend.models.signatories.{Signatories, Signatory}
+import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficers
 import utils.BaseUnitSpec
 
-class SignatoryCheckYourAnswersControllerSpec extends BaseUnitSpec {
+class LiaisonOfficerCheckYourAnswersControllerSpec extends BaseUnitSpec {
 
-  private val signatory = Signatory(testSignatoryId, Some(testName), Some(testSignatoryJobTitle))
-  private val url       = s"$checkSignatoryDetailsEndpoint?id=$testSignatoryId"
+  private val url = s"$checkLiaisonOfficerDetailsEndpoint?id=$testLiaisonOfficerId"
 
-  "SignatoryCheckYourAnswersController.onPageLoad" should {
-
-    "render the matching signatory details and change links" in {
+  "LiaisonOfficerCheckYourAnswersController.onPageLoad" should {
+    "render the matching liaison officer details and change links" in {
       val application = applicationBuilder(
-        effectiveAnswers = Answers(signatories = Some(Signatories(Seq(signatory))))
+        effectiveAnswers = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(testLiaisonOfficer))))
       ).build()
 
       running(application) {
@@ -40,30 +38,30 @@ class SignatoryCheckYourAnswersControllerSpec extends BaseUnitSpec {
         val doc    = Jsoup.parse(contentAsString(result))
 
         status(result)                         shouldBe OK
-        doc.title()                            shouldBe "Check signatory details - Manage ISAs - GOV.UK"
-        doc.select("h1").text()                shouldBe "Check signatory details"
+        doc.title()                            shouldBe "Check liaison officer details - Manage ISAs - GOV.UK"
+        doc.select("h1").text()                shouldBe "Check liaison officer details"
         doc.text()                               should include(testName)
-        doc.text()                               should include(testSignatoryJobTitle)
+        doc.text()                               should include(testEmail)
         doc.text()                               should include("Name")
-        doc.text()                               should include("Job title within organisation")
+        doc.text()                               should include("Communication preferences")
         doc.select(".govuk-caption-l").isEmpty shouldBe true
 
         val links = doc.select(".govuk-summary-list__actions a")
-        links.get(0).attr("href") shouldBe s"$changeSignatoryNameEndpoint?id=$testSignatoryId"
-        links.get(0).text()       shouldBe "Change name of signatory"
-        links.get(1).attr("href") shouldBe s"$changeSignatoryJobTitleEndpoint?id=$testSignatoryId"
-        links.get(1).text()       shouldBe "Change job title"
+        links.get(0).attr("href") shouldBe s"$changeLiaisonOfficerNameEndpoint?id=$testLiaisonOfficerId"
+        links.get(0).text()       shouldBe "Change name of liaison officer"
+        links.get(2).attr("href") shouldBe s"$changeLiaisonOfficerPhoneNumberEndpoint?id=$testLiaisonOfficerId"
+        links.get(2).text()       shouldBe "Change uk phone number"
 
         val continue = doc.select("a.govuk-button")
         continue.text()       shouldBe "Continue"
-        continue.attr("href") shouldBe addedSignatoriesEndpoint
+        continue.attr("href") shouldBe addedLiaisonOfficerEndpoint
         doc.text()              should include("Is this page not working properly?")
       }
     }
 
-    "redirect when the signatory cannot be found" in {
+    "redirect when the liaison officer cannot be found" in {
       val application =
-        applicationBuilder(effectiveAnswers = Answers(signatories = Some(Signatories(Seq.empty)))).build()
+        applicationBuilder(effectiveAnswers = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq.empty)))).build()
 
       running(application) {
         val result = route(application, FakeRequest(GET, url)).value
@@ -74,9 +72,9 @@ class SignatoryCheckYourAnswersControllerSpec extends BaseUnitSpec {
     }
 
     "redirect when the signatory details are incomplete" in {
-      val incomplete  = signatory.copy(jobTitle = None)
+      val incomplete  = testLiaisonOfficer.copy(communication = Set.empty)
       val application = applicationBuilder(
-        effectiveAnswers = Answers(signatories = Some(Signatories(Seq(incomplete))))
+        effectiveAnswers = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(incomplete))))
       ).build()
 
       running(application) {
@@ -86,5 +84,6 @@ class SignatoryCheckYourAnswersControllerSpec extends BaseUnitSpec {
         redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
       }
     }
+
   }
 }

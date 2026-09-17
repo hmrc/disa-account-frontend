@@ -20,7 +20,7 @@ import play.api.test.FakeRequest
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficerCommunication.{ByEmail, ByPhone}
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
-import uk.gov.hmrc.disaaccountfrontend.models.pages.LiaisonOfficerPhoneNumberPage
+import uk.gov.hmrc.disaaccountfrontend.models.pages.liaisonofficers.LiaisonOfficerPhoneNumberPage
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates, UserAnswers}
 import utils.BaseUnitSpec

@@ -14,21 +14,24 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.models.pages
+package uk.gov.hmrc.disaaccountfrontend.models.pages.signatories
 
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
-import uk.gov.hmrc.disaaccountfrontend.models.{Mode, NormalMode, SessionUpdates}
+import uk.gov.hmrc.disaaccountfrontend.models.pages.PageWithAnswers
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
 import uk.gov.hmrc.disaaccountfrontend.models.signatories.Signatories
+import uk.gov.hmrc.disaaccountfrontend.models.{Mode, NormalMode, SessionUpdates}
 
-case class SignatoryJobTitlePage(id: String, mode: Mode = NormalMode) extends PageWithAnswers[String] {
+case class SignatoryNamePage(id: String, mode: Mode = NormalMode) extends PageWithAnswers[String] {
 
   def saveAnswerAndHandleDependents(request: DataRequest[_], newAnswer: String): SessionUpdates = {
     val existingUpdates    = request.sessionAnswers.fold(SessionUpdates())(_.updates)
-    val updatedSignatories = request.effectiveAnswers.signatories
-      .getOrElse(Signatories())
-      .upsertJobTitle(id, newAnswer, mode)
+    val updatedSignatories =
+      request.effectiveAnswers.signatories
+        .getOrElse(Signatories())
+        .upsertName(id, newAnswer, mode)
 
     existingUpdates.copy(signatories = Assign(updatedSignatories))
+
   }
 }

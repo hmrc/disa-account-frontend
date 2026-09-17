@@ -26,7 +26,7 @@ import uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority.{Certifica
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.{CrowdFundedDebentures, PeertopeerLoansAndHave36hPermissions}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct.{CashIsas, InnovativeFinanceIsas}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
-import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficerCommunication.ByEmail
+import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficerCommunication.{ByEmail, ByPhone}
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
 import uk.gov.hmrc.disaaccountfrontend.models.registration.{OrganisationDetails, OrganisationEmail, RegistrationDetails}
 import uk.gov.hmrc.disaaccountfrontend.models.signatories.{Signatories, Signatory}
@@ -86,23 +86,23 @@ trait TestData {
 
   val testFinancialOrganisationSelections: Seq[FinancialOrganisation] =
     Seq(BuildingSociety, InsuranceCompany)
+  val testFcaArticlesCheckedBoxes: Seq[FcaArticles]                   = Seq(FcaArticle14, FcaArticle64)
 
-  val testFcaArticlesCheckedBoxes: Seq[FcaArticles] = Seq(FcaArticle14, FcaArticle64)
-
+  val testName: String                     = "Jane Smith"
+  val testEmail: String                    = "jane.smith@example.com"
+  val testLiaisonOfficerId: String         = "liaison-officer-1"
+  val testLiaisonOfficer                   = LiaisonOfficer(
+    id = testLiaisonOfficerId,
+    fullName = Some(testName),
+    phoneNumber = Some("07777777777"),
+    communication = Set(ByEmail, ByPhone),
+    email = Some(testEmail)
+  )
   val testLiaisonOfficers: LiaisonOfficers = LiaisonOfficers(
-    Seq(
-      LiaisonOfficer(
-        id = "liaison-officer-1",
-        fullName = Some("Jane Smith"),
-        phoneNumber = Some("07777777777"),
-        communication = Set(ByEmail),
-        email = Some("jane.smith@example.com")
-      )
-    )
+    Seq(testLiaisonOfficer)
   )
 
   val testSignatoryId: String       = "signatory-1"
-  val testSignatoryName: String     = "Jane Smith"
   val testSignatoryJobTitle: String = "Director"
   val testSignatoryEmail: String    = "signatory@example.com"
 
@@ -110,7 +110,7 @@ trait TestData {
     Seq(
       Signatory(
         id = testSignatoryId,
-        fullName = Some(testSignatoryName),
+        fullName = Some(testName),
         jobTitle = Some(testSignatoryJobTitle),
         email = Some(testSignatoryEmail)
       )

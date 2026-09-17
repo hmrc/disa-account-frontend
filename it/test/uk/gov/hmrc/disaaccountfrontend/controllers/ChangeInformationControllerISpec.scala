@@ -84,7 +84,7 @@ class ChangeInformationControllerISpec extends BaseIntegrationSpec {
             "signatories" -> Json.arr(
               Json.obj(
                 "id"       -> testSignatoryId,
-                "fullName" -> testSignatoryName,
+                "fullName" -> testName,
                 "jobTitle" -> testSignatoryJobTitle,
                 "email"    -> testSignatoryEmail
               )

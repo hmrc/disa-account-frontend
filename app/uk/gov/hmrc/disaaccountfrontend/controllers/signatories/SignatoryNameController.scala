@@ -24,9 +24,9 @@ import uk.gov.hmrc.disaaccountfrontend.config.AppConfig
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction}
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes.ChangeOfCircumstancesController
 import uk.gov.hmrc.disaaccountfrontend.forms.SignatoryNameFormProvider
+import uk.gov.hmrc.disaaccountfrontend.models.pages.signatories.SignatoryNamePage
 import uk.gov.hmrc.disaaccountfrontend.models.signatories.Signatory
 import uk.gov.hmrc.disaaccountfrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
-import uk.gov.hmrc.disaaccountfrontend.models.pages.SignatoryNamePage
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
 import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
