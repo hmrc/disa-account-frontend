@@ -33,7 +33,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.stubControllerComponents
 import play.api.test.{DefaultAwaitTimeout, FakeRequest}
 import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.disaaccountfrontend.config.AppConfig
+import uk.gov.hmrc.disaaccountfrontend.config.{AppConfig, InternalAuthTokenInitialiser, NoOpInternalAuthTokenInitialiser}
 import uk.gov.hmrc.disaaccountfrontend.connectors.{EmailVerificationConnector, RegistrationConnector, ReportingWindowConnector}
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{AuthenticatedIdentifierAction, DataRetrievalAction, IdentifierAction}
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, UserAnswers}
@@ -103,7 +103,8 @@ abstract class BaseUnitSpec
       bind[AppConfig].toInstance(mockAppConfig),
       bind[RegistrationConnector].toInstance(mockRegistrationConnector),
       bind[UserAnswersRepository].toInstance(mockUserAnswersRepository),
-      bind[IdentifierAction].to[AuthenticatedIdentifierAction]
+      bind[IdentifierAction].to[AuthenticatedIdentifierAction],
+      bind[InternalAuthTokenInitialiser].to[NoOpInternalAuthTokenInitialiser]
     )
     .build()
 
@@ -133,7 +134,8 @@ abstract class BaseUnitSpec
         bind[UserAnswersRepository].toInstance(mockUserAnswersRepository),
         bind[EmailVerificationConnector].toInstance(mockEmailVerificationConnector),
         bind[RegistrationConnector].toInstance(mockRegistrationConnector),
-        bind[ReportingWindowConnector].toInstance(mockReportingWindowConnector)
+        bind[ReportingWindowConnector].toInstance(mockReportingWindowConnector),
+        bind[InternalAuthTokenInitialiser].to[NoOpInternalAuthTokenInitialiser]
       )
   }
 
