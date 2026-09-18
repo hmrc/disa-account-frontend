@@ -122,6 +122,7 @@ abstract class BaseUnitSpec
           .toInstance(new FakeIdentifierAction(bodyParsers, zReference, credentialId, sessionId, email)),
         bind[DataRetrievalAction]
           .toInstance(new FakeDataRetrievalAction(effectiveAnswers, sessionAnswers, originalAnswers)),
+        bind[RegistrationConnector].toInstance(mockRegistrationConnector),
         bind[UserAnswersRepository].toInstance(mockUserAnswersRepository),
         bind[EmailVerificationConnector].toInstance(mockEmailVerificationConnector)
       )

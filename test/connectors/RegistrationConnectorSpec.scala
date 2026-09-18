@@ -17,10 +17,12 @@
 package uk.gov.hmrc.disaaccountfrontend.connectors
 
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
-import play.api.http.Status.{INTERNAL_SERVER_ERROR, NOT_FOUND}
-import uk.gov.hmrc.disaaccountfrontend.models.registration.RegistrationDetails
-import uk.gov.hmrc.http.{StringContextOps, UpstreamErrorResponse}
+import org.mockito.Mockito.{verify, when}
+import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND, OK}
+import play.api.libs.json.Json
+import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
+import uk.gov.hmrc.disaaccountfrontend.models.registration.{RegistrationDetails, UpdateRegistrationDetailsRequest}
+import uk.gov.hmrc.http.{HttpResponse, StringContextOps, UpstreamErrorResponse}
 import utils.BaseUnitSpec
 
 import scala.concurrent.Future
@@ -80,6 +82,33 @@ class RegistrationConnectorSpec extends BaseUnitSpec {
       val thrown = connector.getRegistrationDetails(testZref).failed.futureValue
 
       thrown shouldBe exception
+    }
+  }
+
+  "RegistrationConnector.updateRegistrationDetails" should {
+    "send the typed request and complete when the call succeeds" in new TestSetup {
+      val details = UpdateRegistrationDetailsRequest(tradingName = Some("Updated name"))
+      when(mockHttpClient.put(url"${disaAccountRegistrationEndpoint(testZref)}"))
+        .thenReturn(mockRequestBuilder)
+      when(mockRequestBuilder.withBody(Json.toJson(details))).thenReturn(mockRequestBuilder)
+      when(mockRequestBuilder.execute[Either[UpstreamErrorResponse, HttpResponse]](any(), any()))
+        .thenReturn(Future.successful(Right(HttpResponse(OK, ""))))
+
+      connector.updateRegistrationDetails(testZref, details).futureValue shouldBe (())
+
+      verify(mockRequestBuilder).withBody(Json.toJson(details))
+    }
+
+    "fail when the backend rejects the update" in new TestSetup {
+      val details = UpdateRegistrationDetailsRequest()
+      val error   = UpstreamErrorResponse("Bad request", BAD_REQUEST, BAD_REQUEST, Map.empty)
+      when(mockHttpClient.put(url"${disaAccountRegistrationEndpoint(testZref)}"))
+        .thenReturn(mockRequestBuilder)
+      when(mockRequestBuilder.withBody(Json.toJson(details))).thenReturn(mockRequestBuilder)
+      when(mockRequestBuilder.execute[Either[UpstreamErrorResponse, HttpResponse]](any(), any()))
+        .thenReturn(Future.successful(Left(error)))
+
+      connector.updateRegistrationDetails(testZref, details).failed.futureValue shouldBe error
     }
   }
 }

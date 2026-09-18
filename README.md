@@ -1,7 +1,7 @@
 
 # disa-account-frontend
 
-App Description to be confirmed
+This is the frontend service for managing accounts in Manage ISAs.
 
 ## Running the app
 
