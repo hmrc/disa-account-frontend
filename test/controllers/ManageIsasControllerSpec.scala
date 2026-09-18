@@ -37,7 +37,8 @@ class ManageIsasControllerSpec extends BaseUnitSpec {
     "http://localhost:1205/obligations/returns/isa/monthly-report-submission"
 
   private def application(windowOpen: Boolean, registrationDetails: Option[RegistrationDetails]) = {
-    when(mockRegistrationConnector.getRegistrationDetails(any())(any())).thenReturn(Future.successful(registrationDetails))
+    when(mockRegistrationConnector.getRegistrationDetails(any())(any()))
+      .thenReturn(Future.successful(registrationDetails))
     when(mockReportingWindowConnector.isReportingWindowOpen(any())(any())).thenReturn(Future.successful(windowOpen))
 
     applicationBuilder()
@@ -54,10 +55,10 @@ class ManageIsasControllerSpec extends BaseUnitSpec {
         val result = route(app, FakeRequest(GET, manageIsasEndpoint)).value
         val doc    = Jsoup.parse(contentAsString(result))
 
-        status(result)           shouldBe OK
-        doc.select("h1").text() shouldBe s"Manage $testCompanyName ISAs"
-        doc.text()                should include("The window for submitting your monthly report is now closed.")
-        doc.text()                should include("Reporting period for July is closed.")
+        status(result)                                   shouldBe OK
+        doc.select("h1").text()                          shouldBe s"Manage $testCompanyName ISAs"
+        doc.text()                                         should include("The window for submitting your monthly report is now closed.")
+        doc.text()                                         should include("Reporting period for July is closed.")
         doc.select(".govuk-notification-banner").isEmpty shouldBe true
       }
     }
@@ -69,16 +70,16 @@ class ManageIsasControllerSpec extends BaseUnitSpec {
         val result = route(app, FakeRequest(GET, manageIsasEndpoint)).value
         val doc    = Jsoup.parse(contentAsString(result))
 
-        status(result)           shouldBe OK
-        doc.select("h1").text() shouldBe s"Manage $testCompanyName ISAs"
-        doc.text()                should include(
+        status(result)                                   shouldBe OK
+        doc.select("h1").text()                          shouldBe s"Manage $testCompanyName ISAs"
+        doc.text()                                         should include(
           "The monthly reporting period for July is now open. You can upload your June report. It closes at 11:59pm on 19 July."
         )
-        doc.text()                should include("You have 11 days left to submit your monthly report.")
-        doc.text()                should include(
+        doc.text()                                         should include("You have 11 days left to submit your monthly report.")
+        doc.text()                                         should include(
           "The window for submitting your monthly report is now open. You can either download the Excel template file or continue to upload your monthly report."
         )
-        doc.text()                should include("Reporting period for July is open. Upload your June report.")
+        doc.text()                                         should include("Reporting period for July is open. Upload your June report.")
         doc.select(".govuk-notification-banner").isEmpty shouldBe false
       }
     }
@@ -91,7 +92,7 @@ class ManageIsasControllerSpec extends BaseUnitSpec {
         val doc    = Jsoup.parse(contentAsString(result))
 
         val heading = doc.select("h2:contains(Submit report)")
-        heading.text()          shouldBe "Submit report"
+        heading.text()              shouldBe "Submit report"
         heading.select("a").isEmpty shouldBe true
       }
     }
@@ -127,14 +128,14 @@ class ManageIsasControllerSpec extends BaseUnitSpec {
         val result = route(app, FakeRequest(GET, manageIsasEndpoint)).value
         val doc    = Jsoup.parse(contentAsString(result))
 
-        doc.text() should include("Change of circumstances")
-        doc.text() should include(
+        doc.text()                                                                     should include("Change of circumstances")
+        doc.text()                                                                     should include(
           "You changed the ISA products your organisation offers. This is being checked by HMRC."
         )
-        doc.text() should include(
+        doc.text()                                                                     should include(
           "You will not be able to make any further changes until HMRC have agreed to the current changes."
         )
-        doc.text() should include("You will receive a letter from HMRC once the changes have been approved.")
+        doc.text()                                                                     should include("You will receive a letter from HMRC once the changes have been approved.")
         doc.select("a:contains(Update information about your organisation)").isEmpty shouldBe true
       }
     }
@@ -146,11 +147,13 @@ class ManageIsasControllerSpec extends BaseUnitSpec {
         val result = route(app, FakeRequest(GET, manageIsasEndpoint)).value
         val doc    = Jsoup.parse(contentAsString(result))
 
-        doc.text() should include("Change of circumstances")
-        doc.text() should include(
+        doc.text()        should include("Change of circumstances")
+        doc.text()        should include(
           "Only administrators can carry out any change of circumstances that relate to the organisation."
         )
-        doc.select("a:contains(Update information about your organisation)").attr("href") shouldBe changeInformationEndpoint
+        doc
+          .select("a:contains(Update information about your organisation)")
+          .attr("href") shouldBe changeInformationEndpoint
       }
     }
 
