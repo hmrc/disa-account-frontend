@@ -28,7 +28,7 @@ import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct.{CashIsas, 
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficerCommunication.ByEmail
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
-import uk.gov.hmrc.disaaccountfrontend.models.registration.{OrganisationDetails, OrganisationEmail, RegistrationDetails}
+import uk.gov.hmrc.disaaccountfrontend.models.registration.{BusinessVerification, OrganisationDetails, OrganisationEmail, RegistrationDetails}
 import uk.gov.hmrc.disaaccountfrontend.models.signatories.{Signatories, Signatory}
 
 import java.util.concurrent.ThreadLocalRandom
@@ -54,8 +54,10 @@ trait TestData {
   val testOrganisationEmailAddress: String = "test@example.com"
   val testP2pPlatform: String              = "Platform r Us"
   val testP2pPlatformNumber: String        = "1234567"
+  val testCompanyName: String              = "Test Company Ltd"
 
   val testRegistrationDetails: RegistrationDetails = RegistrationDetails(
+    businessVerification = Some(BusinessVerification(companyName = Some(testCompanyName))),
     organisationDetails = Some(
       OrganisationDetails(
         correspondenceAddress = Some(testCorrespondenceAddress),

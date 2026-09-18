@@ -36,6 +36,9 @@ class RegistrationConnectorISpec extends BaseIntegrationSpec {
       val responseBody =
         s"""{
            |  "groupId": "test-group-id",
+           |  "businessVerification": {
+           |    "companyName": "$testCompanyName"
+           |  },
            |  "organisationDetails": {
            |    "correspondenceAddress": ${Json.toJson(testCorrespondenceAddress)},
            |    "orgTelephoneNumber": "$testOrgTelephoneNumber"

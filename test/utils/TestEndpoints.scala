@@ -57,21 +57,26 @@ trait TestEndpoints {
     s"$accountFrontendRoutePrefix/change-liaison-officer-communication"
   val changeOfCircumstancesEndpoint: String             = s"$accountFrontendRoutePrefix/change-of-circumstances"
   val changesCompletedEndpoint: String                  = s"$accountFrontendRoutePrefix/changes-completed"
+  val manageIsasEndpoint: String                        = s"$accountFrontendRoutePrefix/manage-isas"
   val fcaArticlesEndpoint: String                       = s"$accountFrontendRoutePrefix/fca-articles"
   val keepAliveEndpoint: String                         = s"$accountFrontendRoutePrefix/refresh-session"
   val signOutEndpoint: String                           = s"$accountFrontendRoutePrefix/sign-out"
   val signedOutEndpoint: String                         = s"$accountFrontendRoutePrefix/signed-out"
   val customRedirectEndpoint: String                    = "/custom-redirect"
 
-  val authLoginStubSignInEndpoint: String = "http://localhost:9949/auth-login-stub/gg-sign-in"
-  val loginContinueEndpoint: String       =
+  val authLoginStubSignInEndpoint: String  = "http://localhost:9949/auth-login-stub/gg-sign-in"
+  val loginContinueEndpoint: String        =
     "http://localhost:12107/disa-account-frontend/enter-your-organisation-address"
-  val basGatewaySignOutEndpoint: String   = "http://localhost:9553/bas-gateway/sign-out-without-state"
-  val disaAccountBaseUrl: String          = "http://localhost:12105"
-  val emailVerificationBaseUrl: String    = "http://localhost:9891"
+  val basGatewaySignOutEndpoint: String    = "http://localhost:9553/bas-gateway/sign-out-without-state"
+  val disaAccountBaseUrl: String           = "http://localhost:12105"
+  val emailVerificationBaseUrl: String     = "http://localhost:9891"
+  val disaReturnsSubmissionBaseUrl: String = "http://localhost:12103"
 
   def disaAccountRegistrationEndpoint(zReference: String): String =
     s"$disaAccountBaseUrl/disa-account/registration/$zReference"
+
+  def reportingWindowStatusEndpoint(zReference: String): String =
+    s"$disaReturnsSubmissionBaseUrl/disa-returns-submission/reporting-window/status/$zReference"
 
   val emailVerificationSendCodeEndpoint: String =
     s"$emailVerificationBaseUrl/email-verification/v2/send-code"

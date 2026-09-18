@@ -89,7 +89,7 @@ class ChangesCompletedControllerISpec extends BaseIntegrationSpec {
 
       val result = route(app, authenticatedGet()).get
 
-      status(result)          shouldBe OK
+      status(result)        shouldBe OK
       contentAsString(result) should include("Changes completed")
       contentAsString(result) should include("Updated ISA products")
     }
@@ -100,7 +100,7 @@ class ChangesCompletedControllerISpec extends BaseIntegrationSpec {
 
       val result = route(app, authenticatedGet()).get
 
-      status(result)          shouldBe OK
+      status(result)        shouldBe OK
       contentAsString(result) should not include "Updated ISA products"
     }
 
@@ -109,7 +109,7 @@ class ChangesCompletedControllerISpec extends BaseIntegrationSpec {
 
       val result = route(app, FakeRequest(GET, endpoint)).get
 
-      status(result)                 shouldBe SEE_OTHER
+      status(result)             shouldBe SEE_OTHER
       redirectLocation(result).get should include("auth-login-stub")
     }
   }

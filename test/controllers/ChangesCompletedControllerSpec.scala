@@ -55,10 +55,11 @@ class ChangesCompletedControllerSpec extends BaseUnitSpec {
         )
         doc.select("h2:matchesOwn(^What happens next$)").size()    shouldBe 1
         doc.select("h2:matchesOwn(^Updated ISA products$)").size() shouldBe 1
-        doc.select("a[href=/]").size()                             shouldBe 2
-        doc.select("a[href=/]").last().text()                      shouldBe "Go back to manage ISAs start page"
-        guidanceLink.attr("target")                                shouldBe "_blank"
-        guidanceLink.text()                                        shouldBe
+        val manageIsasLinks = doc.select(s"a[href=$manageIsasEndpoint]")
+        manageIsasLinks.size()        shouldBe 2
+        manageIsasLinks.last().text() shouldBe "Go back to manage ISAs start page"
+        guidanceLink.attr("target")   shouldBe "_blank"
+        guidanceLink.text()           shouldBe
           "read the guidance in the ISA managers guidance collection (opens in new tab)"
       }
     }
