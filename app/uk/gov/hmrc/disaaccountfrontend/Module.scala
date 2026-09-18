@@ -18,6 +18,7 @@ package uk.gov.hmrc.disaaccountfrontend
 
 import play.api.{Configuration, Environment}
 import play.api.inject.{Binding, Module as AppModule}
+import uk.gov.hmrc.disaaccountfrontend.config.{InternalAuthTokenInitialiser, InternalAuthTokenInitialiserImpl, NoOpInternalAuthTokenInitialiser}
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{AuthenticatedIdentifierAction, DataRetrievalAction, DataRetrievalActionImpl, IdentifierAction, PageGuardAction, PageGuardActionImpl}
 
 import java.time.Clock
@@ -27,10 +28,21 @@ class Module extends AppModule {
   override def bindings(
     environment: Environment,
     configuration: Configuration
-  ): Seq[Binding[_]] =
-    bind[Clock].toInstance(Clock.systemDefaultZone) :: // inject if current time needs to be controlled in unit tests
-      bind[IdentifierAction].to[AuthenticatedIdentifierAction] ::
-      bind[DataRetrievalAction].to[DataRetrievalActionImpl] ::
-      bind[PageGuardAction].to[PageGuardActionImpl] ::
-      Nil
+  ): Seq[Binding[_]] = {
+
+    val authTokenInitialiserBindings: Seq[Binding[_]] =
+      if (configuration.get[Boolean]("create-internal-auth-token-on-start")) {
+        Seq(bind[InternalAuthTokenInitialiser].to[InternalAuthTokenInitialiserImpl])
+      } else {
+        Seq(bind[InternalAuthTokenInitialiser].to[NoOpInternalAuthTokenInitialiser])
+      }
+
+    Seq(
+      bind[Clock].toInstance(Clock.systemDefaultZone),
+      bind[IdentifierAction].to[AuthenticatedIdentifierAction],
+      bind[DataRetrievalAction].to[DataRetrievalActionImpl],
+      bind[PageGuardAction].to[PageGuardActionImpl],
+      bind[AppInitialiser].toSelf.eagerly()
+    ) ++ authTokenInitialiserBindings
+  }
 }

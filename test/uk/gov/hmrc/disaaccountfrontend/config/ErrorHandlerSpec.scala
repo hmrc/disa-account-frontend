@@ -28,6 +28,7 @@ class ErrorHandlerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuit
 
   override def fakeApplication(): Application =
     new GuiceApplicationBuilder()
+      .configure("create-internal-auth-token-on-start" -> false)
       .build()
 
   private val fakeRequest = FakeRequest("GET", "/")

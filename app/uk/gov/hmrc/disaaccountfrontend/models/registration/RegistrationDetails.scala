@@ -40,14 +40,23 @@ object OrganisationEmail {
   implicit val reads: Reads[OrganisationEmail] = Json.reads[OrganisationEmail]
 }
 
+case class BusinessVerification(companyName: Option[String] = None)
+
+object BusinessVerification {
+  implicit val reads: Reads[BusinessVerification] = Json.reads[BusinessVerification]
+}
+
 case class RegistrationDetails(
+  businessVerification: Option[BusinessVerification] = None,
   organisationDetails: Option[OrganisationDetails] = None,
   organisationEmail: Option[OrganisationEmail] = None,
   isaProducts: Option[IsaProducts] = None,
   certificatesOfAuthority: Option[CertificatesOfAuthority] = None,
   signatories: Option[Signatories] = None,
-  liaisonOfficers: Option[LiaisonOfficers] = None
+  liaisonOfficers: Option[LiaisonOfficers] = None,
+  isaProductsChangeUnderReview: Boolean = false
 ) {
+  def companyName: Option[String]                          = businessVerification.flatMap(_.companyName)
   def correspondenceAddress: Option[CorrespondenceAddress] = organisationDetails.flatMap(_.correspondenceAddress)
   def orgTelephoneNumber: Option[String]                   = organisationDetails.flatMap(_.orgTelephoneNumber)
   def tradingName: Option[String]                          = organisationDetails.flatMap(_.tradingName)
