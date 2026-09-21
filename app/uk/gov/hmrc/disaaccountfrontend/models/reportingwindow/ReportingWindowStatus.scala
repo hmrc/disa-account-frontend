@@ -16,10 +16,22 @@
 
 package uk.gov.hmrc.disaaccountfrontend.models.reportingwindow
 
-import play.api.libs.json.{Json, Reads}
+import play.api.libs.json.{JsError, JsString, JsSuccess, Json, Reads}
 
-case class ReportingWindowStatus(reportingWindowOpen: Boolean)
+import java.time.Instant
+import scala.util.Try
+
+case class ReportingWindowStatus(
+  reportingWindowOpen: Boolean,
+  reportingWindowStart: Instant,
+  reportingWindowEnd: Instant,
+  resolvedAt: Instant
+)
 
 object ReportingWindowStatus {
+  implicit val instantReads: Reads[Instant]        = Reads {
+    case JsString(value) => Try(Instant.parse(value)).fold(_ => JsError("invalid instant"), JsSuccess(_))
+    case _               => JsError("instant must be a string")
+  }
   implicit val reads: Reads[ReportingWindowStatus] = Json.reads[ReportingWindowStatus]
 }

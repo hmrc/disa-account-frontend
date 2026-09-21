@@ -48,9 +48,9 @@ class ManageIsasController @Inject() (
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     val registrationDetails   = registrationConnector.getRegistrationDetails(request.zReference)
-    val reportingWindowStatus = reportingWindowConnector.isReportingWindowOpen(request.zReference)
+    val reportingWindowStatus = reportingWindowConnector.getReportingWindowStatus(request.zReference)
 
-    registrationDetails.zip(reportingWindowStatus).flatMap { case (registration, reportingWindowOpen) =>
+    registrationDetails.zip(reportingWindowStatus).flatMap { case (registration, windowStatus) =>
       registration.flatMap(_.companyName) match {
         case None              => errorHandler.internalServerError
         case Some(companyName) =>
@@ -58,11 +58,12 @@ class ManageIsasController @Inject() (
             Ok(
               view(
                 companyName = companyName,
-                reportingWindowOpen = reportingWindowOpen,
-                reportingWindowMonth = reportingPeriodService.reportingWindowMonth,
-                reportingPeriodMonth = reportingPeriodService.reportingPeriodMonth,
-                closingDateFormatted = reportingPeriodService.closingDateFormatted,
-                daysRemaining = reportingPeriodService.daysRemaining,
+                reportingWindowOpen = windowStatus.reportingWindowOpen,
+                reportingWindowMonth = reportingPeriodService.reportingWindowMonth(windowStatus.reportingWindowEnd),
+                reportingPeriodMonth = reportingPeriodService.reportingPeriodMonth(windowStatus.reportingWindowEnd),
+                closingDateFormatted = reportingPeriodService.closingDateFormatted(windowStatus.reportingWindowEnd),
+                daysRemaining =
+                  reportingPeriodService.daysRemaining(windowStatus.resolvedAt, windowStatus.reportingWindowEnd),
                 submitReportUrl = appConfig.monthlyReportSubmissionUrl,
                 isaProductsChangeUnderReview = registration.exists(_.isaProductsChangeUnderReview)
               )

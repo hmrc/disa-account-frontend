@@ -41,7 +41,7 @@ class ReportingWindowConnector @Inject() (
     case UpstreamErrorResponse.Upstream5xxResponse(_) => true
   }
 
-  def isReportingWindowOpen(zref: String)(implicit hc: HeaderCarrier): Future[Boolean] = {
+  def getReportingWindowStatus(zref: String)(implicit hc: HeaderCarrier): Future[ReportingWindowStatus] = {
     val url = s"${appConfig.disaReturnsSubmissionBaseUrl}/disa-returns-submission/reporting-window/status/$zref"
     retryFor[ReportingWindowStatus]("GET disa-returns-submission reporting window status")(retryCondition) {
       http
@@ -52,6 +52,6 @@ class ReportingWindowConnector @Inject() (
           case Right(status) => Future.successful(status)
           case Left(error)   => Future.failed(error)
         }
-    }.map(_.reportingWindowOpen)
+    }
   }
 }

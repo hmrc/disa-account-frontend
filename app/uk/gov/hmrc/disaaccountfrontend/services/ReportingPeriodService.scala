@@ -16,28 +16,27 @@
 
 package uk.gov.hmrc.disaaccountfrontend.services
 
-import uk.gov.hmrc.disaaccountfrontend.config.AppConfig
-
 import java.time.format.{DateTimeFormatter, TextStyle}
 import java.time.temporal.ChronoUnit
-import java.time.{Clock, LocalDate}
+import java.time.{Clock, Instant, LocalDate}
 import java.util.Locale
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class ReportingPeriodService @Inject() (appConfig: AppConfig, clock: Clock) {
-
-  private def today: LocalDate = LocalDate.now(clock)
+class ReportingPeriodService @Inject() (clock: Clock) {
 
   private def monthName(date: LocalDate): String = date.getMonth.getDisplayName(TextStyle.FULL, Locale.UK)
 
-  def reportingWindowMonth: String = monthName(today)
+  def reportingWindowMonth(reportingWindowEnd: Instant): String = monthName(closingDate(reportingWindowEnd))
 
-  def reportingPeriodMonth: String = monthName(today.minusMonths(1))
+  def reportingPeriodMonth(reportingWindowEnd: Instant): String =
+    monthName(closingDate(reportingWindowEnd).minusMonths(1))
 
-  def closingDate: LocalDate = today.withDayOfMonth(appConfig.reportingWindowClosingDay)
+  def closingDate(reportingWindowEnd: Instant): LocalDate = LocalDate.ofInstant(reportingWindowEnd, clock.getZone)
 
-  def closingDateFormatted: String = closingDate.format(DateTimeFormatter.ofPattern("d MMMM", Locale.UK))
+  def closingDateFormatted(reportingWindowEnd: Instant): String =
+    closingDate(reportingWindowEnd).format(DateTimeFormatter.ofPattern("d MMMM", Locale.UK))
 
-  def daysRemaining: Int = ChronoUnit.DAYS.between(today, closingDate).toInt
+  def daysRemaining(resolvedAt: Instant, reportingWindowEnd: Instant): Int =
+    ChronoUnit.DAYS.between(LocalDate.ofInstant(resolvedAt, clock.getZone), closingDate(reportingWindowEnd)).toInt
 }

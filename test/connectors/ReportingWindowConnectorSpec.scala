@@ -24,11 +24,15 @@ import uk.gov.hmrc.disaaccountfrontend.models.reportingwindow.ReportingWindowSta
 import uk.gov.hmrc.http.{StringContextOps, UpstreamErrorResponse}
 import utils.BaseUnitSpec
 
+import java.time.Instant
 import scala.concurrent.Future
 
 class ReportingWindowConnectorSpec extends BaseUnitSpec {
 
   private val testInternalAuthToken = "valid-internal-auth-token-disa-account-frontend"
+  private val testWindowStart       = Instant.parse("2026-07-06T00:00:00Z")
+  private val testWindowEnd         = Instant.parse("2026-07-19T23:59:59Z")
+  private val testResolvedAt        = Instant.parse("2026-07-08T09:00:00Z")
 
   trait TestSetup {
     val connector: ReportingWindowConnector =
@@ -43,25 +47,31 @@ class ReportingWindowConnectorSpec extends BaseUnitSpec {
     when(mockRequestBuilder.setHeader(any())).thenReturn(mockRequestBuilder)
   }
 
-  "ReportingWindowConnector.isReportingWindowOpen" should {
+  "ReportingWindowConnector.getReportingWindowStatus" should {
 
-    "return true when the backend reports the window is open" in new TestSetup {
+    "return the status when the window is open" in new TestSetup {
+      val status: ReportingWindowStatus =
+        ReportingWindowStatus(reportingWindowOpen = true, testWindowStart, testWindowEnd, testResolvedAt)
+
       when(mockRequestBuilder.execute[Either[UpstreamErrorResponse, ReportingWindowStatus]](any(), any()))
-        .thenReturn(Future.successful(Right(ReportingWindowStatus(reportingWindowOpen = true))))
+        .thenReturn(Future.successful(Right(status)))
 
-      val result: Boolean = connector.isReportingWindowOpen(testZref).futureValue
+      val result: ReportingWindowStatus = connector.getReportingWindowStatus(testZref).futureValue
 
-      result shouldBe true
+      result shouldBe status
       verify(mockRequestBuilder).setHeader("Authorization" -> testInternalAuthToken)
     }
 
-    "return false when the backend reports the window is closed" in new TestSetup {
+    "return the status when the window is closed" in new TestSetup {
+      val status: ReportingWindowStatus =
+        ReportingWindowStatus(reportingWindowOpen = false, testWindowStart, testWindowEnd, testResolvedAt)
+
       when(mockRequestBuilder.execute[Either[UpstreamErrorResponse, ReportingWindowStatus]](any(), any()))
-        .thenReturn(Future.successful(Right(ReportingWindowStatus(reportingWindowOpen = false))))
+        .thenReturn(Future.successful(Right(status)))
 
-      val result: Boolean = connector.isReportingWindowOpen(testZref).futureValue
+      val result: ReportingWindowStatus = connector.getReportingWindowStatus(testZref).futureValue
 
-      result shouldBe false
+      result shouldBe status
     }
 
     "propagate the failure when the backend returns an unexpected error" in new TestSetup {
@@ -71,7 +81,7 @@ class ReportingWindowConnectorSpec extends BaseUnitSpec {
       when(mockRequestBuilder.execute[Either[UpstreamErrorResponse, ReportingWindowStatus]](any(), any()))
         .thenReturn(Future.successful(Left(serverError)))
 
-      val thrown = connector.isReportingWindowOpen(testZref).failed.futureValue
+      val thrown = connector.getReportingWindowStatus(testZref).failed.futureValue
 
       thrown shouldBe serverError
     }
@@ -82,7 +92,7 @@ class ReportingWindowConnectorSpec extends BaseUnitSpec {
       when(mockRequestBuilder.execute[Either[UpstreamErrorResponse, ReportingWindowStatus]](any(), any()))
         .thenReturn(Future.failed(exception))
 
-      val thrown = connector.isReportingWindowOpen(testZref).failed.futureValue
+      val thrown = connector.getReportingWindowStatus(testZref).failed.futureValue
 
       thrown shouldBe exception
     }

@@ -23,6 +23,7 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.disaaccountfrontend.models.registration.RegistrationDetails
+import uk.gov.hmrc.disaaccountfrontend.models.reportingwindow.ReportingWindowStatus
 import utils.BaseUnitSpec
 
 import java.time.{Clock, Instant, ZoneOffset}
@@ -33,13 +34,25 @@ class ManageIsasControllerSpec extends BaseUnitSpec {
   private val fixedClock: Clock =
     Clock.fixed(Instant.parse("2026-07-08T09:00:00Z"), ZoneOffset.UTC)
 
+  private val defaultWindowStart: Instant = Instant.parse("2026-07-06T00:00:00Z")
+  private val defaultWindowEnd: Instant   = Instant.parse("2026-07-19T23:59:59Z")
+  private val defaultResolvedAt: Instant  = Instant.parse("2026-07-08T09:00:00Z")
+
   private val monthlyReportSubmissionUrl: String =
     "http://localhost:1205/obligations/returns/isa/monthly-report-submission"
 
-  private def application(windowOpen: Boolean, registrationDetails: Option[RegistrationDetails]) = {
+  private def application(
+    windowOpen: Boolean,
+    registrationDetails: Option[RegistrationDetails],
+    windowStart: Instant = defaultWindowStart,
+    windowEnd: Instant = defaultWindowEnd,
+    resolvedAt: Instant = defaultResolvedAt
+  ) = {
     when(mockRegistrationConnector.getRegistrationDetails(any())(any()))
       .thenReturn(Future.successful(registrationDetails))
-    when(mockReportingWindowConnector.isReportingWindowOpen(any())(any())).thenReturn(Future.successful(windowOpen))
+    when(mockReportingWindowConnector.getReportingWindowStatus(any())(any())).thenReturn(
+      Future.successful(ReportingWindowStatus(windowOpen, windowStart, windowEnd, resolvedAt))
+    )
 
     applicationBuilder()
       .overrides(bind[Clock].toInstance(fixedClock))
@@ -175,6 +188,61 @@ class ManageIsasControllerSpec extends BaseUnitSpec {
         val result = route(app, FakeRequest(GET, manageIsasEndpoint)).value
 
         status(result) shouldBe INTERNAL_SERVER_ERROR
+      }
+    }
+
+    "reflect an overridden reporting window end date, not the default declaration period" in {
+      val overriddenWindowEnd = Instant.parse("2026-07-25T23:59:59Z")
+      val app                 = application(
+        windowOpen = true,
+        registrationDetails = Some(testRegistrationDetails),
+        windowEnd = overriddenWindowEnd
+      )
+
+      running(app) {
+        val result = route(app, FakeRequest(GET, manageIsasEndpoint)).value
+        val doc    = Jsoup.parse(contentAsString(result))
+
+        doc.text() should include("It closes at 11:59pm on 25 July.")
+        doc.text() should include("You have 17 days left to submit your monthly report.")
+        doc.text() should include("Upload your June report")
+        doc.text() should not include "19 July"
+        doc.text() should not include "11 days left"
+      }
+    }
+
+    "derive the reporting window and reporting period months from the overridden window end, not the local clock" in {
+      val juneWindowEnd = Instant.parse("2026-06-19T23:59:59Z")
+      val app           = application(
+        windowOpen = true,
+        registrationDetails = Some(testRegistrationDetails),
+        windowEnd = juneWindowEnd
+      )
+
+      running(app) {
+        val result = route(app, FakeRequest(GET, manageIsasEndpoint)).value
+        val doc    = Jsoup.parse(contentAsString(result))
+
+        doc.text() should include("Reporting period for June is open. Upload your May report.")
+        doc.text() should not include "July"
+      }
+    }
+
+    "derive days remaining from resolvedAt, not the local clock, when the window is overridden to a different month" in {
+      val juneResolvedAt = Instant.parse("2026-06-12T00:00:00Z")
+      val juneWindowEnd  = Instant.parse("2026-06-19T23:59:59Z")
+      val app            = application(
+        windowOpen = true,
+        registrationDetails = Some(testRegistrationDetails),
+        windowEnd = juneWindowEnd,
+        resolvedAt = juneResolvedAt
+      )
+
+      running(app) {
+        val result = route(app, FakeRequest(GET, manageIsasEndpoint)).value
+        val doc    = Jsoup.parse(contentAsString(result))
+
+        doc.text() should include("You have 7 days left to submit your monthly report.")
       }
     }
   }

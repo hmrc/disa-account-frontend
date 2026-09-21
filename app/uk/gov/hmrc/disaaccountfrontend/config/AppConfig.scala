@@ -45,8 +45,6 @@ class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig
   lazy val monthlyReportSubmissionUrl: String =
     s"${servicesConfig.baseUrl(serviceName = "disa-returns-frontend")}/obligations/returns/isa/monthly-report-submission"
 
-  val reportingWindowClosingDay: Int = config.get[Int]("reporting-window.closing-day")
-
   val timeout: Int   = config.get[Int]("timeout-dialog.timeout")
   val countdown: Int = config.get[Int]("timeout-dialog.countdown")
 
