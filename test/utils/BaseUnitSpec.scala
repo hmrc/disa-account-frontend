@@ -134,7 +134,6 @@ abstract class BaseUnitSpec
         bind[RegistrationConnector].toInstance(mockRegistrationConnector),
         bind[UserAnswersRepository].toInstance(mockUserAnswersRepository),
         bind[EmailVerificationConnector].toInstance(mockEmailVerificationConnector),
-        bind[RegistrationConnector].toInstance(mockRegistrationConnector),
         bind[ReportingWindowConnector].toInstance(mockReportingWindowConnector),
         bind[InternalAuthTokenInitialiser].to[NoOpInternalAuthTokenInitialiser]
       )
