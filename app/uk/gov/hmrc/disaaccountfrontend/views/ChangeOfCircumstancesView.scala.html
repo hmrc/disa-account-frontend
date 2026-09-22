@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeInformationController, DeclarationForChangesController}
+@import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeInformationController, DeclarationForChangesController, ManageIsasController}
 
 @this(layout: Layout, govukSummaryList: GovukSummaryList, govukButton: GovukButton)
 
@@ -42,8 +42,7 @@
         @messages("changeOfCircumstances.intro.differentOption.beforeLink")
         <a class="govuk-link" href="@ChangeInformationController.onPageLoad().url">@messages("changeOfCircumstances.selectDifferentOption.link")</a>
         @messages("changeOfCircumstances.intro.differentOption.orReturn")
-        <!-- TODO Link back to page created in DFI-2538 & DFI-2539 -->
-        <a class="govuk-link" href="/">@messages("changeOfCircumstances.returnToManageIsas.link")</a>.
+        <a class="govuk-link" href="@ManageIsasController.onPageLoad().url">@messages("changeOfCircumstances.returnToManageIsas.link")</a>.
     </p>
 
     @section("changeOfCircumstances.organisationDetails.heading", organisation)

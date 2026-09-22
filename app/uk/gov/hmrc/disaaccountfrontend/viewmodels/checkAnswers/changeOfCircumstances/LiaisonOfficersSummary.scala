@@ -38,7 +38,8 @@ object LiaisonOfficersSummary {
               ActionItem(
                 href = AddedLiaisonOfficersController.onPageLoad().url,
                 content = Text(messages("site.change")),
-                visuallyHiddenText = Some(messages("changeOfCircumstances.authorisedUsers.liaisonOfficer.change.hidden"))
+                visuallyHiddenText =
+                  Some(messages("changeOfCircumstances.authorisedUsers.liaisonOfficer.change.hidden"))
               )
             )
           )

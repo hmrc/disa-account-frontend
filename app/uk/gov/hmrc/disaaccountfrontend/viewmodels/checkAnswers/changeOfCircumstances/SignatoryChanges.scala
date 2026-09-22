@@ -39,7 +39,7 @@ final case class SignatoryChanges(added: Seq[String], removed: Seq[String]) {
 object SignatoryChanges {
 
   def apply(original: Answers, effective: Answers): SignatoryChanges = {
-    val originalSignatories: Seq[Signatory] =
+    val originalSignatories: Seq[Signatory]  =
       original.signatories.toSeq.flatMap(_.signatories).filter(_.isComplete)
     val effectiveSignatories: Seq[Signatory] =
       effective.signatories.toSeq.flatMap(_.signatories).filter(_.isComplete)

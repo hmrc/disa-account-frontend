@@ -39,7 +39,7 @@ final case class LiaisonOfficerChanges(added: Seq[String], removed: Seq[String])
 object LiaisonOfficerChanges {
 
   def apply(original: Answers, effective: Answers): LiaisonOfficerChanges = {
-    val originalOfficers: Seq[LiaisonOfficer] =
+    val originalOfficers: Seq[LiaisonOfficer]  =
       original.liaisonOfficers.toSeq.flatMap(_.liaisonOfficers).filter(_.isComplete)
     val effectiveOfficers: Seq[LiaisonOfficer] =
       effective.liaisonOfficers.toSeq.flatMap(_.liaisonOfficers).filter(_.isComplete)

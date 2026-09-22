@@ -43,7 +43,7 @@ class LiaisonOfficerChangesSpec extends BaseUnitSpec {
       val changes = LiaisonOfficerChanges(original, effective)
 
       changes.added      shouldBe Seq("John Smith")
-      changes.removed     shouldBe Seq.empty
+      changes.removed    shouldBe Seq.empty
       changes.hasChanges shouldBe true
     }
 
@@ -60,8 +60,7 @@ class LiaisonOfficerChangesSpec extends BaseUnitSpec {
     "not treat an edited liaison officer as added or removed" in {
       val original  = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(officer("lo-1", "John Smith")))))
       val effective = Answers(
-        liaisonOfficers =
-          Some(LiaisonOfficers(Seq(officer("lo-1", "John Smith").copy(phoneNumber = Some("0999")))))
+        liaisonOfficers = Some(LiaisonOfficers(Seq(officer("lo-1", "John Smith").copy(phoneNumber = Some("0999")))))
       )
 
       val changes = LiaisonOfficerChanges(original, effective)

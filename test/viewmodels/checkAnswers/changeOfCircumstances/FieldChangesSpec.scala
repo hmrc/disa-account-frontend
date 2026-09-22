@@ -36,7 +36,7 @@ class FieldChangesSpec extends BaseUnitSpec {
 
       val rows = FieldChanges.rows(original, effective)(messages(app))
 
-      rows.map(_.key.content.asHtml.body) shouldBe Seq("Changed trading name")
+      rows.map(_.key.content.asHtml.body)   shouldBe Seq("Changed trading name")
       rows.map(_.value.content.asHtml.body) shouldBe Seq("ABC Bank to XYZ Bank")
     }
 
@@ -46,7 +46,7 @@ class FieldChangesSpec extends BaseUnitSpec {
 
       val rows = FieldChanges.rows(original, effective)(messages(app))
 
-      rows.map(_.key.content.asHtml.body) shouldBe Seq("Changed organisation telephone number")
+      rows.map(_.key.content.asHtml.body)   shouldBe Seq("Changed organisation telephone number")
       rows.map(_.value.content.asHtml.body) shouldBe Seq("111 to 222")
     }
 
@@ -56,7 +56,7 @@ class FieldChangesSpec extends BaseUnitSpec {
 
       val rows = FieldChanges.rows(original, effective)(messages(app))
 
-      rows.map(_.key.content.asHtml.body) shouldBe Seq("Changed organisation email")
+      rows.map(_.key.content.asHtml.body)   shouldBe Seq("Changed organisation email")
       rows.map(_.value.content.asHtml.body) shouldBe Seq("old@example.com to new@example.com")
     }
 
@@ -93,7 +93,7 @@ class FieldChangesSpec extends BaseUnitSpec {
     }
 
     "show every changed field together" in {
-      val original = Answers(
+      val original  = Answers(
         tradingName = Some("ABC Bank"),
         organisationTelephoneNumber = Some("111"),
         organisationEmailAddress = Some("old@example.com")

@@ -28,7 +28,8 @@ object FcaArticlesSummary {
 
   def row(answers: Answers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.fcaArticles.filter(_.nonEmpty).map { articles =>
-      val lines = FcaArticles.values.filter(articles.contains).map(article => messages(s"FcaArticles.${article.toString}"))
+      val lines =
+        FcaArticles.values.filter(articles.contains).map(article => messages(s"FcaArticles.${article.toString}"))
 
       SummaryListRow(
         key = Key(Text(messages("changeOfCircumstances.articles.label"))),

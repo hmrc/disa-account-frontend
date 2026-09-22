@@ -35,12 +35,13 @@ class SignatoryChangesSpec extends BaseUnitSpec {
 
     "list a signatory as added when its id is new" in {
       val original  = Answers(signatories = None)
-      val effective = Answers(signatories = Some(Signatories(Seq(Signatory("s-1", Some("Jane Doe"), Some("Director"))))))
+      val effective =
+        Answers(signatories = Some(Signatories(Seq(Signatory("s-1", Some("Jane Doe"), Some("Director"))))))
 
       val changes = SignatoryChanges(original, effective)
 
       changes.added      shouldBe Seq("Jane Doe")
-      changes.removed     shouldBe Seq.empty
+      changes.removed    shouldBe Seq.empty
       changes.hasChanges shouldBe true
     }
 
@@ -74,7 +75,8 @@ class SignatoryChangesSpec extends BaseUnitSpec {
 
     "not treat a signatory as changed when only its id differs but the name matches" in {
       val original  = Answers(signatories = Some(Signatories(Seq(Signatory("s-1", Some("Jane Doe"), Some("Director"))))))
-      val effective = Answers(signatories = Some(Signatories(Seq(Signatory("s-2", Some("Jane Doe"), Some("Director"))))))
+      val effective =
+        Answers(signatories = Some(Signatories(Seq(Signatory("s-2", Some("Jane Doe"), Some("Director"))))))
 
       val changes = SignatoryChanges(original, effective)
 
@@ -82,7 +84,8 @@ class SignatoryChangesSpec extends BaseUnitSpec {
     }
 
     "still detect a genuine add alongside a signatory whose id changed but name matches" in {
-      val original  = Answers(signatories = Some(Signatories(Seq(Signatory("s-1", Some("Test Signatory"), Some("Director"))))))
+      val original  =
+        Answers(signatories = Some(Signatories(Seq(Signatory("s-1", Some("Test Signatory"), Some("Director"))))))
       val effective = Answers(
         signatories = Some(
           Signatories(

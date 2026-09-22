@@ -81,14 +81,14 @@ class ChangeOfCircumstancesControllerSpec extends BaseUnitSpec {
         val result = route(application, FakeRequest(GET, changeOfCircumstancesEndpoint)).value
         val doc    = Jsoup.parse(contentAsString(result))
 
-        status(result)                                   shouldBe OK
-        doc.select("h1").text()                          shouldBe "Manage organisation information"
-        doc.select("main h2").eachText()                      shouldBe java.util.List.of(
+        status(result)                                      shouldBe OK
+        doc.select("h1").text()                             shouldBe "Manage organisation information"
+        doc.select("main h2").eachText()                    shouldBe java.util.List.of(
           "Organisation details",
           "Product information",
           "Authorised users"
         )
-        doc.select(".govuk-summary-list__key").eachText() shouldBe java.util.List.of(
+        doc.select(".govuk-summary-list__key").eachText()   shouldBe java.util.List.of(
           "Trading name",
           "Added correspondence address",
           "Organisation telephone number",
@@ -98,9 +98,9 @@ class ChangeOfCircumstancesControllerSpec extends BaseUnitSpec {
           "Liaison officer",
           "Signatory"
         )
-        doc.select(".govuk-summary-list__value").eachText() should contain("ABC Bank")
-        doc.select(".govuk-summary-list__value").eachText() should contain("123 Number Road Fake Town AB1 BA1")
-        doc.select(".govuk-summary-list__value").eachText() should contain("Jane Doe Joe Blogs")
+        doc.select(".govuk-summary-list__value").eachText()   should contain("ABC Bank")
+        doc.select(".govuk-summary-list__value").eachText()   should contain("123 Number Road Fake Town AB1 BA1")
+        doc.select(".govuk-summary-list__value").eachText()   should contain("Jane Doe Joe Blogs")
         doc.select(".govuk-summary-list__actions a").size() shouldBe 8
 
         doc.select(".govuk-summary-list__actions a").eachAttr("href") shouldBe java.util.List.of(
@@ -123,8 +123,8 @@ class ChangeOfCircumstancesControllerSpec extends BaseUnitSpec {
         val result = route(application, FakeRequest(GET, changeOfCircumstancesEndpoint)).value
         val doc    = Jsoup.parse(contentAsString(result))
 
-        doc.select("a:contains(select a different option)").attr("href") shouldBe changeInformationEndpoint
-        doc.select("a:contains(return to the Manage ISAs homepage)").attr("href") shouldBe "/"
+        doc.select("a:contains(select a different option)").attr("href")          shouldBe changeInformationEndpoint
+        doc.select("a:contains(return to the Manage ISAs homepage)").attr("href") shouldBe manageIsasEndpoint
       }
     }
 
@@ -178,19 +178,19 @@ class ChangeOfCircumstancesControllerSpec extends BaseUnitSpec {
         val result = route(application, FakeRequest(GET, changeOfCircumstancesEndpoint)).value
         val doc    = Jsoup.parse(contentAsString(result))
 
-        doc.select("main").text() should not include "Check your changes"
-        doc.select("main").text() should not include "ISA product changes information"
+        doc.select("main").text()                     should not include "Check your changes"
+        doc.select("main").text()                     should not include "ISA product changes information"
         doc.select("main .govuk-inset-text").size() shouldBe 0
       }
     }
 
     "show changed organisation fields, and none of them when they haven't changed" in {
-      val original = Answers(
+      val original    = Answers(
         tradingName = Some("ABC Bank"),
         organisationTelephoneNumber = Some("111"),
         organisationEmailAddress = Some("old@example.com")
       )
-      val effective = Answers(
+      val effective   = Answers(
         tradingName = Some("XYZ Bank"),
         organisationTelephoneNumber = Some("111"),
         organisationEmailAddress = Some("new@example.com")
@@ -202,7 +202,7 @@ class ChangeOfCircumstancesControllerSpec extends BaseUnitSpec {
         val doc              = Jsoup.parse(contentAsString(result))
         val checkYourChanges = doc.select(".govuk-summary-list").last()
 
-        doc.select("main h2").eachText()                                shouldBe
+        doc.select("main h2").eachText()                                 shouldBe
           java.util.List.of("Organisation details", "Check your changes")
         checkYourChanges.select(".govuk-summary-list__key").eachText()   shouldBe
           java.util.List.of("Changed trading name", "Changed organisation email")
@@ -212,10 +212,10 @@ class ChangeOfCircumstancesControllerSpec extends BaseUnitSpec {
     }
 
     "show signatories added and removed, without the ISA product changes information" in {
-      val original = Answers(
+      val original    = Answers(
         signatories = Some(Signatories(Seq(Signatory("s-1", Some("Jane Doe"), Some("Director")))))
       )
-      val effective = Answers(
+      val effective   = Answers(
         signatories = Some(Signatories(Seq(Signatory("s-2", Some("Joe Blogs"), Some("Director")))))
       )
       val application = applicationBuilder(effectiveAnswers = effective, originalAnswers = Some(original)).build()
@@ -225,7 +225,7 @@ class ChangeOfCircumstancesControllerSpec extends BaseUnitSpec {
         val doc              = Jsoup.parse(contentAsString(result))
         val checkYourChanges = doc.select(".govuk-summary-list").last()
 
-        doc.select("main h2").eachText()                            shouldBe
+        doc.select("main h2").eachText()                                 shouldBe
           java.util.List.of("Authorised users", "Check your changes")
         checkYourChanges.select(".govuk-summary-list__key").eachText()   shouldBe
           java.util.List.of("Signatories added", "Signatories removed")
@@ -235,7 +235,7 @@ class ChangeOfCircumstancesControllerSpec extends BaseUnitSpec {
     }
 
     "show liaison officers added and removed" in {
-      val original = Answers(
+      val original    = Answers(
         liaisonOfficers = Some(
           LiaisonOfficers(
             Seq(
@@ -250,7 +250,7 @@ class ChangeOfCircumstancesControllerSpec extends BaseUnitSpec {
           )
         )
       )
-      val effective = Answers(
+      val effective   = Answers(
         liaisonOfficers = Some(
           LiaisonOfficers(
             Seq(
@@ -272,7 +272,7 @@ class ChangeOfCircumstancesControllerSpec extends BaseUnitSpec {
         val doc              = Jsoup.parse(contentAsString(result))
         val checkYourChanges = doc.select(".govuk-summary-list").last()
 
-        doc.select("main h2").eachText()                            shouldBe
+        doc.select("main h2").eachText()                                 shouldBe
           java.util.List.of("Authorised users", "Check your changes")
         checkYourChanges.select(".govuk-summary-list__key").eachText()   shouldBe
           java.util.List.of("Liaison officers added", "Liaison officers removed")
@@ -282,8 +282,8 @@ class ChangeOfCircumstancesControllerSpec extends BaseUnitSpec {
     }
 
     "show products added and removed, and the manual processing information" in {
-      val original  = Answers(isaProducts = Some(Seq(StocksAndSharesIsas, InnovativeFinanceIsas)))
-      val effective = Answers(isaProducts = Some(Seq(CashIsas, CashJuniorIsas)))
+      val original    = Answers(isaProducts = Some(Seq(StocksAndSharesIsas, InnovativeFinanceIsas)))
+      val effective   = Answers(isaProducts = Some(Seq(CashIsas, CashJuniorIsas)))
       val application = applicationBuilder(effectiveAnswers = effective, originalAnswers = Some(original)).build()
 
       running(application) {
@@ -291,7 +291,7 @@ class ChangeOfCircumstancesControllerSpec extends BaseUnitSpec {
         val doc              = Jsoup.parse(contentAsString(result))
         val checkYourChanges = doc.select(".govuk-summary-list").last()
 
-        doc.select("main h2").eachText() shouldBe java.util.List.of(
+        doc.select("main h2").eachText()                                 shouldBe java.util.List.of(
           "Check your changes",
           "ISA product changes information"
         )
@@ -299,13 +299,13 @@ class ChangeOfCircumstancesControllerSpec extends BaseUnitSpec {
           java.util.List.of("Products added", "Products removed")
         checkYourChanges.select(".govuk-summary-list__value").eachText() shouldBe
           java.util.List.of("Cash ISAs Cash Junior ISAs", "Stocks and Shares ISAs Innovative Finance ISAs")
-        doc.select("main").text() should include(
+        doc.select("main").text()                                          should include(
           "Any changes to ISA products will require manual processing once submitted and you will be unable to make any additional changes until you hear from HMRC. We aim to confirm the changes by email, within 2 weeks."
         )
-        doc.select("main").text() should include(
+        doc.select("main").text()                                          should include(
           "If you have other changes to make, for example, to organisation details or authorised users - you can do these before you make ISA product changes and submit them."
         )
-        doc.select("main .govuk-inset-text").size() shouldBe 1
+        doc.select("main .govuk-inset-text").size()                      shouldBe 1
       }
     }
 
