@@ -30,9 +30,20 @@ class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig
 
   lazy val emailVerificationBaseUrl: String = servicesConfig.baseUrl(serviceName = "email-verification")
 
+  lazy val disaReturnsSubmissionBaseUrl: String = servicesConfig.baseUrl(serviceName = "disa-returns-submission")
+
+  lazy val internalAuthService: String = servicesConfig.baseUrl(serviceName = "internal-auth")
+
+  val internalAuthToken: String = config.get[String]("internal-auth.token")
+
+  val appName: String = config.get[String]("appName")
+
   val loginUrl: String         = config.get[String]("urls.login")
   val loginContinueUrl: String = config.get[String]("urls.loginContinue")
   val signOutUrl: String       = config.get[String]("urls.signOut")
+
+  lazy val monthlyReportSubmissionUrl: String =
+    s"${servicesConfig.baseUrl(serviceName = "disa-returns-frontend")}/obligations/returns/isa/monthly-report-submission"
 
   val timeout: Int   = config.get[Int]("timeout-dialog.timeout")
   val countdown: Int = config.get[Int]("timeout-dialog.countdown")

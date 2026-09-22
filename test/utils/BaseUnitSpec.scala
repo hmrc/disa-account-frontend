@@ -33,8 +33,8 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.stubControllerComponents
 import play.api.test.{DefaultAwaitTimeout, FakeRequest}
 import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.disaaccountfrontend.config.AppConfig
-import uk.gov.hmrc.disaaccountfrontend.connectors.{EmailVerificationConnector, RegistrationConnector}
+import uk.gov.hmrc.disaaccountfrontend.config.{AppConfig, InternalAuthTokenInitialiser, NoOpInternalAuthTokenInitialiser}
+import uk.gov.hmrc.disaaccountfrontend.connectors.{EmailVerificationConnector, RegistrationConnector, ReportingWindowConnector}
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{AuthenticatedIdentifierAction, DataRetrievalAction, IdentifierAction}
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, UserAnswers}
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
@@ -70,6 +70,7 @@ abstract class BaseUnitSpec
   val mockRegistrationConnector: RegistrationConnector           = mock[RegistrationConnector]
   val mockUserAnswersRepository: UserAnswersRepository           = mock[UserAnswersRepository]
   val mockEmailVerificationConnector: EmailVerificationConnector = mock[EmailVerificationConnector]
+  val mockReportingWindowConnector: ReportingWindowConnector     = mock[ReportingWindowConnector]
 
   override def beforeEach(): Unit = {
     Mockito.reset(
@@ -79,7 +80,8 @@ abstract class BaseUnitSpec
       mockAuthConnector,
       mockRegistrationConnector,
       mockUserAnswersRepository,
-      mockEmailVerificationConnector
+      mockEmailVerificationConnector,
+      mockReportingWindowConnector
     )
 
     // Sane defaults for anything that constructs an AuthenticatedIdentifierAction directly from mockAppConfig.
@@ -92,13 +94,17 @@ abstract class BaseUnitSpec
   }
 
   override def fakeApplication(): Application = GuiceApplicationBuilder()
-    .configure("http-verbs.retries.intervals" -> Seq("1ms", "1ms", "1ms"))
+    .configure(
+      "http-verbs.retries.intervals"        -> Seq("1ms", "1ms", "1ms"),
+      "create-internal-auth-token-on-start" -> false
+    )
     .overrides(
       bind[AuthConnector].toInstance(mockAuthConnector),
       bind[AppConfig].toInstance(mockAppConfig),
       bind[RegistrationConnector].toInstance(mockRegistrationConnector),
       bind[UserAnswersRepository].toInstance(mockUserAnswersRepository),
-      bind[IdentifierAction].to[AuthenticatedIdentifierAction]
+      bind[IdentifierAction].to[AuthenticatedIdentifierAction],
+      bind[InternalAuthTokenInitialiser].to[NoOpInternalAuthTokenInitialiser]
     )
     .build()
 
@@ -116,7 +122,10 @@ abstract class BaseUnitSpec
   ): GuiceApplicationBuilder = {
     val bodyParsers = stubControllerComponents().parsers
     GuiceApplicationBuilder()
-      .configure("play.filters.csrf.header.bypassHeaders.Csrf-Token" -> "nocheck")
+      .configure(
+        "play.filters.csrf.header.bypassHeaders.Csrf-Token" -> "nocheck",
+        "create-internal-auth-token-on-start"               -> false
+      )
       .overrides(
         bind[IdentifierAction]
           .toInstance(new FakeIdentifierAction(bodyParsers, zReference, credentialId, sessionId, email)),
@@ -124,7 +133,10 @@ abstract class BaseUnitSpec
           .toInstance(new FakeDataRetrievalAction(effectiveAnswers, sessionAnswers, originalAnswers)),
         bind[RegistrationConnector].toInstance(mockRegistrationConnector),
         bind[UserAnswersRepository].toInstance(mockUserAnswersRepository),
-        bind[EmailVerificationConnector].toInstance(mockEmailVerificationConnector)
+        bind[EmailVerificationConnector].toInstance(mockEmailVerificationConnector),
+        bind[RegistrationConnector].toInstance(mockRegistrationConnector),
+        bind[ReportingWindowConnector].toInstance(mockReportingWindowConnector),
+        bind[InternalAuthTokenInitialiser].to[NoOpInternalAuthTokenInitialiser]
       )
   }
 
