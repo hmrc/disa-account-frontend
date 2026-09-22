@@ -26,8 +26,7 @@
     <h2 class="govuk-heading-m">@messages("changesCompleted.whatHappensNext.heading")</h2>
     <p class="govuk-body">
         @messages("changesCompleted.whatHappensNext.beforeLink")
-        <!-- TODO Link back to page created in DFI-2538 & DFI-2539 -->
-        <a class="govuk-link" href="/">@messages("changesCompleted.manageIsasStartPage")</a>.
+        <a class="govuk-link" href="@ManageIsasController.onPageLoad().url">@messages("changesCompleted.manageIsasStartPage")</a>.
     </p>
 
     @if(isaProductsUpdated) {
@@ -37,8 +36,7 @@
     }
 
     <p class="govuk-body">
-        <!-- TODO Link back to page created in DFI-2538 & DFI-2539 -->
-        <a class="govuk-link" href="/">@messages("changesCompleted.returnToManageIsas")</a>
+        <a class="govuk-link" href="@ManageIsasController.onPageLoad().url">@messages("changesCompleted.returnToManageIsas")</a>
     </p>
 
     <p class="govuk-body">

@@ -307,6 +307,24 @@ changesCompleted.returnToManageIsas = Go back to manage ISAs start page
 changesCompleted.guidance.beforeLink = If you need to find out more you can
 changesCompleted.guidance.link = read the guidance in the ISA managers guidance collection (opens in new tab)
 
+manageIsas.title = Manage {0} ISAs
+manageIsas.heading = Manage {0} ISAs
+manageIsas.windowClosed.guidance = The window for submitting your monthly report is now closed.
+manageIsas.windowOpen.guidance = The window for submitting your monthly report is now open. You can either download the Excel template file or continue to upload your monthly report.
+manageIsas.important.windowOpen = The monthly reporting period for {0} is now open. You can upload your {1} report. It closes at 11:59pm on {2}.
+manageIsas.important.daysRemaining = You have {0} days left to submit your monthly report.
+manageIsas.submitReport.heading = Submit report
+manageIsas.submitReport.link.windowOpen = Upload your {0} report
+manageIsas.submitReport.windowClosed = Reporting period for {0} is closed.
+manageIsas.submitReport.windowOpen.prefix = Reporting period for {0} is open.
+manageIsas.downloadTemplate.link = Download Excel template file
+manageIsas.changeOfCircumstances.heading = Change of circumstances
+manageIsas.changeOfCircumstances.p1 = Only administrators can carry out any change of circumstances that relate to the organisation.
+manageIsas.changeOfCircumstances.link = Update information about your organisation
+manageIsas.changeOfCircumstances.underReview.warning = You changed the ISA products your organisation offers. This is being checked by HMRC.
+manageIsas.changeOfCircumstances.underReview.p1 = You will not be able to make any further changes until HMRC have agreed to the current changes.
+manageIsas.changeOfCircumstances.underReview.p2 = You will receive a letter from HMRC once the changes have been approved.
+
 changeInformation.title = What would you like to change?
 changeInformation.heading = What would you like to change?
 changeInformation.caption = Select all sections that apply
