@@ -14,10 +14,54 @@
  * limitations under the License.
  *@
 
-@this(layout: Layout)
+@import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeInformationController, DeclarationForChangesController}
 
-@()(implicit request: RequestHeader, messages: Messages)
+@this(layout: Layout, govukSummaryList: GovukSummaryList, govukButton: GovukButton)
+
+@(
+    organisation: Option[SummaryList],
+    products: Option[SummaryList],
+    authorisedUsers: Option[SummaryList],
+    checkYourChanges: Option[SummaryList],
+    isaProductsChanged: Boolean
+)(implicit request: RequestHeader, messages: Messages)
+
+@section(headingKey: String, summary: Option[SummaryList]) = {
+    @summary.map { list =>
+        <h2 class="govuk-heading-m">@messages(headingKey)</h2>
+        @govukSummaryList(list)
+    }
+}
 
 @layout(pageTitle = Some(titleNoForm(messages("changeOfCircumstances.title")))) {
     <h1 class="govuk-heading-xl">@messages("changeOfCircumstances.heading")</h1>
+
+    <p class="govuk-body">@messages("changeOfCircumstances.intro.declaration")</p>
+    <p class="govuk-body">@messages("changeOfCircumstances.intro.warning")</p>
+    <p class="govuk-body">
+        @messages("changeOfCircumstances.intro.differentOption.beforeLink")
+        <a class="govuk-link" href="@ChangeInformationController.onPageLoad().url">@messages("changeOfCircumstances.selectDifferentOption.link")</a>
+        @messages("changeOfCircumstances.intro.differentOption.orReturn")
+        <!-- TODO Link back to page created in DFI-2538 & DFI-2539 -->
+        <a class="govuk-link" href="/">@messages("changeOfCircumstances.returnToManageIsas.link")</a>.
+    </p>
+
+    @section("changeOfCircumstances.organisationDetails.heading", organisation)
+    @section("changeOfCircumstances.productInformation.heading", products)
+    @section("changeOfCircumstances.authorisedUsers.heading", authorisedUsers)
+
+    @section("changeOfCircumstances.checkYourChanges.heading", checkYourChanges)
+
+    @if(isaProductsChanged) {
+        <h2 class="govuk-heading-m">@messages("changeOfCircumstances.isaProductChanges.heading")</h2>
+        <div class="govuk-inset-text">
+            <p class="govuk-body">@messages("changeOfCircumstances.isaProductChanges.manualProcessing")</p>
+            <p class="govuk-body">@messages("changeOfCircumstances.isaProductChanges.noFurtherChanges")</p>
+        </div>
+    }
+
+    @govukButton(Button(
+        href = Some(DeclarationForChangesController.onPageLoad().url),
+        content = Text(messages("changeOfCircumstances.continue"))
+    ))
 }

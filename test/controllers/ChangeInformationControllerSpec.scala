@@ -22,7 +22,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, when}
 import play.api.test.Helpers.*
 import play.api.test.*
-import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
+import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.{Assign, Unchanged}
 import uk.gov.hmrc.disaaccountfrontend.models.ChangeInformationSelection.*
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, SessionUpdates, UserAnswers}
 import utils.BaseUnitSpec
@@ -223,6 +223,123 @@ class ChangeInformationControllerSpec extends BaseUnitSpec {
         verify(mockUserAnswersRepository).set(captor.capture())
         captor.getValue.updates.changeInformationSelections shouldBe Assign(
           Seq(OrganisationInformation, AuthorisedUsers)
+        )
+      }
+    }
+
+    "clear authorised users answers when the section is deselected after previously viewing all information" in {
+      val existingUpdates = SessionUpdates(
+        changeInformationSelections = Assign(Seq(ViewAllInformation)),
+        tradingName = Assign("Existing trading name"),
+        signatories = Assign(testSignatories),
+        liaisonOfficers = Assign(testLiaisonOfficers)
+      )
+      when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
+      val application     = signatoryApplicationBuilder(
+        sessionAnswers = Some(UserAnswers(testSessionId, existingUpdates))
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(POST, changeInformationEndpoint)
+          .withFormUrlEncodedBody("value[]" -> OrganisationInformation.toString)
+          .withHeaders("Csrf-Token" -> "nocheck")
+        val result  = route(application, request).value
+
+        status(result) shouldBe SEE_OTHER
+
+        val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+        verify(mockUserAnswersRepository).set(captor.capture())
+        captor.getValue.updates shouldBe existingUpdates.copy(
+          changeInformationSelections = Assign(Seq(OrganisationInformation)),
+          signatories = Unchanged,
+          liaisonOfficers = Unchanged
+        )
+      }
+    }
+
+    "keep authorised users answers when the section remains selected" in {
+      val existingUpdates = SessionUpdates(
+        changeInformationSelections = Assign(Seq(AuthorisedUsers)),
+        signatories = Assign(testSignatories),
+        liaisonOfficers = Assign(testLiaisonOfficers)
+      )
+      when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
+      val application     = signatoryApplicationBuilder(
+        sessionAnswers = Some(UserAnswers(testSessionId, existingUpdates))
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(POST, changeInformationEndpoint)
+          .withFormUrlEncodedBody(
+            "value[]" -> OrganisationInformation.toString,
+            "value[]" -> AuthorisedUsers.toString
+          )
+          .withHeaders("Csrf-Token" -> "nocheck")
+        val result  = route(application, request).value
+
+        status(result) shouldBe SEE_OTHER
+
+        val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+        verify(mockUserAnswersRepository).set(captor.capture())
+        captor.getValue.updates shouldBe existingUpdates.copy(
+          changeInformationSelections = Assign(Seq(OrganisationInformation, AuthorisedUsers))
+        )
+      }
+    }
+
+    "clear organisation and ISA product answers when their sections are deselected" in {
+      val existingUpdates = SessionUpdates(
+        changeInformationSelections = Assign(Seq(ViewAllInformation)),
+        tradingName = Assign("Existing trading name"),
+        organisationTelephoneNumber = Assign("0123456789"),
+        isaProducts = Assign(Seq(uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct.CashIsas)),
+        fcaArticles = Assign(Seq(uk.gov.hmrc.disaaccountfrontend.models.articles.FcaArticles.FcaArticle14)),
+        signatories = Assign(testSignatories)
+      )
+      when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
+      val application     = signatoryApplicationBuilder(
+        sessionAnswers = Some(UserAnswers(testSessionId, existingUpdates))
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(POST, changeInformationEndpoint)
+          .withFormUrlEncodedBody("value[]" -> AuthorisedUsers.toString)
+          .withHeaders("Csrf-Token" -> "nocheck")
+        val result  = route(application, request).value
+
+        status(result) shouldBe SEE_OTHER
+
+        val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+        verify(mockUserAnswersRepository).set(captor.capture())
+        captor.getValue.updates shouldBe existingUpdates.copy(
+          changeInformationSelections = Assign(Seq(AuthorisedUsers)),
+          tradingName = Unchanged,
+          organisationTelephoneNumber = Unchanged,
+          isaProducts = Unchanged,
+          fcaArticles = Unchanged
+        )
+      }
+    }
+
+    "not clear any answers on the first ever selection, even where a section is left out" in {
+      val existingUpdates = SessionUpdates(signatories = Assign(testSignatories))
+      when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
+      val application     = signatoryApplicationBuilder(
+        sessionAnswers = Some(UserAnswers(testSessionId, existingUpdates))
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(POST, changeInformationEndpoint)
+          .withFormUrlEncodedBody("value[]" -> OrganisationInformation.toString)
+          .withHeaders("Csrf-Token" -> "nocheck")
+        val result  = route(application, request).value
+
+        status(result) shouldBe SEE_OTHER
+
+        val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+        verify(mockUserAnswersRepository).set(captor.capture())
+        captor.getValue.updates shouldBe existingUpdates.copy(
+          changeInformationSelections = Assign(Seq(OrganisationInformation))
         )
       }
     }

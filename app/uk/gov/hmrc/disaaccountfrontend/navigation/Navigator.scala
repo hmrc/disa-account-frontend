@@ -18,7 +18,6 @@ package uk.gov.hmrc.disaaccountfrontend.navigation
 
 import play.api.mvc.Call
 import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.{AddedLiaisonOfficersController, LiaisonOfficerCheckYourAnswersController, LiaisonOfficerCommunicationController, LiaisonOfficerEmailController, LiaisonOfficerNameController, LiaisonOfficerPhoneNumberController}
-import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.{OrganisationTelephoneNumberController, TradingNameController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.routes.EmailVerificationCodeController
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, InnovativeFinancialProductsController, PeerToPeerPlatformController, PeerToPeerPlatformNumberController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.signatories.routes.{AddedSignatoryController, SignatoryCheckYourAnswersController, SignatoryJobTitleController, SignatoryNameController}
@@ -58,10 +57,9 @@ class Navigator @Inject() () {
   }
 
   def nextPage(page: Page, answers: Answers = Answers(), mode: Mode = NormalMode): Call = page match {
-    case EnterYourOrganisationAddressPage      => OrganisationTelephoneNumberController.onPageLoad()
-    // TODO: replace with the next page in the journey once it exists.
-    case OrganisationTelephoneNumberPage       => OrganisationTelephoneNumberController.onPageLoad()
-    case TradingNamePage                       => TradingNameController.onPageLoad()
+    case EnterYourOrganisationAddressPage      => ChangeOfCircumstancesController.onPageLoad()
+    case OrganisationTelephoneNumberPage       => ChangeOfCircumstancesController.onPageLoad()
+    case TradingNamePage                       => ChangeOfCircumstancesController.onPageLoad()
     case InnovativeFinancialProductsPage       => innovativeFinancialProductsNextPage(answers)
     case PeerToPeerPlatformPage                => peerToPeerPlatformNextPage(answers)
     case PeerToPeerPlatformNumberPage          => peerToPeerPlatformNumberNextPage()

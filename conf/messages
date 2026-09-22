@@ -238,8 +238,48 @@ unauthorised.title = You cannot access this service
 unauthorised.heading = You cannot access this service
 unauthorised.body = You need to be signed in with an organisation that is enrolled to manage ISAs to use this service.
 
-changeOfCircumstances.title = Change of circumstances
-changeOfCircumstances.heading = Change of circumstances
+changeOfCircumstances.title = Manage organisation information
+changeOfCircumstances.heading = Manage organisation information
+changeOfCircumstances.intro.declaration = Once you’ve made all the changes you will need to agree to the declaration before submitting them.
+changeOfCircumstances.intro.warning = If you don’t submit your changes, they will be lost.
+changeOfCircumstances.intro.differentOption.beforeLink = If you want to make other changes you can
+changeOfCircumstances.selectDifferentOption.link = select a different option
+changeOfCircumstances.intro.differentOption.orReturn = or you can
+changeOfCircumstances.returnToManageIsas.link = return to the Manage ISAs homepage
+
+changeOfCircumstances.organisationDetails.heading = Organisation details
+changeOfCircumstances.productInformation.heading = Product information
+changeOfCircumstances.authorisedUsers.heading = Authorised users
+changeOfCircumstances.authorisedUsers.liaisonOfficer = Liaison officer
+changeOfCircumstances.authorisedUsers.liaisonOfficer.change.hidden = liaison officers
+changeOfCircumstances.authorisedUsers.signatory = Signatory
+changeOfCircumstances.authorisedUsers.signatory.change.hidden = signatories
+changeOfCircumstances.articles.label = Articles
+
+changeOfCircumstances.checkYourChanges.heading = Check your changes
+changeOfCircumstances.checkYourChanges.productsAdded = Products added
+changeOfCircumstances.checkYourChanges.productsRemoved = Products removed
+changeOfCircumstances.checkYourChanges.signatoriesAdded = Signatories added
+changeOfCircumstances.checkYourChanges.signatoriesRemoved = Signatories removed
+changeOfCircumstances.checkYourChanges.liaisonOfficersAdded = Liaison officers added
+changeOfCircumstances.checkYourChanges.liaisonOfficersRemoved = Liaison officers removed
+changeOfCircumstances.checkYourChanges.changedTradingName = Changed trading name
+changeOfCircumstances.checkYourChanges.changedCorrespondenceAddress = Changed correspondence address
+changeOfCircumstances.checkYourChanges.changedOrganisationTelephoneNumber = Changed organisation telephone number
+changeOfCircumstances.checkYourChanges.changedOrganisationEmailAddress = Changed organisation email
+changeOfCircumstances.checkYourChanges.valueChange = {0} to {1}
+changeOfCircumstances.checkYourChanges.to = to
+
+changeOfCircumstances.isaProductChanges.heading = ISA product changes information
+changeOfCircumstances.isaProductChanges.manualProcessing = Any changes to ISA products will require manual processing once submitted and you will be unable to make any additional changes until you hear from HMRC. We aim to confirm the changes by email, within 2 weeks.
+changeOfCircumstances.isaProductChanges.noFurtherChanges = If you have other changes to make, for example, to organisation details or authorised users - you can do these before you make ISA product changes and submit them.
+
+changeOfCircumstances.continue = Continue
+
+isaProducts.checkYourAnswersLabel = Products
+isaProducts.change.hidden = products
+correspondenceAddress.checkYourAnswersLabel = Added correspondence address
+correspondenceAddress.change.hidden = correspondence address
 
 declarationForChanges.title = Declaration for changes
 declarationForChanges.title.isaProducts = Declaration for changes, including ISA products

@@ -85,7 +85,7 @@ class EnterYourOrganisationAddressControllerSpec extends BaseUnitSpec {
         val result = route(application, request).value
 
         status(result)               shouldBe SEE_OTHER
-        redirectLocation(result).value should endWith(organisationTelephoneNumberEndpoint)
+        redirectLocation(result).value should endWith(changeOfCircumstancesEndpoint)
 
         val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
         verify(mockUserAnswersRepository).set(captor.capture())

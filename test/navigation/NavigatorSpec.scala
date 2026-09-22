@@ -18,7 +18,6 @@ package navigation
 
 import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.{AddedLiaisonOfficersController, LiaisonOfficerCheckYourAnswersController, LiaisonOfficerCommunicationController, LiaisonOfficerEmailController, LiaisonOfficerNameController, LiaisonOfficerPhoneNumberController}
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, InnovativeFinancialProductsController, PeerToPeerPlatformController, PeerToPeerPlatformNumberController}
-import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.OrganisationTelephoneNumberController
 import uk.gov.hmrc.disaaccountfrontend.controllers.signatories.routes.{AddedSignatoryController, SignatoryCheckYourAnswersController, SignatoryJobTitleController, SignatoryNameController}
 import uk.gov.hmrc.disaaccountfrontend.models.YesNoAnswer.{No, Yes}
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, CheckMode, NormalMode, SessionUpdates}
@@ -77,12 +76,16 @@ class NavigatorSpec extends BaseUnitSpec {
       ) shouldBe ChangeOfCircumstancesController.onPageLoad()
     }
 
-    "go from EnterYourOrganisationAddressPage to the organisation telephone number page" in {
-      navigator.nextPage(EnterYourOrganisationAddressPage) shouldBe OrganisationTelephoneNumberController.onPageLoad()
+    "go from EnterYourOrganisationAddressPage to change of circumstances" in {
+      navigator.nextPage(EnterYourOrganisationAddressPage) shouldBe ChangeOfCircumstancesController.onPageLoad()
     }
 
-    "go from OrganisationTelephoneNumberPage back to itself until the next page in the journey exists" in {
-      navigator.nextPage(OrganisationTelephoneNumberPage) shouldBe OrganisationTelephoneNumberController.onPageLoad()
+    "go from OrganisationTelephoneNumberPage to change of circumstances" in {
+      navigator.nextPage(OrganisationTelephoneNumberPage) shouldBe ChangeOfCircumstancesController.onPageLoad()
+    }
+
+    "go from TradingNamePage to change of circumstances" in {
+      navigator.nextPage(TradingNamePage) shouldBe ChangeOfCircumstancesController.onPageLoad()
     }
 
     "go from InnovativeFinancialProductsPage to the peer-to-peer platform page when the platform option is selected" in {

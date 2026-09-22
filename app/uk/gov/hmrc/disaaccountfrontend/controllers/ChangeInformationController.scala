@@ -20,8 +20,8 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction}
 import uk.gov.hmrc.disaaccountfrontend.forms.ChangeInformationFormProvider
-import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
-import uk.gov.hmrc.disaaccountfrontend.models.ChangeInformationSelection.{ViewAllInformation, viewAllInformationFormValue}
+import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.{Assign, Unchanged}
+import uk.gov.hmrc.disaaccountfrontend.models.ChangeInformationSelection.{AuthorisedUsers, IsaProductInformation, OrganisationInformation, ViewAllInformation, viewAllInformationFormValue}
 import uk.gov.hmrc.disaaccountfrontend.models.{ChangeInformationSelection, SessionUpdates, UserAnswers}
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
 import uk.gov.hmrc.disaaccountfrontend.views.html.ChangeInformation
@@ -68,12 +68,16 @@ class ChangeInformationController @Inject() (
       .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, availableSelections))),
         formValues => {
-          val selections      = ChangeInformationSelection.fromForm(formValues, availableSelections)
-          val existingUpdates = request.sessionAnswers.fold(SessionUpdates())(_.updates)
-          val updatedAnswers  = UserAnswers(
-            id = request.sessionId,
-            updates = existingUpdates.copy(changeInformationSelections = Assign(selections))
-          )
+          val selections       = ChangeInformationSelection.fromForm(formValues, availableSelections)
+          val existingUpdates  = request.sessionAnswers.fold(SessionUpdates())(_.updates)
+          val previousSelected = existingUpdates.changeInformationSelections match {
+            case Assign(previous) => Some(previous)
+            case _                => None
+          }
+          val updatedUpdates   = previousSelected
+            .fold(existingUpdates)(previous => clearHiddenSections(existingUpdates, previous, selections))
+            .copy(changeInformationSelections = Assign(selections))
+          val updatedAnswers   = UserAnswers(id = request.sessionId, updates = updatedUpdates)
 
           userAnswersRepository
             .set(updatedAnswers)
@@ -81,4 +85,44 @@ class ChangeInformationController @Inject() (
         }
       )
   }
+
+  // Section checkboxes only control what's shown on the Change of circumstances page; the answers
+  // themselves live on in the session regardless, so any pending changes for a section the user has
+  // just hidden would otherwise still be submitted without the user seeing them again. Discarding
+  // them here (reverting to Unchanged, i.e. whatever's already on the account) keeps the two in sync.
+  // Only applies when narrowing an existing selection - there's nothing to narrow away from on the
+  // user's first ever pass through this page, so nothing is cleared then.
+  private def clearHiddenSections(
+    updates: SessionUpdates,
+    previousSelections: Seq[ChangeInformationSelection],
+    newSelections: Seq[ChangeInformationSelection]
+  ): SessionUpdates =
+    sectionFieldClearers.foldLeft(updates) { case (acc, (section, clearFields)) =>
+      val wasShown = ChangeInformationSelection.isShown(previousSelections, section)
+      val isShown  = ChangeInformationSelection.isShown(newSelections, section)
+      if (wasShown && !isShown) clearFields(acc) else acc
+    }
+
+  private val sectionFieldClearers: Seq[(ChangeInformationSelection, SessionUpdates => SessionUpdates)] = Seq(
+    OrganisationInformation -> ((updates: SessionUpdates) =>
+      updates.copy(
+        correspondenceAddress = Unchanged,
+        organisationTelephoneNumber = Unchanged,
+        tradingName = Unchanged,
+        organisationEmailAddress = Unchanged,
+        organisationEmailVerified = Unchanged
+      )
+    ),
+    IsaProductInformation   -> ((updates: SessionUpdates) =>
+      updates.copy(
+        isaProducts = Unchanged,
+        innovativeFinancialProducts = Unchanged,
+        p2pPlatform = Unchanged,
+        p2pPlatformNumber = Unchanged,
+        fcaArticles = Unchanged,
+        financialOrganisation = Unchanged
+      )
+    ),
+    AuthorisedUsers         -> ((updates: SessionUpdates) => updates.copy(signatories = Unchanged, liaisonOfficers = Unchanged))
+  )
 }
