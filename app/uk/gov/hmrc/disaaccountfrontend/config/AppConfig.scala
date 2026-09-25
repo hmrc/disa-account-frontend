@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.disaaccountfrontend.config
 
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
@@ -38,9 +40,13 @@ class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig
 
   val appName: String = config.get[String]("appName")
 
-  val loginUrl: String         = config.get[String]("urls.login")
-  val loginContinueUrl: String = config.get[String]("urls.loginContinue")
-  val signOutUrl: String       = config.get[String]("urls.signOut")
+  val loginUrl: String           = config.get[String]("urls.login")
+  val loginContinueUrl: String   = config.get[String]("urls.loginContinue")
+  val signOutUrl: String         = config.get[String]("urls.signOut")
+  val signOutContinueUrl: String = config.get[String]("urls.signOutContinue")
+
+  lazy val signInUrl: String =
+    s"$loginUrl?continue=${URLEncoder.encode(loginContinueUrl, StandardCharsets.UTF_8)}"
 
   lazy val monthlyReportSubmissionUrl: String =
     s"${servicesConfig.baseUrl(serviceName = "disa-returns-frontend")}/obligations/returns/isa/monthly-report-submission"

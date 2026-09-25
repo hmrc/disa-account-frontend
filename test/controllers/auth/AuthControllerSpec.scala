@@ -43,7 +43,7 @@ class AuthControllerSpec extends BaseUnitSpec {
         status(result)                                                                 shouldBe SEE_OTHER
         redirectUrl                                                                      should startWith(basGatewaySignOutEndpoint)
         URLDecoder.decode(URI.create(redirectUrl).getRawQuery, StandardCharsets.UTF_8) shouldBe
-          s"continue=$signedOutEndpoint"
+          s"continue=$signOutContinueEndpoint"
         verify(mockUserAnswersRepository).clear(testSessionId)
       }
     }

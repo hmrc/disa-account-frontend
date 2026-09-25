@@ -18,7 +18,7 @@ package uk.gov.hmrc.disaaccountfrontend.controllers
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{AccountMaintenanceGuardAction, DataRetrievalAction, IdentifierAction}
+import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction}
 import uk.gov.hmrc.disaaccountfrontend.views.html.ChangesCompletedView
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
@@ -28,13 +28,12 @@ class ChangesCompletedController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
-  accountMaintenanceGuard: AccountMaintenanceGuardAction,
   val controllerComponents: MessagesControllerComponents,
   view: ChangesCompletedView
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen accountMaintenanceGuard) { implicit request =>
+  def onPageLoad(): Action[AnyContent] = (identify andThen getData) { implicit request =>
     Ok(view(request.isaProductsUpdated))
   }
 }

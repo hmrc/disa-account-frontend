@@ -16,10 +16,9 @@
 
 package controllers
 
-import controllers.actions.FakeAccountMaintenanceGuardAction
 import org.jsoup.Jsoup
-import play.api.test.Helpers.*
 import play.api.test.*
+import play.api.test.Helpers.*
 import uk.gov.hmrc.disaaccountfrontend.models.Answers
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct.{CashIsas, StocksAndSharesIsas}
 import utils.BaseUnitSpec
@@ -28,18 +27,6 @@ class ChangesCompletedControllerSpec extends BaseUnitSpec {
 
   "ChangesCompletedController.onPageLoad" should {
 
-    "redirect to manage ISAs when an ISA product change is under review" in {
-      val application = applicationBuilder(
-        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
-      ).build()
-
-      running(application) {
-        val result = route(application, FakeRequest(GET, changesCompletedEndpoint)).value
-
-        status(result)                 shouldBe SEE_OTHER
-        redirectLocation(result).value shouldBe manageIsasEndpoint
-      }
-    }
     "render the page and ISA product section when products changed" in {
       val originalAnswers  = Answers(isaProducts = Some(Seq(CashIsas)))
       val effectiveAnswers = Answers(isaProducts = Some(Seq(CashIsas, StocksAndSharesIsas)))
