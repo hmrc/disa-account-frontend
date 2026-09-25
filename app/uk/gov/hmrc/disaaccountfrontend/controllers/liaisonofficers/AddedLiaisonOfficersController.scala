@@ -19,7 +19,7 @@ package uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.disaaccountfrontend.config.AppConfig
-import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction, PageGuardAction}
+import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{AccountMaintenanceGuardAction, DataRetrievalAction, IdentifierAction, PageGuardAction}
 import uk.gov.hmrc.disaaccountfrontend.forms.generic.YesNoAnswerFormProvider
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
 import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator
@@ -36,6 +36,7 @@ class AddedLiaisonOfficersController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   guardPage: PageGuardAction,
+  accountMaintenanceGuard: AccountMaintenanceGuardAction,
   formProvider: YesNoAnswerFormProvider,
   navigator: Navigator,
   appConfig: AppConfig,
@@ -45,7 +46,8 @@ class AddedLiaisonOfficersController @Inject() (
     with I18nSupport {
 
   private val form       = formProvider("addedLiaisonOfficer.error.required")
-  private val pageAction = identify andThen getData andThen guardPage(AddedLiaisonOfficerPage)
+  private val pageAction =
+    identify andThen getData andThen accountMaintenanceGuard andThen guardPage(AddedLiaisonOfficerPage)
 
   def onPageLoad(): Action[AnyContent] = pageAction { implicit request =>
     Ok(view(form, summary))

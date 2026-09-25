@@ -16,6 +16,7 @@
 
 package controllers.liaisonofficers
 
+import controllers.actions.FakeAccountMaintenanceGuardAction
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
@@ -52,6 +53,22 @@ class RemoveOfficersControllerSpec extends BaseUnitSpec {
     )
 
   "RemoveOfficersController.onPageLoad" should {
+
+    "redirect to manage ISAs when an ISA product change is under review" in {
+      val application = applicationBuilder(
+        effectiveAnswers = Answers(liaisonOfficers = Some(testLiaisonOfficers)),
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val result =
+          route(application, FakeRequest(GET, s"$removeLiaisonOfficerEndpoint?id=$testLiaisonOfficerId")).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+      }
+    }
+
     "must return OK and the correct view for a GET when the officer exists" in {
       val application = applicationBuilder(
         effectiveAnswers = Answers(liaisonOfficers = Some(testLiaisonOfficers))
@@ -83,6 +100,25 @@ class RemoveOfficersControllerSpec extends BaseUnitSpec {
   }
 
   "RemoveOfficersController.onSubmit" should {
+
+    "redirect to manage ISAs when an ISA product change is under review" in {
+      val application = applicationBuilder(
+        effectiveAnswers = Answers(liaisonOfficers = Some(testLiaisonOfficers)),
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(POST, s"$removeLiaisonOfficerEndpoint?id=$testLiaisonOfficerId")
+          .withFormUrlEncodedBody("value" -> Yes.toString)
+          .withHeaders("Csrf-Token" -> "nocheck")
+        val result  = route(application, request).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+        verify(mockUserAnswersRepository, never).set(any())
+      }
+    }
+
     "remove the selected officer when Yes is submitted" in {
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
 

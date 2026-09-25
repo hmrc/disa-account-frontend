@@ -21,7 +21,7 @@ import uk.gov.hmrc.disaaccountfrontend.models.UserAnswers
 
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
-import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction}
+import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{AccountMaintenanceGuardAction, DataRetrievalAction, IdentifierAction}
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
 import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator
 import uk.gov.hmrc.disaaccountfrontend.views.html.FcaArticlesView
@@ -36,6 +36,7 @@ class FcaArticlesController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  accountMaintenanceGuard: AccountMaintenanceGuardAction,
   userAnswersRepository: UserAnswersRepository,
   navigator: Navigator,
   formProvider: FcaArticlesFormProvider,
@@ -47,7 +48,7 @@ class FcaArticlesController @Inject() (
     with I18nSupport {
 
   private val form       = formProvider()
-  private val pageAction = identify andThen getData
+  private val pageAction = identify andThen getData andThen accountMaintenanceGuard
 
   def onPageLoad(): Action[AnyContent] = pageAction { implicit request =>
     val preparedForm = request.effectiveAnswers.fcaArticles.fold(form)(answer => form.fill(answer.toSet))

@@ -17,18 +17,18 @@
 package uk.gov.hmrc.disaaccountfrontend.navigation
 
 import play.api.mvc.Call
-import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.{AddedLiaisonOfficersController, LiaisonOfficerCheckYourAnswersController, LiaisonOfficerCommunicationController, LiaisonOfficerEmailController, LiaisonOfficerNameController, LiaisonOfficerPhoneNumberController}
-import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.{OrganisationTelephoneNumberController, TradingNameController}
+import uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers.routes.*
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.routes.EmailVerificationCodeController
-import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeOfCircumstancesController, InnovativeFinancialProductsController, PeerToPeerPlatformController, PeerToPeerPlatformNumberController}
-import uk.gov.hmrc.disaaccountfrontend.controllers.signatories.routes.{AddedSignatoryController, SignatoryCheckYourAnswersController, SignatoryJobTitleController, SignatoryNameController}
+import uk.gov.hmrc.disaaccountfrontend.controllers.routes.ChangeOfCircumstancesController
+import uk.gov.hmrc.disaaccountfrontend.controllers.signatories.routes.*
+import uk.gov.hmrc.disaaccountfrontend.controllers.isaproducts.routes.*
+import uk.gov.hmrc.disaaccountfrontend.models.*
 import uk.gov.hmrc.disaaccountfrontend.models.YesNoAnswer.{No, Yes}
-import uk.gov.hmrc.disaaccountfrontend.models.{Answers, CheckMode, Mode, NormalMode, YesNoAnswer}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct.InnovativeFinanceIsas
 import uk.gov.hmrc.disaaccountfrontend.models.pages.*
-import uk.gov.hmrc.disaaccountfrontend.models.pages.liaisonofficers.{LiaisonOfficerCheckYourAnswersPage, LiaisonOfficerCommunicationPage, LiaisonOfficerEmailPage, LiaisonOfficerNamePage, LiaisonOfficerPhoneNumberPage, RemoveLiaisonOfficerPage}
-import uk.gov.hmrc.disaaccountfrontend.models.pages.signatories.{RemoveSignatoryPage, SignatoryJobTitlePage, SignatoryNamePage}
+import uk.gov.hmrc.disaaccountfrontend.models.pages.liaisonofficers.*
+import uk.gov.hmrc.disaaccountfrontend.models.pages.signatories.*
 
 import javax.inject.{Inject, Singleton}
 
@@ -57,12 +57,21 @@ class Navigator @Inject() () {
     }
   }
 
+  def nextPageFromInnovativeFinancialProducts(previousAnswers: Answers, updatedAnswers: Answers): Call = {
+    def platformWithPermissionsSelected(answers: Answers): Boolean =
+      answers.innovativeFinancialProducts.exists(_.contains(PeertopeerLoansUsingAPlatformWith36hPermissions))
+
+    if (platformWithPermissionsSelected(updatedAnswers) && !platformWithPermissionsSelected(previousAnswers)) {
+      PeerToPeerPlatformController.onPageLoad()
+    } else {
+      ChangeOfCircumstancesController.onPageLoad()
+    }
+  }
+
   def nextPage(page: Page, answers: Answers = Answers(), mode: Mode = NormalMode): Call = page match {
-    case EnterYourOrganisationAddressPage      => OrganisationTelephoneNumberController.onPageLoad()
-    // TODO: replace with the next page in the journey once it exists.
-    case OrganisationTelephoneNumberPage       => OrganisationTelephoneNumberController.onPageLoad()
-    case TradingNamePage                       => TradingNameController.onPageLoad()
-    case InnovativeFinancialProductsPage       => innovativeFinancialProductsNextPage(answers)
+    case EnterYourOrganisationAddressPage      => ChangeOfCircumstancesController.onPageLoad()
+    case OrganisationTelephoneNumberPage       => ChangeOfCircumstancesController.onPageLoad()
+    case TradingNamePage                       => ChangeOfCircumstancesController.onPageLoad()
     case PeerToPeerPlatformPage                => peerToPeerPlatformNextPage(answers)
     case PeerToPeerPlatformNumberPage          => peerToPeerPlatformNumberNextPage()
     case FcaArticlesPage                       => fcaArticlesNextPage()
@@ -82,17 +91,6 @@ class Navigator @Inject() () {
     case unsupportedPage                       =>
       throw new IllegalArgumentException(s"No navigation defined for page: $unsupportedPage")
   }
-
-  private def innovativeFinancialProductsNextPage(answers: Answers): Call =
-    answers.innovativeFinancialProducts match {
-      case Some(products) if products.contains(PeertopeerLoansUsingAPlatformWith36hPermissions) =>
-        peerToPeerPlatformQuestionPage
-      case _                                                                                    =>
-        ChangeOfCircumstancesController.onPageLoad()
-    }
-
-  private def peerToPeerPlatformQuestionPage: Call =
-    PeerToPeerPlatformController.onPageLoad()
 
   private def peerToPeerPlatformNextPage(answers: Answers): Call =
     answers.p2pPlatformNumber match {

@@ -18,7 +18,7 @@ package uk.gov.hmrc.disaaccountfrontend.controllers.liaisonofficers
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction, PageGuardAction}
+import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{AccountMaintenanceGuardAction, DataRetrievalAction, IdentifierAction, PageGuardAction}
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes.ChangeOfCircumstancesController
 import uk.gov.hmrc.disaaccountfrontend.models.pages.liaisonofficers.LiaisonOfficerCheckYourAnswersPage
 import uk.gov.hmrc.disaaccountfrontend.viewmodels.checkAnswers.liaisonofficers.{LiaisonOfficerCommunicationSummary, LiaisonOfficerEmailSummary, LiaisonOfficerNameSummary, LiaisonOfficerPhoneSummary}
@@ -33,13 +33,16 @@ class LiaisonOfficerCheckYourAnswersController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   guardPage: PageGuardAction,
+  accountMaintenanceGuard: AccountMaintenanceGuardAction,
   val controllerComponents: MessagesControllerComponents,
   view: LiaisonOfficerCheckYourAnswersView
 ) extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad(id: String): Action[AnyContent] =
-    (identify andThen getData andThen guardPage(LiaisonOfficerCheckYourAnswersPage(id))) { implicit request =>
+    (identify andThen getData andThen accountMaintenanceGuard andThen guardPage(
+      LiaisonOfficerCheckYourAnswersPage(id)
+    )) { implicit request =>
       request.effectiveAnswers.liaisonOfficers
         .flatMap(_.liaisonOfficers.find(_.id == id))
         .fold(Redirect(ChangeOfCircumstancesController.onPageLoad())) { officer =>

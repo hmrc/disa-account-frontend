@@ -63,7 +63,8 @@ class AddedSignatoryControllerISpec extends BaseIntegrationSpec {
        |      {
        |        "id": "$signatoryId",
        |        "fullName": "Test Signatory",
-       |        "jobTitle": "Director"
+       |        "jobTitle": "Director",
+       |        "email": "signatory@example.com"
        |      }
        |    ]
        |  }
@@ -93,6 +94,16 @@ class AddedSignatoryControllerISpec extends BaseIntegrationSpec {
       status(result)        shouldBe OK
       contentAsString(result) should include("You currently have a signatory")
       contentAsString(result) should include("Test Signatory")
+    }
+
+    "redirect a non-signatory to change of circumstances" in {
+      stubAuth(testZref, testCredentialId, Some("someone.else@example.com"))
+      stubGet(registrationUrl, OK, registrationResponseBody)
+
+      val result = route(app, authenticatedGet).get
+
+      status(result)           shouldBe SEE_OTHER
+      redirectLocation(result) shouldBe Some("/obligations/account/isa/change-of-circumstances")
     }
   }
 

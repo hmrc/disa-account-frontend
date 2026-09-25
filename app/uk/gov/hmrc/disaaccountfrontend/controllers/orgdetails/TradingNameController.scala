@@ -21,7 +21,7 @@ import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.disaaccountfrontend.controllers.PageController
-import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction}
+import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{AccountMaintenanceGuardAction, DataRetrievalAction, IdentifierAction}
 import uk.gov.hmrc.disaaccountfrontend.forms.TradingNameFormProvider
 import uk.gov.hmrc.disaaccountfrontend.models.UserAnswers
 import uk.gov.hmrc.disaaccountfrontend.models.pages.TradingNamePage
@@ -37,6 +37,7 @@ class TradingNameController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  accountMaintenanceGuard: AccountMaintenanceGuardAction,
   userAnswersRepository: UserAnswersRepository,
   navigator: Navigator,
   formProvider: TradingNameFormProvider,
@@ -50,12 +51,14 @@ class TradingNameController @Inject() (
 
   val form: Form[String] = formProvider()
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData) { implicit request =>
+  private val pageAction = identify andThen getData andThen accountMaintenanceGuard
+
+  def onPageLoad(): Action[AnyContent] = pageAction { implicit request =>
     val preparedForm = request.effectiveAnswers.tradingName.fold(form)(form.fill)
     Ok(view(preparedForm))
   }
 
-  def onSubmit(): Action[AnyContent] = (identify andThen getData).async { implicit request =>
+  def onSubmit(): Action[AnyContent] = pageAction.async { implicit request =>
     form
       .bindFromRequest()
       .fold(

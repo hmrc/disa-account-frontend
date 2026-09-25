@@ -16,6 +16,7 @@
 
 package controllers.signatories
 
+import controllers.actions.FakeAccountMaintenanceGuardAction
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.*
@@ -31,14 +32,33 @@ import scala.concurrent.Future
 
 class SignatoryJobTitleControllerSpec extends BaseUnitSpec {
 
+  private def signatoryApplicationBuilder(effectiveAnswers: Answers) =
+    applicationBuilder(effectiveAnswers = effectiveAnswers, email = Some(testSignatoryEmail))
+
   val validFormData: Map[String, String] = Map("value" -> testSignatoryJobTitle)
 
-  val existingSignatory: Signatory = Signatory(testSignatoryId, fullName = Some(testName))
+  val existingSignatory: Signatory =
+    Signatory(testSignatoryId, fullName = Some(testName), email = Some(testSignatoryEmail))
 
   "SignatoryJobTitleController.onPageLoad" should {
 
-    "return 200 OK with an empty form when the signatory has no job title yet" in {
+    "redirect to manage ISAs when an ISA product change is under review" in {
       val application = applicationBuilder(
+        effectiveAnswers = Answers(signatories = Some(Signatories(Seq(existingSignatory)))),
+        email = Some(testSignatoryEmail),
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, s"$signatoryJobTitleEndpoint?id=$testSignatoryId")).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+      }
+    }
+
+    "return 200 OK with an empty form when the signatory has no job title yet" in {
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(signatories = Some(Signatories(Seq(existingSignatory))))
       ).build()
 
@@ -51,7 +71,7 @@ class SignatoryJobTitleControllerSpec extends BaseUnitSpec {
     }
 
     "return 200 OK prefilled from the effective answers when the signatory already has a job title" in {
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers =
           Answers(signatories = Some(Signatories(Seq(existingSignatory.copy(jobTitle = Some(testSignatoryJobTitle))))))
       ).build()
@@ -69,7 +89,7 @@ class SignatoryJobTitleControllerSpec extends BaseUnitSpec {
     }
 
     "render the check-mode form for an existing signatory" in {
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(
           signatories = Some(Signatories(Seq(existingSignatory.copy(jobTitle = Some(testSignatoryJobTitle)))))
         )
@@ -87,7 +107,7 @@ class SignatoryJobTitleControllerSpec extends BaseUnitSpec {
     }
 
     "redirect to change of circumstances when the id does not match an existing signatory" in {
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(signatories = Some(Signatories(Seq(existingSignatory))))
       ).build()
 
@@ -100,8 +120,21 @@ class SignatoryJobTitleControllerSpec extends BaseUnitSpec {
     }
 
     "redirect to change of circumstances when the matching signatory has no name yet" in {
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(signatories = Some(Signatories(Seq(Signatory(testSignatoryId)))))
+      ).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, s"$signatoryJobTitleEndpoint?id=$testSignatoryId")).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
+      }
+    }
+
+    "redirect a non-signatory to change of circumstances" in {
+      val application = applicationBuilder(
+        effectiveAnswers = Answers(signatories = Some(Signatories(Seq(existingSignatory))))
       ).build()
 
       running(application) {
@@ -115,10 +148,30 @@ class SignatoryJobTitleControllerSpec extends BaseUnitSpec {
 
   "SignatoryJobTitleController.onSubmit" should {
 
+    "redirect to manage ISAs when an ISA product change is under review" in {
+      val application = applicationBuilder(
+        effectiveAnswers = Answers(signatories = Some(Signatories(Seq(existingSignatory)))),
+        email = Some(testSignatoryEmail),
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, s"$signatoryJobTitleEndpoint?id=$testSignatoryId")
+            .withFormUrlEncodedBody(validFormData.toSeq: _*)
+            .withHeaders("Csrf-Token" -> "nocheck")
+        val result  = route(application, request).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+        verify(mockUserAnswersRepository, never).set(any())
+      }
+    }
+
     "update the matching signatory's job title and preserve their name" in {
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
 
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(signatories = Some(Signatories(Seq(existingSignatory))))
       ).build()
 
@@ -144,7 +197,7 @@ class SignatoryJobTitleControllerSpec extends BaseUnitSpec {
     "return directly to check signatory details after updating a job title in check mode" in {
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
 
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(signatories = Some(Signatories(Seq(existingSignatory))))
       ).build()
 
@@ -162,7 +215,7 @@ class SignatoryJobTitleControllerSpec extends BaseUnitSpec {
     }
 
     "return 400 BadRequest when the form is invalid" in {
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(signatories = Some(Signatories(Seq(existingSignatory))))
       ).build()
 
@@ -181,13 +234,32 @@ class SignatoryJobTitleControllerSpec extends BaseUnitSpec {
     }
 
     "redirect to change of circumstances and not save when the id does not match an existing signatory" in {
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(signatories = Some(Signatories(Seq(existingSignatory))))
       ).build()
 
       running(application) {
         val request =
           FakeRequest(POST, s"$signatoryJobTitleEndpoint?id=some-other-id")
+            .withFormUrlEncodedBody(validFormData.toSeq: _*)
+            .withHeaders("Csrf-Token" -> "nocheck")
+
+        val result = route(application, request).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
+        verify(mockUserAnswersRepository, never).set(any())
+      }
+    }
+
+    "redirect a non-signatory to change of circumstances and not save" in {
+      val application = applicationBuilder(
+        effectiveAnswers = Answers(signatories = Some(Signatories(Seq(existingSignatory))))
+      ).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, s"$signatoryJobTitleEndpoint?id=$testSignatoryId")
             .withFormUrlEncodedBody(validFormData.toSeq: _*)
             .withHeaders("Csrf-Token" -> "nocheck")
 

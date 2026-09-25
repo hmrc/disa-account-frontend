@@ -19,7 +19,7 @@ package uk.gov.hmrc.disaaccountfrontend.controllers.signatories
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.disaaccountfrontend.config.AppConfig
-import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction, PageGuardAction}
+import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{AccountMaintenanceGuardAction, DataRetrievalAction, IdentifierAction, PageGuardAction, RequireSignatoryAction}
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes.ChangeOfCircumstancesController
 import uk.gov.hmrc.disaaccountfrontend.forms.generic.YesNoAnswerFormProvider
 import uk.gov.hmrc.disaaccountfrontend.models.pages.signatories.AddedSignatoryPage
@@ -36,6 +36,8 @@ class AddedSignatoryController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   guardPage: PageGuardAction,
+  requireSignatory: RequireSignatoryAction,
+  accountMaintenanceGuard: AccountMaintenanceGuardAction,
   formProvider: YesNoAnswerFormProvider,
   navigator: Navigator,
   appConfig: AppConfig,
@@ -45,7 +47,10 @@ class AddedSignatoryController @Inject() (
     with I18nSupport {
 
   private val form       = formProvider("addedSignatory.error.required")
-  private val pageAction = identify andThen getData andThen guardPage(AddedSignatoryPage)
+  private val pageAction =
+    identify andThen getData andThen accountMaintenanceGuard andThen requireSignatory andThen guardPage(
+      AddedSignatoryPage
+    )
 
   def onPageLoad(): Action[AnyContent] = pageAction { implicit request =>
     Ok(view(form, summary))

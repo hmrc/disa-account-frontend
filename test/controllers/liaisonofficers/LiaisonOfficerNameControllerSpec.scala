@@ -16,6 +16,7 @@
 
 package controllers.liaisonofficers
 
+import controllers.actions.FakeAccountMaintenanceGuardAction
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
@@ -47,6 +48,19 @@ class LiaisonOfficerNameControllerSpec extends BaseUnitSpec {
   private val officersAtLimit = LiaisonOfficers(otherOfficers :+ testLiaisonOfficer)
 
   "LiaisonOfficerNameController.onPageLoad" should {
+
+    "redirect to manage ISAs when an ISA product change is under review" in {
+      val application = applicationBuilder(
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, liaisonOfficerNameEndpoint)).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+      }
+    }
 
     "generate an id and redirect to the canonical URL when no id is supplied" in {
       val generatedId   = "generated-id"
@@ -185,6 +199,23 @@ class LiaisonOfficerNameControllerSpec extends BaseUnitSpec {
   }
 
   "LiaisonOfficerNameController.onSubmit" should {
+
+    "redirect to manage ISAs when an ISA product change is under review" in {
+      val application = applicationBuilder(
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(POST, liaisonOfficerNameEndpointFor(testLiaisonOfficerId))
+          .withFormUrlEncodedBody("value" -> "New Name")
+          .withHeaders("Csrf-Token" -> "nocheck")
+        val result  = route(application, request).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+        verify(mockUserAnswersRepository, never).set(any())
+      }
+    }
 
     "trim and save the fifteenth officer while preserving other answers and officer details" in {
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))

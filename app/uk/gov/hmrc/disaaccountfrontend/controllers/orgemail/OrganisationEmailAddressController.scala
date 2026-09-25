@@ -22,7 +22,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.disaaccountfrontend.config.ErrorHandler
 import uk.gov.hmrc.disaaccountfrontend.connectors.EmailVerificationConnector
 import uk.gov.hmrc.disaaccountfrontend.controllers.PageController
-import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction}
+import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{AccountMaintenanceGuardAction, DataRetrievalAction, IdentifierAction}
 import uk.gov.hmrc.disaaccountfrontend.forms.OrganisationEmailAddressFormProvider
 import uk.gov.hmrc.disaaccountfrontend.models.UserAnswers
 import uk.gov.hmrc.disaaccountfrontend.models.pages.OrganisationEmailAddressPage
@@ -39,6 +39,7 @@ class OrganisationEmailAddressController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  accountMaintenanceGuard: AccountMaintenanceGuardAction,
   userAnswersRepository: UserAnswersRepository,
   navigator: Navigator,
   formProvider: OrganisationEmailAddressFormProvider,
@@ -53,7 +54,7 @@ class OrganisationEmailAddressController @Inject() (
     with Logging {
 
   private val form       = formProvider()
-  private val pageAction = identify andThen getData
+  private val pageAction = identify andThen getData andThen accountMaintenanceGuard
 
   def onPageLoad(): Action[AnyContent] = pageAction { implicit request =>
     val preparedForm = request.effectiveAnswers.organisationEmailAddress.fold(form)(form.fill)

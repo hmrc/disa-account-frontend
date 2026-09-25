@@ -16,6 +16,7 @@
 
 package controllers.signatories
 
+import controllers.actions.FakeAccountMaintenanceGuardAction
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
@@ -35,6 +36,9 @@ import scala.concurrent.Future
 
 class RemoveSignatoryControllerSpec extends BaseUnitSpec {
 
+  private def signatoryApplicationBuilder(effectiveAnswers: Answers) =
+    applicationBuilder(effectiveAnswers = effectiveAnswers, email = Some(testSignatoryEmail))
+
   def onwardRoute(path: String): Call = Call("GET", s"/obligations/enrolment/isa$path")
 
   val formProvider: YesNoAnswerFormProvider = new YesNoAnswerFormProvider()
@@ -49,8 +53,23 @@ class RemoveSignatoryControllerSpec extends BaseUnitSpec {
 
   "RemoveSignatoryController.onPageLoad" should {
 
-    "must return OK and the correct view for a GET when the signatory exists" in {
+    "redirect to manage ISAs when an ISA product change is under review" in {
       val application = applicationBuilder(
+        effectiveAnswers = Answers(signatories = Some(testSignatories)),
+        email = Some(testSignatoryEmail),
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, s"$removeSignatoryEndpoint?id=$testSignatoryId")).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+      }
+    }
+
+    "must return OK and the correct view for a GET when the signatory exists" in {
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(signatories = Some(testSignatories))
       ).build()
 
@@ -64,7 +83,7 @@ class RemoveSignatoryControllerSpec extends BaseUnitSpec {
     }
 
     "must return 303 error when trying to access an inexistent id" in {
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(signatories = Some(testSignatories))
       ).build()
 
@@ -75,14 +94,46 @@ class RemoveSignatoryControllerSpec extends BaseUnitSpec {
         status(result) shouldBe SEE_OTHER
       }
     }
+
+    "redirect a non-signatory to change of circumstances" in {
+      val application = applicationBuilder(
+        effectiveAnswers = Answers(signatories = Some(testSignatories))
+      ).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, s"$removeSignatoryEndpoint?id=$testSignatoryId")).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
+      }
+    }
   }
   "RemoveSignatoryController.onSubmit" should {
+
+    "redirect to manage ISAs when an ISA product change is under review" in {
+      val application = applicationBuilder(
+        effectiveAnswers = Answers(signatories = Some(testSignatories)),
+        email = Some(testSignatoryEmail),
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(POST, s"$removeSignatoryEndpoint?id=$testSignatoryId")
+          .withFormUrlEncodedBody("value" -> Yes.toString)
+          .withHeaders("Csrf-Token" -> "nocheck")
+        val result  = route(application, request).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+        verify(mockUserAnswersRepository, never).set(any())
+      }
+    }
 
     "remove the selected signatory when Yes is submitted" in {
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
 
       val signatories = Signatories(testSignatories.signatories :+ otherSignatory)
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(signatories = Some(signatories))
       ).build()
 
@@ -106,7 +157,7 @@ class RemoveSignatoryControllerSpec extends BaseUnitSpec {
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
 
       val signatories = Signatories(testSignatories.signatories :+ otherSignatory)
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(signatories = Some(signatories))
       ).build()
 
@@ -127,7 +178,7 @@ class RemoveSignatoryControllerSpec extends BaseUnitSpec {
     }
 
     "return an error and not save when no answer is submitted" in {
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(signatories = Some(testSignatories))
       ).build()
 
@@ -142,6 +193,23 @@ class RemoveSignatoryControllerSpec extends BaseUnitSpec {
           "Select yes if you want to remove this signatory"
         )
         doc.title()                               should startWith("Error:")
+        verify(mockUserAnswersRepository, never).set(any())
+      }
+    }
+
+    "redirect a non-signatory to change of circumstances without saving" in {
+      val application = applicationBuilder(
+        effectiveAnswers = Answers(signatories = Some(testSignatories))
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(POST, s"$removeSignatoryEndpoint?id=$testSignatoryId")
+          .withFormUrlEncodedBody("value" -> Yes.toString)
+          .withHeaders("Csrf-Token" -> "nocheck")
+        val result  = route(application, request).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
         verify(mockUserAnswersRepository, never).set(any())
       }
     }

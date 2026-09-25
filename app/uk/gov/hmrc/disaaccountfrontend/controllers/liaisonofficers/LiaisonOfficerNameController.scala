@@ -22,7 +22,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.disaaccountfrontend.config.AppConfig
 import uk.gov.hmrc.disaaccountfrontend.controllers.PageController
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes.ChangeOfCircumstancesController
-import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction, PageGuardAction}
+import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{AccountMaintenanceGuardAction, DataRetrievalAction, IdentifierAction, PageGuardAction}
 import uk.gov.hmrc.disaaccountfrontend.forms.LiaisonOfficerNameFormProvider
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficers.findLiaisonOfficer
 import uk.gov.hmrc.disaaccountfrontend.models.pages.liaisonofficers.LiaisonOfficerNamePage
@@ -41,6 +41,7 @@ class LiaisonOfficerNameController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   guardPage: PageGuardAction,
+  accountMaintenanceGuard: AccountMaintenanceGuardAction,
   userAnswersRepository: UserAnswersRepository,
   appConfig: AppConfig,
   navigator: Navigator,
@@ -59,7 +60,7 @@ class LiaisonOfficerNameController @Inject() (
     LiaisonOfficerNamePage(id)
 
   private def pageAction(page: LiaisonOfficerNamePage) =
-    identify andThen getData andThen guardPage(page, appConfig)
+    identify andThen getData andThen accountMaintenanceGuard andThen guardPage(page, appConfig)
 
   def onPageLoad(id: Option[String], mode: Mode): Action[AnyContent] = {
     val currentPage = page(id.getOrElse(uuidGenerator.generate()))

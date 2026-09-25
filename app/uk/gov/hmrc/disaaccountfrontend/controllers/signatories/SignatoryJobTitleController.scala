@@ -20,7 +20,7 @@ import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction}
+import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{AccountMaintenanceGuardAction, DataRetrievalAction, IdentifierAction, RequireSignatoryAction}
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes.ChangeOfCircumstancesController
 import uk.gov.hmrc.disaaccountfrontend.forms.SignatoryJobTitleFormProvider
 import uk.gov.hmrc.disaaccountfrontend.models.pages.signatories.SignatoryJobTitlePage
@@ -38,6 +38,8 @@ class SignatoryJobTitleController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  requireSignatory: RequireSignatoryAction,
+  accountMaintenanceGuard: AccountMaintenanceGuardAction,
   userAnswersRepository: UserAnswersRepository,
   navigator: Navigator,
   formProvider: SignatoryJobTitleFormProvider,
@@ -50,7 +52,9 @@ class SignatoryJobTitleController @Inject() (
 
   val form: Form[String] = formProvider()
 
-  def onPageLoad(id: String, mode: Mode): Action[AnyContent] = (identify andThen getData) { implicit request =>
+  private val pageAction = identify andThen getData andThen accountMaintenanceGuard andThen requireSignatory
+
+  def onPageLoad(id: String, mode: Mode): Action[AnyContent] = pageAction { implicit request =>
     signatoryName(id, request).fold(Redirect(ChangeOfCircumstancesController.onPageLoad())) { name =>
       val preparedForm =
         (for {
@@ -62,7 +66,7 @@ class SignatoryJobTitleController @Inject() (
     }
   }
 
-  def onSubmit(id: String, mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
+  def onSubmit(id: String, mode: Mode): Action[AnyContent] = pageAction.async { implicit request =>
     signatoryName(id, request).fold(Future.successful(Redirect(ChangeOfCircumstancesController.onPageLoad()))) { name =>
       form
         .bindFromRequest()

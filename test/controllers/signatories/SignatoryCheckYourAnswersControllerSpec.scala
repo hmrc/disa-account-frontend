@@ -16,6 +16,7 @@
 
 package controllers.signatories
 
+import controllers.actions.FakeAccountMaintenanceGuardAction
 import org.jsoup.Jsoup
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -25,13 +26,32 @@ import utils.BaseUnitSpec
 
 class SignatoryCheckYourAnswersControllerSpec extends BaseUnitSpec {
 
-  private val signatory = Signatory(testSignatoryId, Some(testName), Some(testSignatoryJobTitle))
+  private def signatoryApplicationBuilder(effectiveAnswers: Answers) =
+    applicationBuilder(effectiveAnswers = effectiveAnswers, email = Some(testSignatoryEmail))
+
+  private val signatory =
+    Signatory(testSignatoryId, Some(testName), Some(testSignatoryJobTitle), Some(testSignatoryEmail))
   private val url       = s"$checkSignatoryDetailsEndpoint?id=$testSignatoryId"
 
   "SignatoryCheckYourAnswersController.onPageLoad" should {
 
-    "render the matching signatory details and change links" in {
+    "redirect to manage ISAs when an ISA product change is under review" in {
       val application = applicationBuilder(
+        effectiveAnswers = Answers(signatories = Some(Signatories(Seq(signatory)))),
+        email = Some(testSignatoryEmail),
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, url)).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+      }
+    }
+
+    "render the matching signatory details and change links" in {
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(signatories = Some(Signatories(Seq(signatory))))
       ).build()
 
@@ -75,8 +95,21 @@ class SignatoryCheckYourAnswersControllerSpec extends BaseUnitSpec {
 
     "redirect when the signatory details are incomplete" in {
       val incomplete  = signatory.copy(jobTitle = None)
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(signatories = Some(Signatories(Seq(incomplete))))
+      ).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, url)).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
+      }
+    }
+
+    "redirect a non-signatory to change of circumstances" in {
+      val application = applicationBuilder(
+        effectiveAnswers = Answers(signatories = Some(Signatories(Seq(signatory))))
       ).build()
 
       running(application) {

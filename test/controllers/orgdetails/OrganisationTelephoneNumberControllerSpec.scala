@@ -16,6 +16,7 @@
 
 package controllers.orgdetails
 
+import controllers.actions.FakeAccountMaintenanceGuardAction
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
@@ -32,6 +33,19 @@ class OrganisationTelephoneNumberControllerSpec extends BaseUnitSpec {
   val validFormData: Map[String, String] = Map("value" -> "01642123456")
 
   "OrganisationTelephoneNumberController.onPageLoad" should {
+
+    "redirect to manage ISAs when an ISA product change is under review" in {
+      val application = applicationBuilder(
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, organisationTelephoneNumberEndpoint)).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+      }
+    }
 
     "return 200 OK prefilled from the effective answers supplied by the retrieval action" in {
       val application = applicationBuilder(
@@ -59,6 +73,20 @@ class OrganisationTelephoneNumberControllerSpec extends BaseUnitSpec {
   }
 
   "OrganisationTelephoneNumberController.onSubmit" should {
+
+    "redirect to manage ISAs when an ISA product change is under review" in {
+      val application = applicationBuilder(
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(POST, organisationTelephoneNumberEndpoint).withHeaders("Csrf-Token" -> "nocheck")
+        val result  = route(application, request).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+      }
+    }
 
     "save the answer and redirect when the form is valid" in {
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))

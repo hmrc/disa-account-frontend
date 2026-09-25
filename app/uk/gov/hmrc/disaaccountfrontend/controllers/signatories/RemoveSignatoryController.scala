@@ -21,7 +21,7 @@ import uk.gov.hmrc.disaaccountfrontend.controllers.routes.ChangeOfCircumstancesC
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.disaaccountfrontend.controllers.PageController
-import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction}
+import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{AccountMaintenanceGuardAction, DataRetrievalAction, IdentifierAction, RequireSignatoryAction}
 import uk.gov.hmrc.disaaccountfrontend.forms.generic.YesNoAnswerFormProvider
 import uk.gov.hmrc.disaaccountfrontend.models.{UserAnswers, YesNoAnswer}
 import uk.gov.hmrc.disaaccountfrontend.models.pages.signatories.RemoveSignatoryPage
@@ -39,6 +39,8 @@ class RemoveSignatoryController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  requireSignatory: RequireSignatoryAction,
+  accountMaintenanceGuard: AccountMaintenanceGuardAction,
   userAnswersRepository: UserAnswersRepository,
   navigator: Navigator,
   formProvider: YesNoAnswerFormProvider,
@@ -50,7 +52,7 @@ class RemoveSignatoryController @Inject() (
     with I18nSupport {
 
   private val form: Form[YesNoAnswer] = formProvider("removeSignatory.error.required")
-  private val pageAction              = identify andThen getData
+  private val pageAction              = identify andThen getData andThen accountMaintenanceGuard andThen requireSignatory
 
   def onPageLoad(id: String): Action[AnyContent] = pageAction.async { implicit request =>
     providingName(id, name => Future.successful(Ok(view(id, name, form))))

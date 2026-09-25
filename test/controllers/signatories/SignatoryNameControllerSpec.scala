@@ -16,6 +16,7 @@
 
 package controllers.signatories
 
+import controllers.actions.FakeAccountMaintenanceGuardAction
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.*
 import org.mockito.Mockito.*
@@ -30,17 +31,37 @@ import scala.concurrent.Future
 
 class SignatoryNameControllerSpec extends BaseUnitSpec {
 
+  private def signatoryApplicationBuilder(effectiveAnswers: Answers) =
+    applicationBuilder(effectiveAnswers = effectiveAnswers, email = Some(testSignatoryEmail))
+
   val validFormData: Map[String, String] = Map("value" -> testName)
 
   val maxSignatories: Signatories =
     Signatories(
-      (1 to 25).map(i => Signatory(s"signatory-$i", Some(s"Signatory $i"), Some("Director")))
+      testSignatories.signatories ++ (2 to 25).map(i =>
+        Signatory(s"signatory-$i", Some(s"Signatory $i"), Some("Director"))
+      )
     )
 
   "SignatoryNameController.onPageLoad" should {
 
+    "redirect to manage ISAs when an ISA product change is under review" in {
+      val application = applicationBuilder(
+        effectiveAnswers = Answers(signatories = Some(testSignatories)),
+        email = Some(testSignatoryEmail),
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, signatoryNameEndpoint)).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+      }
+    }
+
     "redirect to itself with a newly generated id when no id is supplied" in {
-      val application = applicationBuilder().build()
+      val application = signatoryApplicationBuilder(Answers(signatories = Some(testSignatories))).build()
 
       running(application) {
         val result = route(application, FakeRequest(GET, signatoryNameEndpoint)).value
@@ -51,7 +72,7 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
     }
 
     "return 200 OK prefilled from the effective answers when the signatory already has a name" in {
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(signatories = Some(testSignatories))
       ).build()
 
@@ -64,7 +85,7 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
     }
 
     "render the check-mode form for an existing signatory" in {
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(signatories = Some(testSignatories))
       ).build()
 
@@ -80,7 +101,7 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
     }
 
     "reject an unknown signatory id in check mode" in {
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(signatories = Some(testSignatories))
       ).build()
 
@@ -93,7 +114,7 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
     }
 
     "return 200 OK with an empty form when the id does not match an existing signatory" in {
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(signatories = Some(testSignatories))
       ).build()
 
@@ -106,7 +127,7 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
     }
 
     "redirect away instead of generating a new id when the maximum number of signatories has been reached" in {
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(signatories = Some(maxSignatories))
       ).build()
 
@@ -120,9 +141,9 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
 
     "exclude incomplete signatories from the maximum count" in {
       val signatories = Signatories(
-        maxSignatories.signatories.drop(1) :+ Signatory("incomplete-id", fullName = Some("Incomplete"))
+        maxSignatories.signatories.dropRight(1) :+ Signatory("incomplete-id", fullName = Some("Incomplete"))
       )
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(signatories = Some(signatories))
       ).build()
 
@@ -133,14 +154,46 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
         redirectLocation(result).value should startWith(s"$signatoryNameEndpoint?id=")
       }
     }
+
+    "redirect a non-signatory to change of circumstances" in {
+      val application = applicationBuilder(
+        effectiveAnswers = Answers(signatories = Some(testSignatories))
+      ).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, s"$signatoryNameEndpoint?id=$testSignatoryId")).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
+      }
+    }
   }
 
   "SignatoryNameController.onSubmit" should {
 
+    "redirect to manage ISAs when an ISA product change is under review" in {
+      val application = applicationBuilder(
+        effectiveAnswers = Answers(signatories = Some(testSignatories)),
+        email = Some(testSignatoryEmail),
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(POST, s"$signatoryNameEndpoint?id=$testSignatoryId")
+          .withFormUrlEncodedBody(validFormData.toSeq: _*)
+          .withHeaders("Csrf-Token" -> "nocheck")
+        val result  = route(application, request).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+        verify(mockUserAnswersRepository, never).set(any())
+      }
+    }
+
     "add a new signatory to the existing list when the id does not already exist" in {
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
 
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(signatories = Some(testSignatories))
       ).build()
 
@@ -166,8 +219,13 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
     "update the matching signatory's name and preserve their job title" in {
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
 
-      val existingSignatory = Signatory(testSignatoryId, fullName = Some("Old Name"), jobTitle = Some("Director"))
-      val application       = applicationBuilder(
+      val existingSignatory = Signatory(
+        testSignatoryId,
+        fullName = Some("Old Name"),
+        jobTitle = Some("Director"),
+        email = Some(testSignatoryEmail)
+      )
+      val application       = signatoryApplicationBuilder(
         effectiveAnswers = Answers(signatories = Some(Signatories(Seq(existingSignatory))))
       ).build()
 
@@ -193,8 +251,13 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
 
       val existingSignatory =
-        Signatory(testSignatoryId, fullName = Some("Old Name"), jobTitle = Some(testSignatoryJobTitle))
-      val application       = applicationBuilder(
+        Signatory(
+          testSignatoryId,
+          fullName = Some("Old Name"),
+          jobTitle = Some(testSignatoryJobTitle),
+          email = Some(testSignatoryEmail)
+        )
+      val application       = signatoryApplicationBuilder(
         effectiveAnswers = Answers(signatories = Some(Signatories(Seq(existingSignatory))))
       ).build()
 
@@ -212,7 +275,8 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
     }
 
     "reject an unknown signatory id in check mode" in {
-      val application = applicationBuilder(effectiveAnswers = Answers(signatories = Some(testSignatories))).build()
+      val application =
+        signatoryApplicationBuilder(effectiveAnswers = Answers(signatories = Some(testSignatories))).build()
 
       running(application) {
         val request =
@@ -229,7 +293,7 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
     }
 
     "return 400 BadRequest when the form is invalid" in {
-      val application = applicationBuilder().build()
+      val application = signatoryApplicationBuilder(Answers(signatories = Some(testSignatories))).build()
 
       running(application) {
         val request =
@@ -245,7 +309,7 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
     }
 
     "redirect away and not save when adding a new signatory would exceed the maximum" in {
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(signatories = Some(maxSignatories))
       ).build()
 
@@ -267,9 +331,9 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
 
       val signatories = Signatories(
-        maxSignatories.signatories.drop(1) :+ Signatory("incomplete-id", fullName = Some("Incomplete"))
+        maxSignatories.signatories.dropRight(1) :+ Signatory("incomplete-id", fullName = Some("Incomplete"))
       )
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(signatories = Some(signatories))
       ).build()
 
@@ -289,7 +353,7 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
     "still allow editing an existing signatory's name when the maximum has been reached" in {
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
 
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(signatories = Some(maxSignatories))
       ).build()
 
@@ -304,6 +368,25 @@ class SignatoryNameControllerSpec extends BaseUnitSpec {
 
         status(result) shouldBe SEE_OTHER
         verify(mockUserAnswersRepository).set(any())
+      }
+    }
+
+    "redirect a non-signatory to change of circumstances and not save" in {
+      val application = applicationBuilder(
+        effectiveAnswers = Answers(signatories = Some(testSignatories))
+      ).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, s"$signatoryNameEndpoint?id=$testSignatoryId")
+            .withFormUrlEncodedBody(validFormData.toSeq: _*)
+            .withHeaders("Csrf-Token" -> "nocheck")
+
+        val result = route(application, request).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
+        verify(mockUserAnswersRepository, never).set(any())
       }
     }
   }

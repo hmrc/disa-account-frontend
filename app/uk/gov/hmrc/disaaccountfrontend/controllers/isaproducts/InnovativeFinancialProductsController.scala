@@ -14,67 +14,63 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.controllers
+package uk.gov.hmrc.disaaccountfrontend.controllers.isaproducts
 
-import play.api.data.Form
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction, PageGuardAction}
-import uk.gov.hmrc.disaaccountfrontend.forms.PeerToPeerPlatformNumberFormProvider
+import uk.gov.hmrc.disaaccountfrontend.controllers.PageController
+import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction, PageGuardAction, RequireSignatoryAction}
+import uk.gov.hmrc.disaaccountfrontend.forms.InnovativeFinancialProductsFormProvider
 import uk.gov.hmrc.disaaccountfrontend.models.UserAnswers
-import uk.gov.hmrc.disaaccountfrontend.models.pages.PeerToPeerPlatformNumberPage
-import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
+import uk.gov.hmrc.disaaccountfrontend.models.pages.InnovativeFinancialProductsPage
 import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
-import uk.gov.hmrc.disaaccountfrontend.views.html.PeerToPeerPlatformNumberView
+import uk.gov.hmrc.disaaccountfrontend.views.html.InnovativeFinancialProductsView
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class PeerToPeerPlatformNumberController @Inject() (
+class InnovativeFinancialProductsController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   guardPage: PageGuardAction,
+  requireSignatory: RequireSignatoryAction,
   userAnswersRepository: UserAnswersRepository,
   navigator: Navigator,
-  formProvider: PeerToPeerPlatformNumberFormProvider,
+  formProvider: InnovativeFinancialProductsFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: PeerToPeerPlatformNumberView
+  view: InnovativeFinancialProductsView
 )(implicit ec: ExecutionContext)
     extends PageController(navigator)
     with FrontendBaseController
     with I18nSupport {
 
-  private val pageAction = identify andThen getData andThen guardPage(PeerToPeerPlatformNumberPage)
-
-  private def platformName(implicit request: DataRequest[_]): String =
-    request.effectiveAnswers.p2pPlatform.get
-
-  private def form(platformName: String)(implicit messages: Messages): Form[String] =
-    formProvider(platformName)
+  private val form       = formProvider()
+  private val pageAction =
+    identify andThen getData andThen requireSignatory andThen guardPage(InnovativeFinancialProductsPage)
 
   def onPageLoad(): Action[AnyContent] = pageAction { implicit request =>
-    val platform     = platformName
-    val preparedForm = request.effectiveAnswers.p2pPlatformNumber.fold(form(platform))(form(platform).fill)
+    val preparedForm = request.effectiveAnswers.innovativeFinancialProducts
+      .fold(form)(answer => form.fill(answer.toSet))
 
-    Ok(view(preparedForm, platform))
+    Ok(view(preparedForm))
   }
 
   def onSubmit(): Action[AnyContent] = pageAction.async { implicit request =>
-    val platform = platformName
-
-    form(platform)
+    form
       .bindFromRequest()
       .fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors, platform))),
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
         answer => {
-          val sessionUpdates = getSessionUpdates(PeerToPeerPlatformNumberPage, answer)
+          val previousAnswers = request.effectiveAnswers
+          val sessionUpdates  = getSessionUpdates(InnovativeFinancialProductsPage, answer)
+          val updatedAnswers  = sessionUpdates.getUpdatedEffectiveAnswers(previousAnswers)
 
           userAnswersRepository
             .set(UserAnswers(id = request.sessionId, updates = sessionUpdates))
-            .map(_ => Redirect(nextPage(PeerToPeerPlatformNumberPage, sessionUpdates)))
+            .map(_ => Redirect(navigator.nextPageFromInnovativeFinancialProducts(previousAnswers, updatedAnswers)))
         }
       )
   }

@@ -18,7 +18,7 @@ package uk.gov.hmrc.disaaccountfrontend.controllers.signatories
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction, PageGuardAction}
+import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{AccountMaintenanceGuardAction, DataRetrievalAction, IdentifierAction, PageGuardAction, RequireSignatoryAction}
 import uk.gov.hmrc.disaaccountfrontend.controllers.routes.ChangeOfCircumstancesController
 import uk.gov.hmrc.disaaccountfrontend.models.pages.signatories.SignatoryCheckYourAnswersPage
 import uk.gov.hmrc.disaaccountfrontend.viewmodels.checkAnswers.signatories.{SignatoryJobTitleSummary, SignatoryNameSummary}
@@ -33,13 +33,17 @@ class SignatoryCheckYourAnswersController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   guardPage: PageGuardAction,
+  requireSignatory: RequireSignatoryAction,
+  accountMaintenanceGuard: AccountMaintenanceGuardAction,
   val controllerComponents: MessagesControllerComponents,
   view: SignatoryCheckYourAnswersView
 ) extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad(id: String): Action[AnyContent] =
-    (identify andThen getData andThen guardPage(SignatoryCheckYourAnswersPage(id))) { implicit request =>
+    (identify andThen getData andThen accountMaintenanceGuard andThen requireSignatory andThen guardPage(
+      SignatoryCheckYourAnswersPage(id)
+    )) { implicit request =>
       request.effectiveAnswers.signatories
         .flatMap(_.signatories.find(_.id == id))
         .fold(Redirect(ChangeOfCircumstancesController.onPageLoad())) { signatory =>

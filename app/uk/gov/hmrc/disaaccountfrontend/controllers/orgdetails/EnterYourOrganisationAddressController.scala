@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.controllers
+package uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction}
+import uk.gov.hmrc.disaaccountfrontend.controllers.PageController
+import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{AccountMaintenanceGuardAction, DataRetrievalAction, IdentifierAction}
 import uk.gov.hmrc.disaaccountfrontend.forms.EnterYourOrganisationAddressFormProvider
 import uk.gov.hmrc.disaaccountfrontend.models.UserAnswers
 import uk.gov.hmrc.disaaccountfrontend.models.pages.EnterYourOrganisationAddressPage
@@ -34,6 +35,7 @@ class EnterYourOrganisationAddressController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  accountMaintenanceGuard: AccountMaintenanceGuardAction,
   userAnswersRepository: UserAnswersRepository,
   navigator: Navigator,
   formProvider: EnterYourOrganisationAddressFormProvider,
@@ -44,14 +46,15 @@ class EnterYourOrganisationAddressController @Inject() (
     with FrontendBaseController
     with I18nSupport {
 
-  private val form = formProvider()
+  private val form       = formProvider()
+  private val pageAction = identify andThen getData andThen accountMaintenanceGuard
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData) { implicit request =>
+  def onPageLoad(): Action[AnyContent] = pageAction { implicit request =>
     val preparedForm = request.effectiveAnswers.correspondenceAddress.fold(form)(form.fill)
     Ok(view(preparedForm))
   }
 
-  def onSubmit(): Action[AnyContent] = (identify andThen getData).async { implicit request =>
+  def onSubmit(): Action[AnyContent] = pageAction.async { implicit request =>
     form
       .bindFromRequest()
       .fold(
