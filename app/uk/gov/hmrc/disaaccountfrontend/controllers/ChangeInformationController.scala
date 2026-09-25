@@ -18,7 +18,7 @@ package uk.gov.hmrc.disaaccountfrontend.controllers
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction}
+import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{AccountMaintenanceGuardAction, DataRetrievalAction, IdentifierAction}
 import uk.gov.hmrc.disaaccountfrontend.forms.ChangeInformationFormProvider
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.{Assign, Unchanged}
 import uk.gov.hmrc.disaaccountfrontend.models.ChangeInformationSelection.{AuthorisedUsers, IsaProductInformation, OrganisationInformation, ViewAllInformation, viewAllInformationFormValue}
@@ -34,6 +34,7 @@ class ChangeInformationController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  accountMaintenanceGuard: AccountMaintenanceGuardAction,
   userAnswersRepository: UserAnswersRepository,
   formProvider: ChangeInformationFormProvider,
   val controllerComponents: MessagesControllerComponents,
@@ -42,7 +43,9 @@ class ChangeInformationController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData) { implicit request =>
+  private val pageAction = identify andThen getData andThen accountMaintenanceGuard
+
+  def onPageLoad(): Action[AnyContent] = pageAction { implicit request =>
     val availableSelections = ChangeInformationSelection.availableValues(request.isSignatory)
     val form                = formProvider(availableSelections)
     val preparedForm        = request.sessionAnswers
@@ -59,7 +62,7 @@ class ChangeInformationController @Inject() (
     Ok(view(preparedForm, availableSelections))
   }
 
-  def onSubmit(): Action[AnyContent] = (identify andThen getData).async { implicit request =>
+  def onSubmit(): Action[AnyContent] = pageAction.async { implicit request =>
     val availableSelections = ChangeInformationSelection.availableValues(request.isSignatory)
     val form                = formProvider(availableSelections)
 

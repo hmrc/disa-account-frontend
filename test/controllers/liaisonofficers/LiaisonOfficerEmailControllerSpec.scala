@@ -16,6 +16,7 @@
 
 package controllers.liaisonofficers
 
+import controllers.actions.FakeAccountMaintenanceGuardAction
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
@@ -40,6 +41,20 @@ class LiaisonOfficerEmailControllerSpec extends BaseUnitSpec {
   private val answers = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(otherOfficer, testLiaisonOfficer))))
 
   "LiaisonOfficerEmailController.onPageLoad" should {
+
+    "redirect to manage ISAs when an ISA product change is under review" in {
+      val application = applicationBuilder(
+        effectiveAnswers = answers,
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, liaisonOfficerEmailEndpointFor(testLiaisonOfficerId))).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+      }
+    }
 
     "render the page with the liaison officer name and standard service content in normal mode" in {
       val application = applicationBuilder(effectiveAnswers = answers).build()
@@ -127,6 +142,24 @@ class LiaisonOfficerEmailControllerSpec extends BaseUnitSpec {
   }
 
   "LiaisonOfficerEmailController.onSubmit" should {
+
+    "redirect to manage ISAs when an ISA product change is under review" in {
+      val application = applicationBuilder(
+        effectiveAnswers = answers,
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(POST, liaisonOfficerEmailEndpointFor(testLiaisonOfficerId))
+          .withFormUrlEncodedBody("value" -> "updated@example.com")
+          .withHeaders("Csrf-Token" -> "nocheck")
+        val result  = route(application, request).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+        verify(mockUserAnswersRepository, never).set(any())
+      }
+    }
 
     "trim and save the email in the logged-in session while preserving existing answers and officer details" in {
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))

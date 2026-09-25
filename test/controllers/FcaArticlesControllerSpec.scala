@@ -16,6 +16,7 @@
 
 package controllers
 
+import controllers.actions.FakeAccountMaintenanceGuardAction
 import org.jsoup.Jsoup
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
@@ -37,6 +38,20 @@ class FcaArticlesControllerSpec extends BaseUnitSpec {
   )
 
   "FcaArticlesController.onPageLoad" should {
+
+    "redirect to manage ISAs when an ISA product change is under review" in {
+      val application = applicationBuilder(
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, fcaArticlesEndpoint)).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+      }
+    }
+
     "render an empty page when Financial Articles were newly added in the session" in {
       val answers     = UserAnswers(
         testSessionId
@@ -70,7 +85,22 @@ class FcaArticlesControllerSpec extends BaseUnitSpec {
       }
     }
   }
-  "FcaArticlesController.onSubmit"   should {
+  "FcaArticlesController.onSubmit" should {
+
+    "redirect to manage ISAs when an ISA product change is under review" in {
+      val application = applicationBuilder(
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(POST, fcaArticlesEndpoint).withHeaders("Csrf-Token" -> "nocheck")
+        val result  = route(application, request).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+      }
+    }
+
     "return Bad Request with the exact inline error when no product is selected" in {
       val application = applicationBuilder().build()
 

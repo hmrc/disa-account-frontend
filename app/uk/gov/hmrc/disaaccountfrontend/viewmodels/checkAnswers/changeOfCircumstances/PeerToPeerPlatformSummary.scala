@@ -17,32 +17,25 @@
 package uk.gov.hmrc.disaaccountfrontend.viewmodels.checkAnswers.changeOfCircumstances
 
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.disaaccountfrontend.controllers.routes.FcaArticlesController
+import uk.gov.hmrc.disaaccountfrontend.controllers.isaproducts.routes.PeerToPeerPlatformController
 import uk.gov.hmrc.disaaccountfrontend.models.Answers
-import uk.gov.hmrc.disaaccountfrontend.models.articles.FcaArticles
 import uk.gov.hmrc.govukfrontend.views.Aliases.{ActionItem, Actions, Key, SummaryListRow, Value}
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 
-object FcaArticlesSummary {
-
-  def articleName(article: FcaArticles)(implicit messages: Messages): String =
-    messages(s"FcaArticles.${article.toString}")
+object PeerToPeerPlatformSummary {
 
   def row(answers: Answers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.fcaArticles.filter(_.nonEmpty).map { articles =>
-      val lines = FcaArticles.values.filter(articles.contains).map(articleName)
-
+    answers.p2pPlatform.filter(_.nonEmpty).map { platform =>
       SummaryListRow(
-        key = Key(Text(messages("changeOfCircumstances.articles.label"))),
-        value = Value(HtmlContent(lines.map(line => HtmlFormat.escape(line).toString).mkString("<br>"))),
+        key = Key(Text(messages("peerToPeerPlatform.checkYourAnswersLabel"))),
+        value = Value(Text(platform)),
         actions = Some(
           Actions(
             items = Seq(
               ActionItem(
-                href = FcaArticlesController.onPageLoad().url,
+                href = PeerToPeerPlatformController.onPageLoad().url,
                 content = Text(messages("site.change")),
-                visuallyHiddenText = Some(messages("FcaArticles.change.hidden"))
+                visuallyHiddenText = Some(messages("peerToPeerPlatform.change.hidden"))
               )
             )
           )

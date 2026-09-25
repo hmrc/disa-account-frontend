@@ -18,14 +18,12 @@ package uk.gov.hmrc.disaaccountfrontend.controllers
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction}
+import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{AccountMaintenanceGuardAction, DataRetrievalAction, IdentifierAction}
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
-import uk.gov.hmrc.disaaccountfrontend.models.ChangeInformationSelection.{AuthorisedUsers, IsaProductInformation, OrganisationInformation}
 import uk.gov.hmrc.disaaccountfrontend.models.ChangeInformationSelection
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
-import uk.gov.hmrc.disaaccountfrontend.viewmodels.checkAnswers.changeOfCircumstances.*
+import uk.gov.hmrc.disaaccountfrontend.viewmodels.ChangeOfCircumstancesViewModel
 import uk.gov.hmrc.disaaccountfrontend.views.html.ChangeOfCircumstancesView
-import uk.gov.hmrc.govukfrontend.views.Aliases.{SummaryList, SummaryListRow}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
@@ -34,49 +32,21 @@ class ChangeOfCircumstancesController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  accountMaintenanceGuard: AccountMaintenanceGuardAction,
   val controllerComponents: MessagesControllerComponents,
   view: ChangeOfCircumstancesView
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData) { implicit request =>
-    val answers    = request.effectiveAnswers
-    val selections = selectedSections
-
-    def shown(section: ChangeInformationSelection): Boolean =
-      ChangeInformationSelection.isShown(selections, section)
-
-    val organisation = Option.when(shown(OrganisationInformation))(
-      summaryList(
-        TradingNameSummary.row(answers),
-        CorrespondenceAddressSummary.row(answers),
-        OrganisationTelephoneNumberSummary.row(answers),
-        OrganisationEmailSummary.row(answers)
-      )
-    )
-
-    val products = Option.when(shown(IsaProductInformation) && request.isSignatory)(
-      summaryList(IsaProductsSummary.row(answers), FcaArticlesSummary.row(answers))
-    )
-
-    val authorisedUsers = Option.when(shown(AuthorisedUsers))(
-      summaryList(LiaisonOfficersSummary.row(answers), SignatoriesSummary.row(answers))
-    )
-
-    val productChanges        = ProductChanges(request.originalAnswers, answers)
-    val signatoryChanges      = SignatoryChanges(request.originalAnswers, answers)
-    val liaisonOfficerChanges = LiaisonOfficerChanges(request.originalAnswers, answers)
-    val checkYourChangesRows  =
-      FieldChanges.rows(request.originalAnswers, answers) ++
-        productChanges.rows ++ signatoryChanges.rows ++ liaisonOfficerChanges.rows
-
+  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen accountMaintenanceGuard) { implicit request =>
     Ok(
       view(
-        organisation.filter(_.rows.nonEmpty),
-        products.filter(_.rows.nonEmpty),
-        authorisedUsers.filter(_.rows.nonEmpty),
-        Option.when(checkYourChangesRows.nonEmpty)(SummaryList(rows = checkYourChangesRows)),
-        productChanges.hasChanges
+        ChangeOfCircumstancesViewModel(
+          originalAnswers = request.originalAnswers,
+          effectiveAnswers = request.effectiveAnswers,
+          selections = selectedSections,
+          isSignatory = request.isSignatory
+        )
       )
     )
   }
@@ -86,7 +56,4 @@ class ChangeOfCircumstancesController @Inject() (
       .map(_.updates.changeInformationSelections)
       .collect { case Assign(selections) => selections }
       .getOrElse(Seq.empty)
-
-  private def summaryList(rows: Option[SummaryListRow]*): SummaryList =
-    SummaryList(rows = rows.flatten)
 }

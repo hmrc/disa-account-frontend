@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.controllers
+package uk.gov.hmrc.disaaccountfrontend.controllers.isaproducts
 
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction, PageGuardAction}
+import uk.gov.hmrc.disaaccountfrontend.controllers.PageController
+import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction, PageGuardAction, RequireSignatoryAction}
 import uk.gov.hmrc.disaaccountfrontend.forms.PeerToPeerPlatformNumberFormProvider
 import uk.gov.hmrc.disaaccountfrontend.models.UserAnswers
 import uk.gov.hmrc.disaaccountfrontend.models.pages.PeerToPeerPlatformNumberPage
@@ -37,6 +38,7 @@ class PeerToPeerPlatformNumberController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   guardPage: PageGuardAction,
+  requireSignatory: RequireSignatoryAction,
   userAnswersRepository: UserAnswersRepository,
   navigator: Navigator,
   formProvider: PeerToPeerPlatformNumberFormProvider,
@@ -47,7 +49,8 @@ class PeerToPeerPlatformNumberController @Inject() (
     with FrontendBaseController
     with I18nSupport {
 
-  private val pageAction = identify andThen getData andThen guardPage(PeerToPeerPlatformNumberPage)
+  private val pageAction =
+    identify andThen getData andThen requireSignatory andThen guardPage(PeerToPeerPlatformNumberPage)
 
   private def platformName(implicit request: DataRequest[_]): String =
     request.effectiveAnswers.p2pPlatform.get

@@ -15,16 +15,11 @@
  *@
 
 @import uk.gov.hmrc.disaaccountfrontend.controllers.routes.{ChangeInformationController, DeclarationForChangesController, ManageIsasController}
+@import uk.gov.hmrc.disaaccountfrontend.viewmodels.ChangeOfCircumstancesViewModel
 
 @this(layout: Layout, govukSummaryList: GovukSummaryList, govukButton: GovukButton)
 
-@(
-    organisation: Option[SummaryList],
-    products: Option[SummaryList],
-    authorisedUsers: Option[SummaryList],
-    checkYourChanges: Option[SummaryList],
-    isaProductsChanged: Boolean
-)(implicit request: RequestHeader, messages: Messages)
+@(viewModel: ChangeOfCircumstancesViewModel)(implicit request: RequestHeader, messages: Messages)
 
 @section(headingKey: String, summary: Option[SummaryList]) = {
     @summary.map { list =>
@@ -45,13 +40,13 @@
         <a class="govuk-link" href="@ManageIsasController.onPageLoad().url">@messages("changeOfCircumstances.returnToManageIsas.link")</a>.
     </p>
 
-    @section("changeOfCircumstances.organisationDetails.heading", organisation)
-    @section("changeOfCircumstances.productInformation.heading", products)
-    @section("changeOfCircumstances.authorisedUsers.heading", authorisedUsers)
+    @section("changeOfCircumstances.organisationDetails.heading", viewModel.organisation)
+    @section("changeOfCircumstances.productInformation.heading", viewModel.products)
+    @section("changeOfCircumstances.authorisedUsers.heading", viewModel.authorisedUsers)
 
-    @section("changeOfCircumstances.checkYourChanges.heading", checkYourChanges)
+    @section("changeOfCircumstances.checkYourChanges.heading", viewModel.checkYourChanges)
 
-    @if(isaProductsChanged) {
+    @if(viewModel.isaProductsChanged) {
         <h2 class="govuk-heading-m">@messages("changeOfCircumstances.isaProductChanges.heading")</h2>
         <div class="govuk-inset-text">
             <p class="govuk-body">@messages("changeOfCircumstances.isaProductChanges.manualProcessing")</p>
@@ -59,8 +54,10 @@
         </div>
     }
 
-    @govukButton(Button(
-        href = Some(DeclarationForChangesController.onPageLoad().url),
-        content = Text(messages("changeOfCircumstances.continue"))
-    ))
+    @if(viewModel.checkYourChanges.isDefined) {
+        @govukButton(Button(
+            href = Some(DeclarationForChangesController.onPageLoad().url),
+            content = Text(messages("changeOfCircumstances.continue"))
+        ))
+    }
 }

@@ -14,42 +14,43 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.controllers
+package uk.gov.hmrc.disaaccountfrontend.controllers.isaproducts
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction, PageGuardAction}
-import uk.gov.hmrc.disaaccountfrontend.forms.PeerToPeerPlatformFormProvider
+import uk.gov.hmrc.disaaccountfrontend.controllers.PageController
+import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction, RequireSignatoryAction}
+import uk.gov.hmrc.disaaccountfrontend.forms.ChangeProductsFormProvider
 import uk.gov.hmrc.disaaccountfrontend.models.UserAnswers
-import uk.gov.hmrc.disaaccountfrontend.models.pages.PeerToPeerPlatformPage
+import uk.gov.hmrc.disaaccountfrontend.models.pages.ChangeProductsPage
 import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
-import uk.gov.hmrc.disaaccountfrontend.views.html.PeerToPeerPlatformView
+import uk.gov.hmrc.disaaccountfrontend.views.html.ChangeProductsView
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class PeerToPeerPlatformController @Inject() (
+class ChangeProductsController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
-  guardPage: PageGuardAction,
+  requireSignatory: RequireSignatoryAction,
   userAnswersRepository: UserAnswersRepository,
   navigator: Navigator,
-  formProvider: PeerToPeerPlatformFormProvider,
+  formProvider: ChangeProductsFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: PeerToPeerPlatformView
+  view: ChangeProductsView
 )(implicit ec: ExecutionContext)
     extends PageController(navigator)
     with FrontendBaseController
     with I18nSupport {
 
   private val form       = formProvider()
-  private val pageAction = identify andThen getData andThen guardPage(PeerToPeerPlatformPage)
+  private val pageAction = identify andThen getData andThen requireSignatory
 
   def onPageLoad(): Action[AnyContent] = pageAction { implicit request =>
-    val preparedForm = request.effectiveAnswers.p2pPlatform.fold(form)(form.fill)
+    val preparedForm = request.effectiveAnswers.isaProducts.fold(form)(answer => form.fill(answer.toSet))
     Ok(view(preparedForm))
   }
 
@@ -59,11 +60,12 @@ class PeerToPeerPlatformController @Inject() (
       .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
         answer => {
-          val sessionUpdates = getSessionUpdates(PeerToPeerPlatformPage, answer)
+          val sessionUpdates = getSessionUpdates(ChangeProductsPage, answer)
+          val updatedAnswers = sessionUpdates.getUpdatedEffectiveAnswers(request.originalAnswers)
 
           userAnswersRepository
             .set(UserAnswers(id = request.sessionId, updates = sessionUpdates))
-            .map(_ => Redirect(nextPage(PeerToPeerPlatformPage, sessionUpdates)))
+            .map(_ => Redirect(navigator.nextPageFromChangeProducts(updatedAnswers)))
         }
       )
   }

@@ -18,7 +18,7 @@ package uk.gov.hmrc.disaaccountfrontend.viewmodels.checkAnswers.changeOfCircumst
 
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.disaaccountfrontend.controllers.routes.ChangeProductsController
+import uk.gov.hmrc.disaaccountfrontend.controllers.isaproducts.routes.ChangeProductsController
 import uk.gov.hmrc.disaaccountfrontend.models.Answers
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct
 import uk.gov.hmrc.govukfrontend.views.Aliases.{ActionItem, Actions, Key, SummaryListRow, Value}

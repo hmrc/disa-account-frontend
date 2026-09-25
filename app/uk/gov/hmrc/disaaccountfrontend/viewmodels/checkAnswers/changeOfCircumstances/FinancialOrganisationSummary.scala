@@ -18,40 +18,35 @@ package uk.gov.hmrc.disaaccountfrontend.viewmodels.checkAnswers.changeOfCircumst
 
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails.routes.EnterYourOrganisationAddressController
-import uk.gov.hmrc.disaaccountfrontend.models.{Answers, CorrespondenceAddress}
+import uk.gov.hmrc.disaaccountfrontend.controllers.routes.FinancialOrganisationController
+import uk.gov.hmrc.disaaccountfrontend.models.Answers
+import uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority.FinancialOrganisation
 import uk.gov.hmrc.govukfrontend.views.Aliases.{ActionItem, Actions, Key, SummaryListRow, Value}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 
-object CorrespondenceAddressSummary {
+object FinancialOrganisationSummary {
+
+  def organisationName(organisation: FinancialOrganisation)(implicit messages: Messages): String =
+    messages(s"financialOrganisation.${organisation.toString}")
 
   def row(answers: Answers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.correspondenceAddress.filter(hasAnyLine).map { address =>
+    answers.financialOrganisation.filter(_.nonEmpty).map { organisations =>
+      val lines = FinancialOrganisation.values.filter(organisations.contains).map(organisationName)
+
       SummaryListRow(
-        key = Key(Text(messages("correspondenceAddress.checkYourAnswersLabel"))),
-        value = Value(HtmlContent(formattedLines(address))),
+        key = Key(Text(messages("changeOfCircumstances.organisationDescription.label"))),
+        value = Value(HtmlContent(lines.map(line => HtmlFormat.escape(line).toString).mkString("<br>"))),
         actions = Some(
           Actions(
             items = Seq(
               ActionItem(
-                href = EnterYourOrganisationAddressController.onPageLoad().url,
+                href = FinancialOrganisationController.onPageLoad().url,
                 content = Text(messages("site.change")),
-                visuallyHiddenText = Some(messages("correspondenceAddress.change.hidden"))
+                visuallyHiddenText = Some(messages("changeOfCircumstances.organisationDescription.change.hidden"))
               )
             )
           )
         )
       )
     }
-
-  private def hasAnyLine(address: CorrespondenceAddress): Boolean =
-    Seq(address.addressLine1, address.addressLine2, address.addressLine3, address.postCode).exists(_.isDefined)
-
-  private def formattedLines(address: CorrespondenceAddress): String =
-    lines(address)
-      .map(line => HtmlFormat.escape(line).toString)
-      .mkString("<br>")
-
-  def lines(address: CorrespondenceAddress): Seq[String] =
-    Seq(address.addressLine1, address.addressLine2, address.addressLine3, address.postCode).flatten
 }

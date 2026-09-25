@@ -16,6 +16,7 @@
 
 package controllers.liaisonofficers
 
+import controllers.actions.FakeAccountMaintenanceGuardAction
 import org.jsoup.Jsoup
 import uk.gov.hmrc.disaaccountfrontend.models.Answers
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
@@ -49,6 +50,20 @@ class AddedLiaisonOfficersControllerSpec extends BaseUnitSpec {
     )
 
   "AddedLiaisonOfficersController.onPageLoad" should {
+
+    "redirect to manage ISAs when an ISA product change is under review" in {
+      val application = applicationBuilder(
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, addedLiaisonOfficerEndpoint)).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+      }
+    }
+
     "render one officer with Change and Remove actions" in {
       val application = applicationBuilder(
         effectiveAnswers = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(completeOfficer))))
@@ -180,6 +195,23 @@ class AddedLiaisonOfficersControllerSpec extends BaseUnitSpec {
   }
 
   "AddedLiaisonOfficersController.onSubmit" should {
+
+    "redirect to manage ISAs when an ISA product change is under review" in {
+      val application = applicationBuilder(
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(POST, addedLiaisonOfficerEndpoint)
+          .withFormUrlEncodedBody("value" -> "yes")
+          .withHeaders("Csrf-Token" -> "nocheck")
+        val result  = route(application, request).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+        verify(mockUserAnswersRepository, never).set(any())
+      }
+    }
 
     "redirect Yes to the officer name page without persisting the answer" in {
       val application = applicationBuilder(

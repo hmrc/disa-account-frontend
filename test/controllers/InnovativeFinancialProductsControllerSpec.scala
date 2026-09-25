@@ -33,6 +33,17 @@ import scala.concurrent.Future
 
 class InnovativeFinancialProductsControllerSpec extends BaseUnitSpec {
 
+  private def signatoryApplicationBuilder(
+    effectiveAnswers: Answers,
+    sessionAnswers: Option[UserAnswers] = None
+  ) =
+    applicationBuilder(
+      effectiveAnswers = effectiveAnswers.copy(signatories = Some(testSignatories)),
+      originalAnswers = Some(effectiveAnswers.copy(signatories = Some(testSignatories))),
+      sessionAnswers = sessionAnswers,
+      email = Some(testSignatoryEmail)
+    )
+
   private val enrolledEffectiveAnswers = Answers(
     isaProducts = Some(testIsaProductSelections),
     innovativeFinancialProducts = Some(testInnovativeFinancialProductSelections)
@@ -44,7 +55,7 @@ class InnovativeFinancialProductsControllerSpec extends BaseUnitSpec {
   "InnovativeFinancialProductsController.onPageLoad" should {
 
     "render and prefill the page from effective answers when Innovative Finance ISAs are already offered" in {
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = enrolledEffectiveAnswers
       ).build()
 
@@ -64,7 +75,7 @@ class InnovativeFinancialProductsControllerSpec extends BaseUnitSpec {
         testSessionId,
         SessionUpdates(isaProducts = Assign(Seq(CashIsas, InnovativeFinanceIsas)))
       )
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(isaProducts = Some(Seq(CashIsas, InnovativeFinanceIsas))),
         sessionAnswers = Some(answers)
       ).build()
@@ -88,7 +99,7 @@ class InnovativeFinancialProductsControllerSpec extends BaseUnitSpec {
           innovativeFinancialProducts = Assign(Seq(LongTermAssetFunds))
         )
       )
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(
           isaProducts = Some(Seq(InnovativeFinanceIsas)),
           innovativeFinancialProducts = Some(Seq(LongTermAssetFunds))
@@ -107,7 +118,7 @@ class InnovativeFinancialProductsControllerSpec extends BaseUnitSpec {
     }
 
     "redirect when Innovative Finance ISAs are absent from both session and enrolment" in {
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(isaProducts = Some(Seq(CashIsas)))
       ).build()
 
@@ -121,10 +132,21 @@ class InnovativeFinancialProductsControllerSpec extends BaseUnitSpec {
 
     "redirect when the session deselects Innovative Finance ISAs from an existing enrolment" in {
       val answers     = UserAnswers(testSessionId, SessionUpdates(isaProducts = Assign(Seq(CashIsas))))
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(isaProducts = Some(Seq(CashIsas))),
         sessionAnswers = Some(answers)
       ).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, innovativeFinancialProductsEndpoint)).value
+
+        status(result)               shouldBe SEE_OTHER
+        redirectLocation(result).value should endWith(changeOfCircumstancesEndpoint)
+      }
+    }
+
+    "redirect a non-signatory to change of circumstances" in {
+      val application = applicationBuilder(effectiveAnswers = enrolledEffectiveAnswers).build()
 
       running(application) {
         val result = route(application, FakeRequest(GET, innovativeFinancialProductsEndpoint)).value
@@ -145,7 +167,7 @@ class InnovativeFinancialProductsControllerSpec extends BaseUnitSpec {
       )
       val existingAnswers = UserAnswers(testSessionId, existingUpdates)
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
-      val application     = applicationBuilder(
+      val application     = signatoryApplicationBuilder(
         effectiveAnswers = Answers(
           correspondenceAddress = Some(testCorrespondenceAddress),
           organisationTelephoneNumber = Some(testOrgTelephoneNumber),
@@ -185,7 +207,7 @@ class InnovativeFinancialProductsControllerSpec extends BaseUnitSpec {
 
     "redirect to the peer-to-peer platform page when the platform-with-36H option is selected" in {
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = enrolledEffectiveAnswers
       ).build()
 
@@ -205,7 +227,7 @@ class InnovativeFinancialProductsControllerSpec extends BaseUnitSpec {
     }
 
     "return Bad Request with the exact inline error when no product is selected" in {
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = enrolledEffectiveAnswers
       ).build()
 
@@ -227,10 +249,25 @@ class InnovativeFinancialProductsControllerSpec extends BaseUnitSpec {
 
     "redirect without saving when the session has deselected Innovative Finance ISAs" in {
       val answers     = UserAnswers(testSessionId, SessionUpdates(isaProducts = Assign(Seq(CashIsas))))
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(isaProducts = Some(Seq(CashIsas))),
         sessionAnswers = Some(answers)
       ).build()
+
+      running(application) {
+        val request = FakeRequest(POST, innovativeFinancialProductsEndpoint)
+          .withFormUrlEncodedBody("value[0]" -> CrowdFundedDebentures.toString)
+          .withHeaders("Csrf-Token" -> "nocheck")
+        val result  = route(application, request).value
+
+        status(result)               shouldBe SEE_OTHER
+        redirectLocation(result).value should endWith(changeOfCircumstancesEndpoint)
+        verify(mockUserAnswersRepository, never).set(any())
+      }
+    }
+
+    "redirect a non-signatory to change of circumstances without saving" in {
+      val application = applicationBuilder(effectiveAnswers = enrolledEffectiveAnswers).build()
 
       running(application) {
         val request = FakeRequest(POST, innovativeFinancialProductsEndpoint)

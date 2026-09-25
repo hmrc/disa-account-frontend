@@ -16,6 +16,7 @@
 
 package controllers.signatories
 
+import controllers.actions.FakeAccountMaintenanceGuardAction
 import org.jsoup.Jsoup
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify}
@@ -27,16 +28,41 @@ import utils.BaseUnitSpec
 
 class AddedSignatoryControllerSpec extends BaseUnitSpec {
 
+  private def signatoryApplicationBuilder(effectiveAnswers: Answers) =
+    applicationBuilder(effectiveAnswers = effectiveAnswers, email = Some(testSignatoryEmail))
+
   private val completeSignatory =
-    Signatory(testSignatoryId, Some(testName), Some(testSignatoryJobTitle))
+    Signatory(testSignatoryId, Some(testName), Some(testSignatoryJobTitle), Some(testSignatoryEmail))
 
   private def completeSignatories(count: Int): Seq[Signatory] =
-    (1 to count).map(number => Signatory(s"signatory-$number", Some(s"Signatory $number"), Some("Director")))
+    (1 to count).map(number =>
+      Signatory(
+        s"signatory-$number",
+        Some(s"Signatory $number"),
+        Some("Director"),
+        email = if (number == 1) Some(testSignatoryEmail) else None
+      )
+    )
 
   "AddedSignatoryController.onPageLoad" should {
 
-    "render one signatory with Change and Remove actions" in {
+    "redirect to manage ISAs when an ISA product change is under review" in {
       val application = applicationBuilder(
+        effectiveAnswers = Answers(signatories = Some(Signatories(Seq(completeSignatory)))),
+        email = Some(testSignatoryEmail),
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, addedSignatoriesEndpoint)).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+      }
+    }
+
+    "render one signatory with Change and Remove actions" in {
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(signatories = Some(Signatories(Seq(completeSignatory))))
       ).build()
 
@@ -66,7 +92,7 @@ class AddedSignatoryControllerSpec extends BaseUnitSpec {
     }
 
     "render the plural heading for multiple signatories" in {
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(signatories = Some(Signatories(completeSignatories(2))))
       ).build()
 
@@ -82,7 +108,7 @@ class AddedSignatoryControllerSpec extends BaseUnitSpec {
 
     "exclude incomplete signatories from the list and heading count" in {
       val incompleteSignatory = Signatory("incomplete-id", Some("Incomplete Signatory"), None)
-      val application         = applicationBuilder(
+      val application         = signatoryApplicationBuilder(
         effectiveAnswers = Answers(signatories = Some(Signatories(completeSignatories(2) :+ incompleteSignatory)))
       ).build()
 
@@ -99,7 +125,7 @@ class AddedSignatoryControllerSpec extends BaseUnitSpec {
 
     "allow another signatory when incomplete records bring the stored collection to the maximum" in {
       val signatories = completeSignatories(24) :+ Signatory("incomplete-id", Some("Incomplete Signatory"), None)
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(signatories = Some(Signatories(signatories)))
       ).build()
 
@@ -114,7 +140,7 @@ class AddedSignatoryControllerSpec extends BaseUnitSpec {
     }
 
     "render the maximum state without the add-another question" in {
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(signatories = Some(Signatories(completeSignatories(25))))
       ).build()
 
@@ -131,7 +157,7 @@ class AddedSignatoryControllerSpec extends BaseUnitSpec {
     }
 
     "defensively use the maximum state above 25 signatories" in {
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(signatories = Some(Signatories(completeSignatories(26))))
       ).build()
 
@@ -153,7 +179,7 @@ class AddedSignatoryControllerSpec extends BaseUnitSpec {
       )
 
       answerSets.foreach { answers =>
-        val application = applicationBuilder(effectiveAnswers = answers).build()
+        val application = signatoryApplicationBuilder(effectiveAnswers = answers).build()
 
         running(application) {
           val result = route(application, FakeRequest(GET, addedSignatoriesEndpoint)).value
@@ -163,12 +189,44 @@ class AddedSignatoryControllerSpec extends BaseUnitSpec {
         }
       }
     }
+
+    "redirect a non-signatory to change of circumstances" in {
+      val application = applicationBuilder(
+        effectiveAnswers = Answers(signatories = Some(Signatories(Seq(completeSignatory))))
+      ).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, addedSignatoriesEndpoint)).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
+      }
+    }
   }
 
   "AddedSignatoryController.onSubmit" should {
 
-    "redirect Yes to the signatory name page without persisting the answer" in {
+    "redirect to manage ISAs when an ISA product change is under review" in {
       val application = applicationBuilder(
+        effectiveAnswers = Answers(signatories = Some(Signatories(Seq(completeSignatory)))),
+        email = Some(testSignatoryEmail),
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(POST, addedSignatoriesEndpoint)
+          .withFormUrlEncodedBody("value" -> "yes")
+          .withHeaders("Csrf-Token" -> "nocheck")
+        val result  = route(application, request).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+        verify(mockUserAnswersRepository, never).set(any())
+      }
+    }
+
+    "redirect Yes to the signatory name page without persisting the answer" in {
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(signatories = Some(Signatories(Seq(completeSignatory))))
       ).build()
 
@@ -185,7 +243,7 @@ class AddedSignatoryControllerSpec extends BaseUnitSpec {
     }
 
     "redirect No to change of circumstances without persisting the answer" in {
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(signatories = Some(Signatories(Seq(completeSignatory))))
       ).build()
 
@@ -202,7 +260,7 @@ class AddedSignatoryControllerSpec extends BaseUnitSpec {
     }
 
     "show the required inline error and error summary when no option is selected" in {
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(signatories = Some(Signatories(Seq(completeSignatory))))
       ).build()
 
@@ -221,12 +279,29 @@ class AddedSignatoryControllerSpec extends BaseUnitSpec {
     }
 
     "redirect from the maximum state without validating or persisting a radio answer" in {
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = Answers(signatories = Some(Signatories(completeSignatories(25))))
       ).build()
 
       running(application) {
         val request = FakeRequest(POST, addedSignatoriesEndpoint)
+          .withHeaders("Csrf-Token" -> "nocheck")
+        val result  = route(application, request).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe changeOfCircumstancesEndpoint
+        verify(mockUserAnswersRepository, never).set(any())
+      }
+    }
+
+    "redirect a non-signatory to change of circumstances without persisting the answer" in {
+      val application = applicationBuilder(
+        effectiveAnswers = Answers(signatories = Some(Signatories(Seq(completeSignatory))))
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(POST, addedSignatoriesEndpoint)
+          .withFormUrlEncodedBody("value" -> "yes")
           .withHeaders("Csrf-Token" -> "nocheck")
         val result  = route(application, request).value
 

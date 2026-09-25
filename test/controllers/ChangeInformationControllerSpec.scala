@@ -16,6 +16,7 @@
 
 package controllers
 
+import controllers.actions.FakeAccountMaintenanceGuardAction
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
@@ -77,6 +78,19 @@ class ChangeInformationControllerSpec extends BaseUnitSpec {
 
         status(result) shouldBe OK
         labels         shouldBe Seq("Organisation information", "Authorised users", "View all information")
+      }
+    }
+
+    "redirect to manage ISAs when an ISA product change is under review" in {
+      val application = applicationBuilder(
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, changeInformationEndpoint)).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
       }
     }
 

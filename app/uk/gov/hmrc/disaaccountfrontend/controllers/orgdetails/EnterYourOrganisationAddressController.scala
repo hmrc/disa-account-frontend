@@ -14,44 +14,43 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.controllers
+package uk.gov.hmrc.disaaccountfrontend.controllers.orgdetails
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction, PageGuardAction}
-import uk.gov.hmrc.disaaccountfrontend.forms.InnovativeFinancialProductsFormProvider
+import uk.gov.hmrc.disaaccountfrontend.controllers.PageController
+import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{AccountMaintenanceGuardAction, DataRetrievalAction, IdentifierAction}
+import uk.gov.hmrc.disaaccountfrontend.forms.EnterYourOrganisationAddressFormProvider
 import uk.gov.hmrc.disaaccountfrontend.models.UserAnswers
-import uk.gov.hmrc.disaaccountfrontend.models.pages.InnovativeFinancialProductsPage
+import uk.gov.hmrc.disaaccountfrontend.models.pages.EnterYourOrganisationAddressPage
 import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
-import uk.gov.hmrc.disaaccountfrontend.views.html.InnovativeFinancialProductsView
+import uk.gov.hmrc.disaaccountfrontend.views.html.EnterYourOrganisationAddressView
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class InnovativeFinancialProductsController @Inject() (
+class EnterYourOrganisationAddressController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
-  guardPage: PageGuardAction,
+  accountMaintenanceGuard: AccountMaintenanceGuardAction,
   userAnswersRepository: UserAnswersRepository,
   navigator: Navigator,
-  formProvider: InnovativeFinancialProductsFormProvider,
+  formProvider: EnterYourOrganisationAddressFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: InnovativeFinancialProductsView
+  view: EnterYourOrganisationAddressView
 )(implicit ec: ExecutionContext)
     extends PageController(navigator)
     with FrontendBaseController
     with I18nSupport {
 
   private val form       = formProvider()
-  private val pageAction = identify andThen getData andThen guardPage(InnovativeFinancialProductsPage)
+  private val pageAction = identify andThen getData andThen accountMaintenanceGuard
 
   def onPageLoad(): Action[AnyContent] = pageAction { implicit request =>
-    val preparedForm = request.effectiveAnswers.innovativeFinancialProducts
-      .fold(form)(answer => form.fill(answer.toSet))
-
+    val preparedForm = request.effectiveAnswers.correspondenceAddress.fold(form)(form.fill)
     Ok(view(preparedForm))
   }
 
@@ -61,11 +60,11 @@ class InnovativeFinancialProductsController @Inject() (
       .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
         answer => {
-          val sessionUpdates = getSessionUpdates(InnovativeFinancialProductsPage, answer)
+          val sessionUpdates = getSessionUpdates(EnterYourOrganisationAddressPage, answer)
 
           userAnswersRepository
             .set(UserAnswers(id = request.sessionId, updates = sessionUpdates))
-            .map(_ => Redirect(nextPage(InnovativeFinancialProductsPage, sessionUpdates)))
+            .map(_ => Redirect(nextPage(EnterYourOrganisationAddressPage, sessionUpdates)))
         }
       )
   }

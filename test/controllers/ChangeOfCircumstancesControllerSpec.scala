@@ -16,12 +16,14 @@
 
 package controllers
 
+import controllers.actions.FakeAccountMaintenanceGuardAction
 import org.jsoup.Jsoup
 import play.api.test.Helpers.*
 import play.api.test.*
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
 import uk.gov.hmrc.disaaccountfrontend.models.ChangeInformationSelection.{AuthorisedUsers, OrganisationInformation, ViewAllInformation}
 import uk.gov.hmrc.disaaccountfrontend.models.articles.FcaArticles.FcaArticle14
+import uk.gov.hmrc.disaaccountfrontend.models.certificatesofauthority.FinancialOrganisation.Bank
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct.{CashIsas, CashJuniorIsas, InnovativeFinanceIsas, StocksAndSharesIsas}
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.{LiaisonOfficer, LiaisonOfficerCommunication, LiaisonOfficers}
 import uk.gov.hmrc.disaaccountfrontend.models.signatories.{Signatories, Signatory}
@@ -116,6 +118,20 @@ class ChangeOfCircumstancesControllerSpec extends BaseUnitSpec {
       }
     }
 
+    "redirect to manage ISAs when an ISA product change is under review" in {
+      val application = applicationBuilder(
+        effectiveAnswers = fullAnswers,
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, changeOfCircumstancesEndpoint)).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+      }
+    }
+
     "link to select a different option and back to the Manage ISAs homepage" in {
       val application = applicationBuilder(effectiveAnswers = fullAnswers).build()
 
@@ -171,6 +187,38 @@ class ChangeOfCircumstancesControllerSpec extends BaseUnitSpec {
       }
     }
 
+    "not show signatories or the added-signatories link to a user who is not a signatory" in {
+      val application = applicationBuilder(effectiveAnswers = fullAnswers).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, changeOfCircumstancesEndpoint)).value
+        val doc    = Jsoup.parse(contentAsString(result))
+
+        doc.select(".govuk-summary-list__key").eachText()             should contain("Liaison officer")
+        doc.select(".govuk-summary-list__key").eachText()             should not contain "Signatory"
+        doc.select(".govuk-summary-list__actions a").eachAttr("href") should not contain addedSignatoriesEndpoint
+      }
+    }
+
+    "not show signatories added or removed in check your changes to a user who is not a signatory" in {
+      val original    = Answers(
+        signatories = Some(Signatories(Seq(Signatory("s-1", Some("Jane Doe"), Some("Director")))))
+      )
+      val effective   = Answers(
+        signatories = Some(Signatories(Seq(Signatory("s-2", Some("Joe Blogs"), Some("Director")))))
+      )
+      val application = applicationBuilder(effectiveAnswers = effective, originalAnswers = Some(original)).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, changeOfCircumstancesEndpoint)).value
+        val doc    = Jsoup.parse(contentAsString(result))
+
+        doc.select("main").text() should not include "Signatories added"
+        doc.select("main").text() should not include "Signatories removed"
+        doc.select("main").text() should not include "Check your changes"
+      }
+    }
+
     "not show the check your changes section when nothing changed" in {
       val application = applicationBuilder(effectiveAnswers = fullAnswers, email = Some(signatoryEmail)).build()
 
@@ -181,6 +229,7 @@ class ChangeOfCircumstancesControllerSpec extends BaseUnitSpec {
         doc.select("main").text()                     should not include "Check your changes"
         doc.select("main").text()                     should not include "ISA product changes information"
         doc.select("main .govuk-inset-text").size() shouldBe 0
+        doc.select("a.govuk-button").size()         shouldBe 0
       }
     }
 
@@ -213,12 +262,16 @@ class ChangeOfCircumstancesControllerSpec extends BaseUnitSpec {
 
     "show signatories added and removed, without the ISA product changes information" in {
       val original    = Answers(
-        signatories = Some(Signatories(Seq(Signatory("s-1", Some("Jane Doe"), Some("Director")))))
+        signatories = Some(Signatories(Seq(Signatory("s-1", Some("Jane Doe"), Some("Director"), Some(signatoryEmail)))))
       )
       val effective   = Answers(
         signatories = Some(Signatories(Seq(Signatory("s-2", Some("Joe Blogs"), Some("Director")))))
       )
-      val application = applicationBuilder(effectiveAnswers = effective, originalAnswers = Some(original)).build()
+      val application = applicationBuilder(
+        effectiveAnswers = effective,
+        originalAnswers = Some(original),
+        email = Some(signatoryEmail)
+      ).build()
 
       running(application) {
         val result           = route(application, FakeRequest(GET, changeOfCircumstancesEndpoint)).value
@@ -282,9 +335,17 @@ class ChangeOfCircumstancesControllerSpec extends BaseUnitSpec {
     }
 
     "show products added and removed, and the manual processing information" in {
-      val original    = Answers(isaProducts = Some(Seq(StocksAndSharesIsas, InnovativeFinanceIsas)))
-      val effective   = Answers(isaProducts = Some(Seq(CashIsas, CashJuniorIsas)))
-      val application = applicationBuilder(effectiveAnswers = effective, originalAnswers = Some(original)).build()
+      val signatories =
+        Some(Signatories(Seq(Signatory("s-1", Some("Jane Doe"), Some("Director"), Some(signatoryEmail)))))
+      val original    =
+        Answers(isaProducts = Some(Seq(StocksAndSharesIsas, InnovativeFinanceIsas)), signatories = signatories)
+      val effective   = Answers(isaProducts = Some(Seq(CashIsas, CashJuniorIsas)), signatories = signatories)
+      val application = applicationBuilder(
+        effectiveAnswers = effective,
+        originalAnswers = Some(original),
+        sessionAnswers = sessionWith(OrganisationInformation),
+        email = Some(signatoryEmail)
+      ).build()
 
       running(application) {
         val result           = route(application, FakeRequest(GET, changeOfCircumstancesEndpoint)).value
@@ -310,9 +371,16 @@ class ChangeOfCircumstancesControllerSpec extends BaseUnitSpec {
     }
 
     "only show products removed when products were only removed" in {
-      val original    = Answers(isaProducts = Some(Seq(CashIsas, StocksAndSharesIsas)))
-      val effective   = Answers(isaProducts = Some(Seq(CashIsas)))
-      val application = applicationBuilder(effectiveAnswers = effective, originalAnswers = Some(original)).build()
+      val signatories =
+        Some(Signatories(Seq(Signatory("s-1", Some("Jane Doe"), Some("Director"), Some(signatoryEmail)))))
+      val original    = Answers(isaProducts = Some(Seq(CashIsas, StocksAndSharesIsas)), signatories = signatories)
+      val effective   = Answers(isaProducts = Some(Seq(CashIsas)), signatories = signatories)
+      val application = applicationBuilder(
+        effectiveAnswers = effective,
+        originalAnswers = Some(original),
+        sessionAnswers = sessionWith(OrganisationInformation),
+        email = Some(signatoryEmail)
+      ).build()
 
       running(application) {
         val result = route(application, FakeRequest(GET, changeOfCircumstancesEndpoint)).value
@@ -323,8 +391,42 @@ class ChangeOfCircumstancesControllerSpec extends BaseUnitSpec {
       }
     }
 
-    "link the continue button to the declaration" in {
-      val application = applicationBuilder(effectiveAnswers = fullAnswers).build()
+    "show the organisation description instead of FCA articles when there are no FCA articles" in {
+      val answers     = Answers(
+        isaProducts = Some(Seq(StocksAndSharesIsas)),
+        financialOrganisation = Some(Seq(Bank)),
+        signatories = Some(Signatories(Seq(Signatory("s-1", Some("Jane Doe"), Some("Director"), Some(signatoryEmail)))))
+      )
+      val application = applicationBuilder(effectiveAnswers = answers, email = Some(signatoryEmail)).build()
+
+      running(application) {
+        val result   = route(application, FakeRequest(GET, changeOfCircumstancesEndpoint)).value
+        val doc      = Jsoup.parse(contentAsString(result))
+        val products = doc.select(".govuk-summary-list").first()
+
+        products.select(".govuk-summary-list__key").eachText()                shouldBe
+          java.util.List.of("Products", "Organisation description")
+        products.select(".govuk-summary-list__value").eachText()                should contain("A bank")
+        products.select(".govuk-summary-list__actions a").last().attr("href") shouldBe financialOrganisationEndpoint
+      }
+    }
+
+    "not show the organisation description to a non-signatory" in {
+      val answers     = Answers(financialOrganisation = Some(Seq(Bank)))
+      val application = applicationBuilder(effectiveAnswers = answers).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, changeOfCircumstancesEndpoint)).value
+        val doc    = Jsoup.parse(contentAsString(result))
+
+        doc.select("main").text() should not include "Organisation description"
+      }
+    }
+
+    "link the continue button to the declaration when something has changed" in {
+      val original    = Answers(tradingName = Some("ABC Bank"))
+      val effective   = fullAnswers.copy(tradingName = Some("XYZ Bank"))
+      val application = applicationBuilder(effectiveAnswers = effective, originalAnswers = Some(original)).build()
 
       running(application) {
         val result = route(application, FakeRequest(GET, changeOfCircumstancesEndpoint)).value

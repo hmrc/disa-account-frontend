@@ -45,6 +45,22 @@ object FieldChanges {
       )
     ).flatten
 
+  // Simple, single-value ISA product fields - kept separate from `rows` above since these are only
+  // ever shown to signatories, unlike the organisation fields.
+  def isaProductFieldRows(original: Answers, effective: Answers)(implicit messages: Messages): Seq[SummaryListRow] =
+    Seq(
+      fieldRow(
+        "changeOfCircumstances.checkYourChanges.changedPlatformName",
+        original.p2pPlatform,
+        effective.p2pPlatform
+      ),
+      fieldRow(
+        "changeOfCircumstances.checkYourChanges.changedPlatformFcaFrn",
+        original.p2pPlatformNumber,
+        effective.p2pPlatformNumber
+      )
+    ).flatten
+
   private def fieldRow(headingKey: String, oldValue: Option[String], newValue: Option[String])(implicit
     messages: Messages
   ): Option[SummaryListRow] =
