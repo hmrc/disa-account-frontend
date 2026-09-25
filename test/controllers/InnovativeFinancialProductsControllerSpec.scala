@@ -226,6 +226,56 @@ class InnovativeFinancialProductsControllerSpec extends BaseUnitSpec {
       }
     }
 
+    "redirect to change of circumstances without revisiting the platform pages when the platform-with-36H option was already selected and remains selected" in {
+      when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
+      val application = signatoryApplicationBuilder(
+        effectiveAnswers = enrolledEffectiveAnswers.copy(
+          innovativeFinancialProducts = Some(Seq(PeertopeerLoansUsingAPlatformWith36hPermissions)),
+          p2pPlatform = Some(testP2pPlatform),
+          p2pPlatformNumber = Some(testP2pPlatformNumber)
+        )
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(POST, innovativeFinancialProductsEndpoint)
+          .withFormUrlEncodedBody(
+            "value[1]" -> PeertopeerLoansUsingAPlatformWith36hPermissions.toString
+          )
+          .withHeaders("Csrf-Token" -> "nocheck")
+
+        val result = route(application, request).value
+
+        status(result)               shouldBe SEE_OTHER
+        redirectLocation(result).value should endWith(changeOfCircumstancesEndpoint)
+        verify(mockUserAnswersRepository).set(any())
+      }
+    }
+
+    "redirect to change of circumstances when the platform-with-36H option is deselected" in {
+      when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
+      val application = signatoryApplicationBuilder(
+        effectiveAnswers = enrolledEffectiveAnswers.copy(
+          innovativeFinancialProducts = Some(Seq(PeertopeerLoansUsingAPlatformWith36hPermissions)),
+          p2pPlatform = Some(testP2pPlatform),
+          p2pPlatformNumber = Some(testP2pPlatformNumber)
+        )
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(POST, innovativeFinancialProductsEndpoint)
+          .withFormUrlEncodedBody(
+            "value[2]" -> CrowdFundedDebentures.toString
+          )
+          .withHeaders("Csrf-Token" -> "nocheck")
+
+        val result = route(application, request).value
+
+        status(result)               shouldBe SEE_OTHER
+        redirectLocation(result).value should endWith(changeOfCircumstancesEndpoint)
+        verify(mockUserAnswersRepository).set(any())
+      }
+    }
+
     "return Bad Request with the exact inline error when no product is selected" in {
       val application = signatoryApplicationBuilder(
         effectiveAnswers = enrolledEffectiveAnswers

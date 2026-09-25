@@ -47,7 +47,6 @@ object ChangeInformationSelection extends Enumerable.Implicits {
   def validFormValues(availableSelections: Seq[ChangeInformationSelection]): Set[String] =
     availableSelections.map(_.toString).toSet + viewAllInformationFormValue
 
-  // No explicit selection, "view all information", or the section itself all mean the section is shown.
   def isShown(selections: Seq[ChangeInformationSelection], section: ChangeInformationSelection): Boolean =
     selections.isEmpty || selections.contains(ViewAllInformation) || selections.contains(section)
 

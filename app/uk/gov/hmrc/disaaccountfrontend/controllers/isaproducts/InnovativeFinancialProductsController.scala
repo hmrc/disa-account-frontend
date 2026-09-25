@@ -64,11 +64,13 @@ class InnovativeFinancialProductsController @Inject() (
       .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
         answer => {
-          val sessionUpdates = getSessionUpdates(InnovativeFinancialProductsPage, answer)
+          val previousAnswers = request.effectiveAnswers
+          val sessionUpdates  = getSessionUpdates(InnovativeFinancialProductsPage, answer)
+          val updatedAnswers  = sessionUpdates.getUpdatedEffectiveAnswers(previousAnswers)
 
           userAnswersRepository
             .set(UserAnswers(id = request.sessionId, updates = sessionUpdates))
-            .map(_ => Redirect(nextPage(InnovativeFinancialProductsPage, sessionUpdates)))
+            .map(_ => Redirect(navigator.nextPageFromInnovativeFinancialProducts(previousAnswers, updatedAnswers)))
         }
       )
   }

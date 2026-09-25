@@ -26,7 +26,8 @@ final case class FinancialOrganisationChanges(added: Seq[FinancialOrganisation],
   val hasChanges: Boolean = added.nonEmpty || removed.nonEmpty
 
   def addedNames(implicit messages: Messages): Seq[String]   = added.map(FinancialOrganisationSummary.organisationName)
-  def removedNames(implicit messages: Messages): Seq[String] = removed.map(FinancialOrganisationSummary.organisationName)
+  def removedNames(implicit messages: Messages): Seq[String] =
+    removed.map(FinancialOrganisationSummary.organisationName)
 
   def rows(implicit messages: Messages): Seq[SummaryListRow] =
     Seq(

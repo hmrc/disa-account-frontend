@@ -49,9 +49,6 @@ object SignatoryChanges {
     val originalNames  = originalSignatories.flatMap(_.fullName).toSet
     val effectiveNames = effectiveSignatories.flatMap(_.fullName).toSet
 
-    // A signatory counts as unchanged if it matches by id, or - since the id we're given for an
-    // untouched signatory isn't guaranteed to stay the same between the original and effective
-    // answers - by full name, so the same person is never reported as both added and removed.
     def isUnchanged(signatory: Signatory, matchingIds: Set[String], matchingNames: Set[String]): Boolean =
       matchingIds(signatory.id) || signatory.fullName.exists(matchingNames)
 

@@ -89,19 +89,37 @@ class NavigatorSpec extends BaseUnitSpec {
       navigator.nextPage(TradingNamePage) shouldBe ChangeOfCircumstancesController.onPageLoad()
     }
 
-    "go from InnovativeFinancialProductsPage to the peer-to-peer platform page when the platform option is selected" in {
-      val answers = Answers(
-        innovativeFinancialProducts = Some(Seq(PeertopeerLoansUsingAPlatformWith36hPermissions))
+    "go from Innovative Financial Products to the peer-to-peer platform page when the platform option is newly selected" in {
+      val previousAnswers = Answers(innovativeFinancialProducts = Some(Seq(CrowdFundedDebentures)))
+      val updatedAnswers  = Answers(
+        innovativeFinancialProducts = Some(Seq(CrowdFundedDebentures, PeertopeerLoansUsingAPlatformWith36hPermissions))
       )
 
-      navigator.nextPage(InnovativeFinancialProductsPage, answers) shouldBe
+      navigator.nextPageFromInnovativeFinancialProducts(previousAnswers, updatedAnswers) shouldBe
         PeerToPeerPlatformController.onPageLoad()
     }
 
-    "go from InnovativeFinancialProductsPage to change of circumstances when the platform option is not selected" in {
-      val answers = Answers(innovativeFinancialProducts = Some(Seq(CrowdFundedDebentures)))
+    "go from Innovative Financial Products to change of circumstances when the platform option is not selected" in {
+      val previousAnswers = Answers(innovativeFinancialProducts = Some(Seq.empty))
+      val updatedAnswers  = Answers(innovativeFinancialProducts = Some(Seq(CrowdFundedDebentures)))
 
-      navigator.nextPage(InnovativeFinancialProductsPage, answers) shouldBe
+      navigator.nextPageFromInnovativeFinancialProducts(previousAnswers, updatedAnswers) shouldBe
+        ChangeOfCircumstancesController.onPageLoad()
+    }
+
+    "go from Innovative Financial Products to change of circumstances when the platform option is deselected" in {
+      val previousAnswers =
+        Answers(innovativeFinancialProducts = Some(Seq(PeertopeerLoansUsingAPlatformWith36hPermissions)))
+      val updatedAnswers  = Answers(innovativeFinancialProducts = Some(Seq(CrowdFundedDebentures)))
+
+      navigator.nextPageFromInnovativeFinancialProducts(previousAnswers, updatedAnswers) shouldBe
+        ChangeOfCircumstancesController.onPageLoad()
+    }
+
+    "go from Innovative Financial Products to change of circumstances when the platform option was already selected and remains selected" in {
+      val answers = Answers(innovativeFinancialProducts = Some(Seq(PeertopeerLoansUsingAPlatformWith36hPermissions)))
+
+      navigator.nextPageFromInnovativeFinancialProducts(answers, answers) shouldBe
         ChangeOfCircumstancesController.onPageLoad()
     }
 

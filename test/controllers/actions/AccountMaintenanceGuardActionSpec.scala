@@ -59,7 +59,7 @@ class AccountMaintenanceGuardActionSpec extends BaseUnitSpec {
 
       val result = action.invokeBlock(dataRequest, _ => Future.successful(Ok))
 
-      status(result)           shouldBe SEE_OTHER
+      status(result)         shouldBe SEE_OTHER
       redirectLocation(result) should contain(manageIsasEndpoint)
     }
   }

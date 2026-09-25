@@ -29,7 +29,8 @@ final case class InnovativeFinancialProductsChanges(
   val hasChanges: Boolean = added.nonEmpty || removed.nonEmpty
 
   def addedNames(implicit messages: Messages): Seq[String]   = added.map(InnovativeFinancialProductsSummary.productName)
-  def removedNames(implicit messages: Messages): Seq[String] = removed.map(InnovativeFinancialProductsSummary.productName)
+  def removedNames(implicit messages: Messages): Seq[String] =
+    removed.map(InnovativeFinancialProductsSummary.productName)
 
   def rows(implicit messages: Messages): Seq[SummaryListRow] =
     Seq(
@@ -49,12 +50,10 @@ object InnovativeFinancialProductsChanges {
     val effectiveProducts = effective.innovativeFinancialProducts.getOrElse(Seq.empty).toSet
 
     InnovativeFinancialProductsChanges(
-      added = InnovativeFinancialProduct.values.filter(product =>
-        effectiveProducts(product) && !originalProducts(product)
-      ),
-      removed = InnovativeFinancialProduct.values.filter(product =>
-        originalProducts(product) && !effectiveProducts(product)
-      )
+      added =
+        InnovativeFinancialProduct.values.filter(product => effectiveProducts(product) && !originalProducts(product)),
+      removed =
+        InnovativeFinancialProduct.values.filter(product => originalProducts(product) && !effectiveProducts(product))
     )
   }
 }

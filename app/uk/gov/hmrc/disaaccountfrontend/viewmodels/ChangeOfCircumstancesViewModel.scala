@@ -76,8 +76,6 @@ object ChangeOfCircumstancesViewModel {
 
     val productChanges = ProductChanges(originalAnswers, effectiveAnswers)
 
-    // All of these live under the isSignatory-only products section above, so their changes are
-    // likewise only ever shown to a signatory.
     val isaProductChangeRows = if (isSignatory) {
       productChanges.rows ++
         InnovativeFinancialProductsChanges(originalAnswers, effectiveAnswers).rows ++

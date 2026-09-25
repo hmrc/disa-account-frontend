@@ -20,9 +20,6 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, CorrespondenceAddress}
 import uk.gov.hmrc.govukfrontend.views.Aliases.SummaryListRow
 
-// Rows for the simple, single-value organisation fields: "Changed <field>" / "<old> to <new>".
-// Fields with their own added/removed semantics (ISA products, signatories, liaison officers)
-// are handled separately by ProductChanges, SignatoryChanges and LiaisonOfficerChanges.
 object FieldChanges {
 
   def rows(original: Answers, effective: Answers)(implicit messages: Messages): Seq[SummaryListRow] =
@@ -45,8 +42,6 @@ object FieldChanges {
       )
     ).flatten
 
-  // Simple, single-value ISA product fields - kept separate from `rows` above since these are only
-  // ever shown to signatories, unlike the organisation fields.
   def isaProductFieldRows(original: Answers, effective: Answers)(implicit messages: Messages): Seq[SummaryListRow] =
     Seq(
       fieldRow(
@@ -79,7 +74,6 @@ object FieldChanges {
 
   // Shown the same way as an added address (each line of its own), but with the old address's lines,
   // a "to" line, then the new address's lines, rather than a single "<old> to <new>" line - an address
-  // read better broken across lines than run together.
   private def addressRow(
     oldAddress: Option[CorrespondenceAddress],
     newAddress: Option[CorrespondenceAddress]

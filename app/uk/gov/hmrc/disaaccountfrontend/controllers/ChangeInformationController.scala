@@ -89,24 +89,18 @@ class ChangeInformationController @Inject() (
       )
   }
 
-  // Section checkboxes only control what's shown on the Change of circumstances page; the answers
-  // themselves live on in the session regardless, so any pending changes for a section the user has
-  // just hidden would otherwise still be submitted without the user seeing them again. Discarding
-  // them here (reverting to Unchanged, i.e. whatever's already on the account) keeps the two in sync.
-  // Only applies when narrowing an existing selection - there's nothing to narrow away from on the
-  // user's first ever pass through this page, so nothing is cleared then.
   private def clearHiddenSections(
     updates: SessionUpdates,
     previousSelections: Seq[ChangeInformationSelection],
     newSelections: Seq[ChangeInformationSelection]
   ): SessionUpdates =
-    sectionFieldClearers.foldLeft(updates) { case (acc, (section, clearFields)) =>
+    hiddenFieldHousekeeping.foldLeft(updates) { case (acc, (section, clearFields)) =>
       val wasShown = ChangeInformationSelection.isShown(previousSelections, section)
       val isShown  = ChangeInformationSelection.isShown(newSelections, section)
       if (wasShown && !isShown) clearFields(acc) else acc
     }
 
-  private val sectionFieldClearers: Seq[(ChangeInformationSelection, SessionUpdates => SessionUpdates)] = Seq(
+  private val hiddenFieldHousekeeping: Seq[(ChangeInformationSelection, SessionUpdates => SessionUpdates)] = Seq(
     OrganisationInformation -> ((updates: SessionUpdates) =>
       updates.copy(
         correspondenceAddress = Unchanged,

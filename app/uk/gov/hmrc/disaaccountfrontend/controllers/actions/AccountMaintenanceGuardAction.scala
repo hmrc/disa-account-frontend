@@ -28,11 +28,6 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-// Blocks the account maintenance flow (change of circumstances and everything under it) when the
-// account isn't in a state that allows changes. The only reason today is disa-account reporting an
-// ISA product change already awaiting HMRC review - that's a fact returned to us by the HoD, so it's
-// read directly from the response rather than derived here. More reasons will be added to this check
-// as this restriction is needed elsewhere in the flow.
 trait AccountMaintenanceGuardAction extends ActionFilter[DataRequest]
 
 @Singleton

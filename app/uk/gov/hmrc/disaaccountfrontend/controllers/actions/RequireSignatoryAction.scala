@@ -24,10 +24,6 @@ import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-// Guards pages that only a signatory should be able to reach (signatory management, ISA product
-// changes). Unlike PageGuardAction - which decides reachability from the answers already on the
-// account - this decides on who is asking, so it belongs in its own action rather than as another
-// GuardedPage.
 trait RequireSignatoryAction extends ActionFilter[DataRequest]
 
 @Singleton

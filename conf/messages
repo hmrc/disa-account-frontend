@@ -73,8 +73,8 @@ innovativeFinancialProducts.peerToPeerLoansUsingAPlatformWith36HPermissions = Pe
 innovativeFinancialProducts.crowdfundedDebentures = Crowdfunded debentures
 innovativeFinancialProducts.longTermAssetFunds = Long-Term Asset Funds (LTAFs) and other funds with extended redemption periods
 innovativeFinancialProducts.error.required = Select which types of innovative finance products your organisation will offer
-innovativeFinancialProducts.checkYourAnswersLabel = Innovative finance products
-innovativeFinancialProducts.change.hidden = innovative finance products
+innovativeFinancialProducts.checkYourAnswersLabel = Innovative Finance ISAs type
+innovativeFinancialProducts.change.hidden = innovative finance ISAs type
 
 peerToPeerPlatform.title = Which platform does your organisation use to offer peer-to-peer loans?
 peerToPeerPlatform.heading = Which platform does your organisation use to offer peer-to-peer loans?
@@ -84,8 +84,8 @@ peerToPeerPlatform.details.content.p1 = Peer-to-peer loans are direct transactio
 peerToPeerPlatform.details.content.p2 = These parties are brought together by an electronic platform which introduces and arranges the loan documentation between the lender and the borrower.
 peerToPeerPlatform.details.content.p3 = It then manages the payment of interest and repayment of the principal according to the terms agreed between the parties.
 peerToPeerPlatform.details.content.link = Find out more about peer-to-peer loans
-peerToPeerPlatform.checkYourAnswersLabel = Platform name
-peerToPeerPlatform.change.hidden = platform name
+peerToPeerPlatform.checkYourAnswersLabel = Innovative Finance ISAs platform
+peerToPeerPlatform.change.hidden = innovative finance ISAs platform
 
 peerToPeerPlatformNumber.title = What is the FCA, FRN of {0}?
 peerToPeerPlatformNumber.heading = What is the FCA, FRN of {0}?
@@ -93,8 +93,8 @@ peerToPeerPlatformNumber.hint = The FCA, FRN is usually a 6 or 7 digit number
 peerToPeerPlatformNumber.error.required = Enter the FCA number of {0}
 peerToPeerPlatformNumber.error.invalidCharacters = The FCA must not include letters a to z, hyphens, spaces or apostrophes
 peerToPeerPlatformNumber.error.pattern = The FCA should be 6 or 7 digits without letters, hyphens, spaces or other characters
-peerToPeerPlatformNumber.change.hidden = platform FCA FRN
-peerToPeerPlatformNumber.checkYourAnswersLabel = Platform FCA FRN
+peerToPeerPlatformNumber.change.hidden = innovative Finance ISAs platform FCA, FRN
+peerToPeerPlatformNumber.checkYourAnswersLabel = Innovative finance ISAs platform FCA, FRN
 
 FcaArticles.title = FCA Articles that apply to your organisation
 FcaArticles.heading = FCA Articles that apply to your organisation
@@ -279,8 +279,8 @@ changeOfCircumstances.checkYourChanges.changedTradingName = Changed trading name
 changeOfCircumstances.checkYourChanges.changedCorrespondenceAddress = Changed correspondence address
 changeOfCircumstances.checkYourChanges.changedOrganisationTelephoneNumber = Changed organisation telephone number
 changeOfCircumstances.checkYourChanges.changedOrganisationEmailAddress = Changed organisation email
-changeOfCircumstances.checkYourChanges.changedPlatformName = Changed platform name
-changeOfCircumstances.checkYourChanges.changedPlatformFcaFrn = Changed platform FCA FRN
+changeOfCircumstances.checkYourChanges.changedPlatformName = Changed innovative finance ISAs platform
+changeOfCircumstances.checkYourChanges.changedPlatformFcaFrn = Changed innovative finance ISAs platform FCA, FRN
 changeOfCircumstances.checkYourChanges.valueChange = {0} to {1}
 changeOfCircumstances.checkYourChanges.to = to
 

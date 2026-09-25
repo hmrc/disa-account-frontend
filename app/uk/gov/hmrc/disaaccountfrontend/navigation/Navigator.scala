@@ -57,11 +57,21 @@ class Navigator @Inject() () {
     }
   }
 
+  def nextPageFromInnovativeFinancialProducts(previousAnswers: Answers, updatedAnswers: Answers): Call = {
+    def platformWithPermissionsSelected(answers: Answers): Boolean =
+      answers.innovativeFinancialProducts.exists(_.contains(PeertopeerLoansUsingAPlatformWith36hPermissions))
+
+    if (platformWithPermissionsSelected(updatedAnswers) && !platformWithPermissionsSelected(previousAnswers)) {
+      PeerToPeerPlatformController.onPageLoad()
+    } else {
+      ChangeOfCircumstancesController.onPageLoad()
+    }
+  }
+
   def nextPage(page: Page, answers: Answers = Answers(), mode: Mode = NormalMode): Call = page match {
     case EnterYourOrganisationAddressPage      => ChangeOfCircumstancesController.onPageLoad()
     case OrganisationTelephoneNumberPage       => ChangeOfCircumstancesController.onPageLoad()
     case TradingNamePage                       => ChangeOfCircumstancesController.onPageLoad()
-    case InnovativeFinancialProductsPage       => innovativeFinancialProductsNextPage(answers)
     case PeerToPeerPlatformPage                => peerToPeerPlatformNextPage(answers)
     case PeerToPeerPlatformNumberPage          => peerToPeerPlatformNumberNextPage()
     case FcaArticlesPage                       => fcaArticlesNextPage()
@@ -81,17 +91,6 @@ class Navigator @Inject() () {
     case unsupportedPage                       =>
       throw new IllegalArgumentException(s"No navigation defined for page: $unsupportedPage")
   }
-
-  private def innovativeFinancialProductsNextPage(answers: Answers): Call =
-    answers.innovativeFinancialProducts match {
-      case Some(products) if products.contains(PeertopeerLoansUsingAPlatformWith36hPermissions) =>
-        peerToPeerPlatformQuestionPage
-      case _                                                                                    =>
-        ChangeOfCircumstancesController.onPageLoad()
-    }
-
-  private def peerToPeerPlatformQuestionPage: Call =
-    PeerToPeerPlatformController.onPageLoad()
 
   private def peerToPeerPlatformNextPage(answers: Answers): Call =
     answers.p2pPlatformNumber match {

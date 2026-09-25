@@ -43,8 +43,8 @@ class ChangeOfCircumstancesViewModelSpec extends BaseUnitSpec {
         isSignatory = true
       )(messages(app))
 
-      viewModel.organisation     shouldBe defined
-      viewModel.authorisedUsers    should not be defined
+      viewModel.organisation  shouldBe defined
+      viewModel.authorisedUsers should not be defined
     }
 
     "only show the selected sections" in {
@@ -55,9 +55,9 @@ class ChangeOfCircumstancesViewModelSpec extends BaseUnitSpec {
         isSignatory = true
       )(messages(app))
 
-      viewModel.organisation     shouldBe defined
-      viewModel.products           should not be defined
-      viewModel.authorisedUsers    should not be defined
+      viewModel.organisation  shouldBe defined
+      viewModel.products        should not be defined
+      viewModel.authorisedUsers should not be defined
     }
 
     "show every section when view all information is selected" in {
@@ -133,8 +133,13 @@ class ChangeOfCircumstancesViewModelSpec extends BaseUnitSpec {
       )(messages(app))
 
       val rows = viewModel.products.value.rows
-      rows.map(_.key.content.asHtml.body)   shouldBe
-        Seq("Products", "Innovative finance products", "Platform name", "Platform FCA FRN")
+      rows.map(_.key.content.asHtml.body) shouldBe
+        Seq(
+          "Products",
+          "Innovative Finance ISAs type",
+          "Innovative Finance ISAs platform",
+          "Innovative finance ISAs platform FCA, FRN"
+        )
       rows.map(_.value.content.asHtml.body) should contain allOf (
         "Crowdfunded debentures",
         "Test platform name",
@@ -187,7 +192,7 @@ class ChangeOfCircumstancesViewModelSpec extends BaseUnitSpec {
         isSignatory = true
       )(messages(app))
 
-      viewModel.checkYourChanges   should not be defined
+      viewModel.checkYourChanges     should not be defined
       viewModel.isaProductsChanged shouldBe false
     }
 
@@ -221,7 +226,8 @@ class ChangeOfCircumstancesViewModelSpec extends BaseUnitSpec {
 
     "not include signatories added or removed in check-your-changes for a non-signatory" in {
       val original  = Answers(signatories = Some(Signatories(Seq(Signatory("s-1", Some("Jane Doe"), Some("Director"))))))
-      val effective = Answers(signatories = Some(Signatories(Seq(Signatory("s-2", Some("Joe Blogs"), Some("Director"))))))
+      val effective =
+        Answers(signatories = Some(Signatories(Seq(Signatory("s-2", Some("Joe Blogs"), Some("Director"))))))
 
       val viewModel = ChangeOfCircumstancesViewModel(
         originalAnswers = original,
@@ -263,8 +269,8 @@ class ChangeOfCircumstancesViewModelSpec extends BaseUnitSpec {
         "Products removed",
         "Innovative finance products added",
         "Innovative finance products removed",
-        "Changed platform name",
-        "Changed platform FCA FRN",
+        "Changed innovative finance ISAs platform",
+        "Changed innovative finance ISAs platform FCA, FRN",
         "Articles added",
         "Articles removed",
         "Organisation description added",
@@ -314,7 +320,7 @@ class ChangeOfCircumstancesViewModelSpec extends BaseUnitSpec {
       )(messages(app))
 
       viewModel.checkYourChanges.value.rows should have size 4
-      viewModel.isaProductsChanged          shouldBe true
+      viewModel.isaProductsChanged        shouldBe true
     }
   }
 }

@@ -49,9 +49,6 @@ object LiaisonOfficerChanges {
     val originalNames  = originalOfficers.flatMap(_.fullName).toSet
     val effectiveNames = effectiveOfficers.flatMap(_.fullName).toSet
 
-    // A liaison officer counts as unchanged if it matches by id, or - since the id we're given for
-    // an untouched officer isn't guaranteed to stay the same between the original and effective
-    // answers - by full name, so the same person is never reported as both added and removed.
     def isUnchanged(officer: LiaisonOfficer, matchingIds: Set[String], matchingNames: Set[String]): Boolean =
       matchingIds(officer.id) || officer.fullName.exists(matchingNames)
 
