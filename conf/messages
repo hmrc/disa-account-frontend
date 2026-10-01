@@ -281,6 +281,12 @@ changeOfCircumstances.checkYourChanges.changedOrganisationTelephoneNumber = Chan
 changeOfCircumstances.checkYourChanges.changedOrganisationEmailAddress = Changed organisation email
 changeOfCircumstances.checkYourChanges.changedPlatformName = Changed innovative finance ISAs platform
 changeOfCircumstances.checkYourChanges.changedPlatformFcaFrn = Changed innovative finance ISAs platform FCA, FRN
+changeOfCircumstances.checkYourChanges.changedLiaisonOfficerName = Changed liaison officer name
+changeOfCircumstances.checkYourChanges.changedLiaisonOfficerEmail = Changed liaison officer email
+changeOfCircumstances.checkYourChanges.changedLiaisonOfficerPhoneNumber = Changed liaison officer phone number
+changeOfCircumstances.checkYourChanges.changedLiaisonOfficerCommunication = Changed liaison officer communication preferences
+changeOfCircumstances.checkYourChanges.changedSignatoryName = Changed signatory name
+changeOfCircumstances.checkYourChanges.changedSignatoryJobTitle = Changed signatory job title
 changeOfCircumstances.checkYourChanges.valueChange = {0} to {1}
 changeOfCircumstances.checkYourChanges.to = to
 

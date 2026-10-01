@@ -21,9 +21,24 @@ import uk.gov.hmrc.disaaccountfrontend.models.Answers
 import uk.gov.hmrc.disaaccountfrontend.models.signatories.Signatory
 import uk.gov.hmrc.govukfrontend.views.Aliases.SummaryListRow
 
-final case class SignatoryChanges(added: Seq[String], removed: Seq[String]) {
+final case class SignatoryUpdate(original: Signatory, effective: Signatory) {
 
-  val hasChanges: Boolean = added.nonEmpty || removed.nonEmpty
+  def rows(implicit messages: Messages): Seq[SummaryListRow] = {
+    def row(headingKey: String, oldValue: Option[String], newValue: Option[String]) =
+      Option.when(oldValue != newValue)(
+        ChangesSummaryRow.valueChange(headingKey, oldValue.getOrElse(""), newValue.getOrElse(""))
+      )
+
+    Seq(
+      row("changeOfCircumstances.checkYourChanges.changedSignatoryName", original.fullName, effective.fullName),
+      row("changeOfCircumstances.checkYourChanges.changedSignatoryJobTitle", original.jobTitle, effective.jobTitle)
+    ).flatten
+  }
+}
+
+final case class SignatoryChanges(added: Seq[String], removed: Seq[String], updated: Seq[SignatoryUpdate] = Seq.empty) {
+
+  val hasChanges: Boolean = added.nonEmpty || removed.nonEmpty || updated.nonEmpty
 
   def rows(implicit messages: Messages): Seq[SummaryListRow] =
     Seq(
@@ -33,7 +48,7 @@ final case class SignatoryChanges(added: Seq[String], removed: Seq[String]) {
       Option.when(removed.nonEmpty)(
         ChangesSummaryRow("changeOfCircumstances.checkYourChanges.signatoriesRemoved", removed)
       )
-    ).flatten
+    ).flatten ++ updated.flatMap(_.rows)
 }
 
 object SignatoryChanges {
@@ -52,9 +67,19 @@ object SignatoryChanges {
     def isUnchanged(signatory: Signatory, matchingIds: Set[String], matchingNames: Set[String]): Boolean =
       matchingIds(signatory.id) || signatory.fullName.exists(matchingNames)
 
+    def originalSignatory(signatory: Signatory): Option[Signatory] =
+      originalSignatories
+        .find(_.id == signatory.id)
+        .orElse(originalSignatories.find(s => s.fullName.isDefined && s.fullName == signatory.fullName))
+
     SignatoryChanges(
       added = effectiveSignatories.filterNot(isUnchanged(_, originalIds, originalNames)).flatMap(_.fullName),
-      removed = originalSignatories.filterNot(isUnchanged(_, effectiveIds, effectiveNames)).flatMap(_.fullName)
+      removed = originalSignatories.filterNot(isUnchanged(_, effectiveIds, effectiveNames)).flatMap(_.fullName),
+      updated = effectiveSignatories.flatMap { signatory =>
+        originalSignatory(signatory)
+          .filter(o => o.fullName != signatory.fullName || o.jobTitle != signatory.jobTitle)
+          .map(SignatoryUpdate(_, signatory))
+      }
     )
   }
 }

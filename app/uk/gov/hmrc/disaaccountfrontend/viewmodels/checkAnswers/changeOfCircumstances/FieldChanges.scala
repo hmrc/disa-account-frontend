@@ -60,16 +60,7 @@ object FieldChanges {
     messages: Messages
   ): Option[SummaryListRow] =
     Option.when(newValue.isDefined && oldValue != newValue)(
-      ChangesSummaryRow(
-        headingKey,
-        Seq(
-          messages(
-            "changeOfCircumstances.checkYourChanges.valueChange",
-            oldValue.getOrElse(""),
-            newValue.getOrElse("")
-          )
-        )
-      )
+      ChangesSummaryRow.valueChange(headingKey, oldValue.getOrElse(""), newValue.getOrElse(""))
     )
 
   // Shown the same way as an added address (each line of its own), but with the old address's lines,

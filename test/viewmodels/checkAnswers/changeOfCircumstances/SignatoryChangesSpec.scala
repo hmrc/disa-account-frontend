@@ -61,7 +61,29 @@ class SignatoryChangesSpec extends BaseUnitSpec {
 
       val changes = SignatoryChanges(original, effective)
 
-      changes.hasChanges shouldBe false
+      changes.added   shouldBe Seq.empty
+      changes.removed shouldBe Seq.empty
+      changes.updated   should have size 1
+    }
+
+    "show a row for each changed field of an existing signatory" in {
+      val original  = Answers(signatories = Some(Signatories(Seq(Signatory("s-1", Some("Jane Doe"), Some("Director"))))))
+      val effective = Answers(signatories = Some(Signatories(Seq(Signatory("s-1", Some("Jane Smith"), Some("CEO"))))))
+
+      val rows = SignatoryChanges(original, effective).rows(messages(app))
+
+      rows.map(_.key.content.asHtml.body)   shouldBe Seq("Changed signatory name", "Changed signatory job title")
+      rows.map(_.value.content.asHtml.body) shouldBe Seq("Jane Doe to Jane Smith", "Director to CEO")
+    }
+
+    "not show a row when only the signatory's email changed" in {
+      val original  = Answers(signatories = Some(Signatories(Seq(Signatory("s-1", Some("Jane Doe"), Some("Director"))))))
+      val effective = Answers(
+        signatories =
+          Some(Signatories(Seq(Signatory("s-1", Some("Jane Doe"), Some("Director"), Some("j@example.com")))))
+      )
+
+      SignatoryChanges(original, effective).hasChanges shouldBe false
     }
 
     "ignore incomplete signatories" in {

@@ -28,4 +28,9 @@ private[changeOfCircumstances] object ChangesSummaryRow {
       key = Key(Text(messages(headingKey))),
       value = Value(HtmlContent(items.map(item => HtmlFormat.escape(item).toString).mkString("<br>")))
     )
+
+  def valueChange(headingKey: String, oldValue: String, newValue: String)(implicit
+    messages: Messages
+  ): SummaryListRow =
+    apply(headingKey, Seq(messages("changeOfCircumstances.checkYourChanges.valueChange", oldValue, newValue)))
 }

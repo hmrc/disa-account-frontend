@@ -24,7 +24,13 @@ import utils.BaseUnitSpec
 class LiaisonOfficerChangesSpec extends BaseUnitSpec {
 
   private def officer(id: String, name: String): LiaisonOfficer =
-    LiaisonOfficer(id, Some(name), Some("0123"), Set(LiaisonOfficerCommunication.values.head), Some(s"$id@example.com"))
+    LiaisonOfficer(
+      id,
+      Some(name),
+      Some("0123"),
+      Set(LiaisonOfficerCommunication.values.head),
+      Some("officer@example.com")
+    )
 
   "LiaisonOfficerChanges" should {
 
@@ -65,7 +71,63 @@ class LiaisonOfficerChangesSpec extends BaseUnitSpec {
 
       val changes = LiaisonOfficerChanges(original, effective)
 
-      changes.hasChanges shouldBe false
+      changes.added   shouldBe Seq.empty
+      changes.removed shouldBe Seq.empty
+      changes.updated   should have size 1
+    }
+
+    "show a row for each changed field of an existing liaison officer" in {
+      val original  = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(officer("lo-1", "John Smith")))))
+      val effective = Answers(
+        liaisonOfficers = Some(
+          LiaisonOfficers(
+            Seq(
+              officer("lo-1", "John Smyth").copy(
+                phoneNumber = Some("0999"),
+                email = Some("new@example.com"),
+                communication = Set(LiaisonOfficerCommunication.ByPhone, LiaisonOfficerCommunication.ByPost)
+              )
+            )
+          )
+        )
+      )
+
+      val rows = LiaisonOfficerChanges(original, effective).rows(messages(app))
+
+      rows.map(_.key.content.asHtml.body)   shouldBe Seq(
+        "Changed liaison officer name",
+        "Changed liaison officer email",
+        "Changed liaison officer phone number",
+        "Changed liaison officer communication preferences"
+      )
+      rows.map(_.value.content.asHtml.body) shouldBe Seq(
+        "John Smith to John Smyth",
+        "officer@example.com to new@example.com",
+        "0123 to 0999",
+        "By email to By phone, By post"
+      )
+    }
+
+    "only show rows for the fields that changed" in {
+      val original  = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(officer("lo-1", "John Smith")))))
+      val effective = Answers(
+        liaisonOfficers = Some(LiaisonOfficers(Seq(officer("lo-1", "John Smith").copy(phoneNumber = Some("0999")))))
+      )
+
+      val rows = LiaisonOfficerChanges(original, effective).rows(messages(app))
+
+      rows.map(_.key.content.asHtml.body) shouldBe Seq("Changed liaison officer phone number")
+    }
+
+    "match an edited liaison officer by name when its id differs" in {
+      val original  = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(officer("lo-1", "John Smith")))))
+      val effective = Answers(
+        liaisonOfficers = Some(LiaisonOfficers(Seq(officer("lo-2", "John Smith").copy(phoneNumber = Some("0999")))))
+      )
+
+      val rows = LiaisonOfficerChanges(original, effective).rows(messages(app))
+
+      rows.map(_.key.content.asHtml.body) shouldBe Seq("Changed liaison officer phone number")
     }
 
     "ignore incomplete liaison officers" in {

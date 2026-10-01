@@ -153,6 +153,28 @@ class RemoveSignatoryControllerSpec extends BaseUnitSpec {
       }
     }
 
+    "redirect to the signatory name page when the only signatory is removed" in {
+      when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
+
+      val application = signatoryApplicationBuilder(
+        effectiveAnswers = Answers(signatories = Some(testSignatories))
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(POST, s"$removeSignatoryEndpoint?id=$testSignatoryId")
+          .withFormUrlEncodedBody("value" -> Yes.toString)
+          .withHeaders("Csrf-Token" -> "nocheck")
+        val result  = route(application, request).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe signatoryNameEndpoint
+
+        val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+        verify(mockUserAnswersRepository).set(captor.capture())
+        captor.getValue.updates.signatories shouldBe Assign(Signatories(Seq.empty))
+      }
+    }
+
     "preserve the signatories when No is submitted" in {
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
 

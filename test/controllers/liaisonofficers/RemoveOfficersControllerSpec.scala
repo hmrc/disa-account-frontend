@@ -145,6 +145,28 @@ class RemoveOfficersControllerSpec extends BaseUnitSpec {
       }
     }
 
+    "redirect to the liaison officer name page when the only officer is removed" in {
+      when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
+
+      val application = applicationBuilder(
+        effectiveAnswers = Answers(liaisonOfficers = Some(testLiaisonOfficers))
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(POST, s"$removeLiaisonOfficerEndpoint?id=$testLiaisonOfficerId")
+          .withFormUrlEncodedBody("value" -> Yes.toString)
+          .withHeaders("Csrf-Token" -> "nocheck")
+        val result  = route(application, request).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe liaisonOfficerNameEndpoint
+
+        val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+        verify(mockUserAnswersRepository).set(captor.capture())
+        captor.getValue.updates.liaisonOfficers shouldBe Assign(LiaisonOfficers(Seq.empty))
+      }
+    }
+
     "preserve the officers when No is submitted" in {
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
 
