@@ -14,11 +14,13 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.disaaccountfrontend.config.AppConfig
 @import uk.gov.hmrc.disaaccountfrontend.views.html.Layout
 
 @this(
     layout: Layout,
-    govukButton: GovukButton
+    govukButton: GovukButton,
+    appConfig: AppConfig
 )
 
 @()(implicit request: RequestHeader, messages: Messages)
@@ -35,6 +37,6 @@
 
     @govukButton(Button(
         content = Text(messages("site.signIn")),
-        href = Some(EnterYourOrganisationAddressController.onPageLoad().url)
+        href = Some(appConfig.signInUrl)
     ))
 }

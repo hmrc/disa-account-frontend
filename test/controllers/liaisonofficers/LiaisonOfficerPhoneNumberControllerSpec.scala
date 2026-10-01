@@ -16,6 +16,7 @@
 
 package controllers.liaisonofficers
 
+import controllers.actions.FakeAccountMaintenanceGuardAction
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
@@ -40,6 +41,21 @@ class LiaisonOfficerPhoneNumberControllerSpec extends BaseUnitSpec {
   private val answers = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(otherOfficer, testLiaisonOfficer))))
 
   "LiaisonOfficerPhoneNumberController.onPageLoad" should {
+
+    "redirect to manage ISAs when an ISA product change is under review" in {
+      val application = applicationBuilder(
+        effectiveAnswers = answers,
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val result =
+          route(application, FakeRequest(GET, liaisonOfficerPhoneNumberEndpointFor(testLiaisonOfficerId))).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+      }
+    }
 
     "render the page with the liaison officer name and standard service content in normal mode" in {
       val application = applicationBuilder(effectiveAnswers = answers).build()
@@ -145,6 +161,24 @@ class LiaisonOfficerPhoneNumberControllerSpec extends BaseUnitSpec {
   }
 
   "LiaisonOfficerPhoneNumberController.onSubmit" should {
+
+    "redirect to manage ISAs when an ISA product change is under review" in {
+      val application = applicationBuilder(
+        effectiveAnswers = answers,
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(POST, liaisonOfficerPhoneNumberEndpointFor(testLiaisonOfficerId))
+          .withFormUrlEncodedBody("value" -> "07123456789")
+          .withHeaders("Csrf-Token" -> "nocheck")
+        val result  = route(application, request).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+        verify(mockUserAnswersRepository, never).set(any())
+      }
+    }
 
     "normalise and save the phone number in the logged-in session while preserving existing answers" in {
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))

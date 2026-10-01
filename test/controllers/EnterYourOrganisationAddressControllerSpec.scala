@@ -16,6 +16,7 @@
 
 package controllers
 
+import controllers.actions.FakeAccountMaintenanceGuardAction
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
@@ -36,6 +37,19 @@ class EnterYourOrganisationAddressControllerSpec extends BaseUnitSpec {
   )
 
   "EnterYourOrganisationAddressController.onPageLoad" should {
+
+    "redirect to manage ISAs when an ISA product change is under review" in {
+      val application = applicationBuilder(
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, enterYourOrganisationAddressEndpoint)).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+      }
+    }
 
     "return 200 OK prefilled from the effective answers supplied by the retrieval action" in {
       val application = applicationBuilder(
@@ -64,6 +78,20 @@ class EnterYourOrganisationAddressControllerSpec extends BaseUnitSpec {
 
   "EnterYourOrganisationAddressController.onSubmit" should {
 
+    "redirect to manage ISAs when an ISA product change is under review" in {
+      val application = applicationBuilder(
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(POST, enterYourOrganisationAddressEndpoint).withHeaders("Csrf-Token" -> "nocheck")
+        val result  = route(application, request).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+      }
+    }
+
     "save the answer, preserve existing session changes and redirect when the form is valid" in {
       val existingAnswers = UserAnswers(
         testSessionId,
@@ -85,7 +113,7 @@ class EnterYourOrganisationAddressControllerSpec extends BaseUnitSpec {
         val result = route(application, request).value
 
         status(result)               shouldBe SEE_OTHER
-        redirectLocation(result).value should endWith(organisationTelephoneNumberEndpoint)
+        redirectLocation(result).value should endWith(changeOfCircumstancesEndpoint)
 
         val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
         verify(mockUserAnswersRepository).set(captor.capture())

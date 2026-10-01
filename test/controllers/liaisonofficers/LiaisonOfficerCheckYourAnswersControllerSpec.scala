@@ -16,6 +16,7 @@
 
 package controllers.liaisonofficers
 
+import controllers.actions.FakeAccountMaintenanceGuardAction
 import org.jsoup.Jsoup
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -28,6 +29,21 @@ class LiaisonOfficerCheckYourAnswersControllerSpec extends BaseUnitSpec {
   private val url = s"$checkLiaisonOfficerDetailsEndpoint?id=$testLiaisonOfficerId"
 
   "LiaisonOfficerCheckYourAnswersController.onPageLoad" should {
+
+    "redirect to manage ISAs when an ISA product change is under review" in {
+      val application = applicationBuilder(
+        effectiveAnswers = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(testLiaisonOfficer)))),
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, url)).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+      }
+    }
+
     "render the matching liaison officer details and change links" in {
       val application = applicationBuilder(
         effectiveAnswers = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(testLiaisonOfficer))))

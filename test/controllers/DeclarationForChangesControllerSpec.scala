@@ -16,6 +16,7 @@
 
 package controllers
 
+import controllers.actions.FakeAccountMaintenanceGuardAction
 import org.jsoup.Jsoup
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
@@ -31,6 +32,19 @@ import scala.concurrent.Future
 class DeclarationForChangesControllerSpec extends BaseUnitSpec {
 
   "DeclarationForChangesController.onPageLoad" should {
+
+    "redirect to manage ISAs when an ISA product change is under review" in {
+      val application = applicationBuilder(
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, declarationForChangesEndpoint)).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+      }
+    }
     "use the ISA products title when ISA products changed" in {
       val originalAnswers  = Answers(isaProducts = Some(Seq(CashIsas)))
       val effectiveAnswers = Answers(isaProducts = Some(Seq(CashIsas, StocksAndSharesIsas)))
@@ -89,6 +103,21 @@ class DeclarationForChangesControllerSpec extends BaseUnitSpec {
   }
 
   "DeclarationForChangesController.onSubmit" should {
+
+    "redirect to manage ISAs when an ISA product change is under review" in {
+      val application = applicationBuilder(
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(POST, declarationForChangesEndpoint).withHeaders("Csrf-Token" -> "nocheck")
+        val result  = route(application, request).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+      }
+    }
+
     "send the effective answers and redirect to changes completed" in {
       val effectiveAnswers = Answers(tradingName = Some("Updated name"))
       when(mockRegistrationConnector.updateRegistrationDetails(any[String], any[UpdateRegistrationDetailsRequest])(any))

@@ -16,6 +16,7 @@
 
 package controllers.liaisonofficers
 
+import controllers.actions.FakeAccountMaintenanceGuardAction
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
@@ -43,6 +44,21 @@ class LiaisonOfficerCommunicationControllerSpec extends BaseUnitSpec {
   private val answers = Answers(liaisonOfficers = Some(LiaisonOfficers(Seq(otherOfficer, testLiaisonOfficer))))
 
   "LiaisonOfficerCommunicationController.onPageLoad" should {
+
+    "redirect to manage ISAs when an ISA product change is under review" in {
+      val application = applicationBuilder(
+        effectiveAnswers = answers,
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val result =
+          route(application, FakeRequest(GET, liaisonOfficerCommunicationEndpointFor(testLiaisonOfficerId))).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+      }
+    }
 
     "render the page with the liaison officer name and communication options in normal mode" in {
       val application = applicationBuilder(effectiveAnswers = answers).build()
@@ -143,6 +159,24 @@ class LiaisonOfficerCommunicationControllerSpec extends BaseUnitSpec {
   }
 
   "LiaisonOfficerCommunicationController.onSubmit" should {
+
+    "redirect to manage ISAs when an ISA product change is under review" in {
+      val application = applicationBuilder(
+        effectiveAnswers = answers,
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(POST, liaisonOfficerCommunicationEndpointFor(testLiaisonOfficerId))
+          .withFormUrlEncodedBody("value[0]" -> "byEmail")
+          .withHeaders("Csrf-Token" -> "nocheck")
+        val result  = route(application, request).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+        verify(mockUserAnswersRepository, never).set(any())
+      }
+    }
 
     "save selected communication options in the logged-in session while preserving existing answers" in {
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))

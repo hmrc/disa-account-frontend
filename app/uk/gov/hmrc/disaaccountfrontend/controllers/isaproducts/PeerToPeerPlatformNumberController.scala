@@ -14,56 +14,70 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccountfrontend.controllers
+package uk.gov.hmrc.disaaccountfrontend.controllers.isaproducts
 
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.data.Form
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction, PageGuardAction}
-import uk.gov.hmrc.disaaccountfrontend.forms.PeerToPeerPlatformFormProvider
+import uk.gov.hmrc.disaaccountfrontend.controllers.PageController
+import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction, PageGuardAction, RequireSignatoryAction}
+import uk.gov.hmrc.disaaccountfrontend.forms.PeerToPeerPlatformNumberFormProvider
 import uk.gov.hmrc.disaaccountfrontend.models.UserAnswers
-import uk.gov.hmrc.disaaccountfrontend.models.pages.PeerToPeerPlatformPage
+import uk.gov.hmrc.disaaccountfrontend.models.pages.PeerToPeerPlatformNumberPage
+import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
 import uk.gov.hmrc.disaaccountfrontend.navigation.Navigator
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
-import uk.gov.hmrc.disaaccountfrontend.views.html.PeerToPeerPlatformView
+import uk.gov.hmrc.disaaccountfrontend.views.html.PeerToPeerPlatformNumberView
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class PeerToPeerPlatformController @Inject() (
+class PeerToPeerPlatformNumberController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   guardPage: PageGuardAction,
+  requireSignatory: RequireSignatoryAction,
   userAnswersRepository: UserAnswersRepository,
   navigator: Navigator,
-  formProvider: PeerToPeerPlatformFormProvider,
+  formProvider: PeerToPeerPlatformNumberFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: PeerToPeerPlatformView
+  view: PeerToPeerPlatformNumberView
 )(implicit ec: ExecutionContext)
     extends PageController(navigator)
     with FrontendBaseController
     with I18nSupport {
 
-  private val form       = formProvider()
-  private val pageAction = identify andThen getData andThen guardPage(PeerToPeerPlatformPage)
+  private val pageAction =
+    identify andThen getData andThen requireSignatory andThen guardPage(PeerToPeerPlatformNumberPage)
+
+  private def platformName(implicit request: DataRequest[_]): String =
+    request.effectiveAnswers.p2pPlatform.get
+
+  private def form(platformName: String)(implicit messages: Messages): Form[String] =
+    formProvider(platformName)
 
   def onPageLoad(): Action[AnyContent] = pageAction { implicit request =>
-    val preparedForm = request.effectiveAnswers.p2pPlatform.fold(form)(form.fill)
-    Ok(view(preparedForm))
+    val platform     = platformName
+    val preparedForm = request.effectiveAnswers.p2pPlatformNumber.fold(form(platform))(form(platform).fill)
+
+    Ok(view(preparedForm, platform))
   }
 
   def onSubmit(): Action[AnyContent] = pageAction.async { implicit request =>
-    form
+    val platform = platformName
+
+    form(platform)
       .bindFromRequest()
       .fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, platform))),
         answer => {
-          val sessionUpdates = getSessionUpdates(PeerToPeerPlatformPage, answer)
+          val sessionUpdates = getSessionUpdates(PeerToPeerPlatformNumberPage, answer)
 
           userAnswersRepository
             .set(UserAnswers(id = request.sessionId, updates = sessionUpdates))
-            .map(_ => Redirect(nextPage(PeerToPeerPlatformPage, sessionUpdates)))
+            .map(_ => Redirect(nextPage(PeerToPeerPlatformNumberPage, sessionUpdates)))
         }
       )
   }

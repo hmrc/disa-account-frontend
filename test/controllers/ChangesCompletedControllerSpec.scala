@@ -17,8 +17,8 @@
 package controllers
 
 import org.jsoup.Jsoup
-import play.api.test.Helpers.*
 import play.api.test.*
+import play.api.test.Helpers.*
 import uk.gov.hmrc.disaaccountfrontend.models.Answers
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct.{CashIsas, StocksAndSharesIsas}
 import utils.BaseUnitSpec
@@ -26,6 +26,7 @@ import utils.BaseUnitSpec
 class ChangesCompletedControllerSpec extends BaseUnitSpec {
 
   "ChangesCompletedController.onPageLoad" should {
+
     "render the page and ISA product section when products changed" in {
       val originalAnswers  = Answers(isaProducts = Some(Seq(CashIsas)))
       val effectiveAnswers = Answers(isaProducts = Some(Seq(CashIsas, StocksAndSharesIsas)))

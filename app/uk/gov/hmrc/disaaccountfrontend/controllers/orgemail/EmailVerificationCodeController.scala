@@ -22,7 +22,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.disaaccountfrontend.config.ErrorHandler
 import uk.gov.hmrc.disaaccountfrontend.connectors.EmailVerificationConnector
 import uk.gov.hmrc.disaaccountfrontend.controllers.PageController
-import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction, PageGuardAction}
+import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{AccountMaintenanceGuardAction, DataRetrievalAction, IdentifierAction, PageGuardAction}
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.routes.EmailVerificationCodeController as EmailVerificationCodeRoutes
 import uk.gov.hmrc.disaaccountfrontend.controllers.orgemail.routes.OrganisationEmailAddressController as OrganisationEmailAddressRoutes
 import uk.gov.hmrc.disaaccountfrontend.forms.generic.EmailVerificationCodeFormProvider
@@ -45,6 +45,7 @@ class EmailVerificationCodeController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   guardPage: PageGuardAction,
+  accountMaintenanceGuard: AccountMaintenanceGuardAction,
   userAnswersRepository: UserAnswersRepository,
   navigator: Navigator,
   formProvider: EmailVerificationCodeFormProvider,
@@ -60,7 +61,7 @@ class EmailVerificationCodeController @Inject() (
 
   private val form       = formProvider()
   private val pageAction =
-    identify andThen getData andThen guardPage(
+    identify andThen getData andThen accountMaintenanceGuard andThen guardPage(
       EmailVerificationCodePage,
       OrganisationEmailAddressRoutes.onPageLoad()
     )

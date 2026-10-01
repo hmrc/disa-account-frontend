@@ -16,6 +16,7 @@
 
 package controllers.orgemail
 
+import controllers.actions.FakeAccountMaintenanceGuardAction
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{eq as eqTo, *}
 import org.mockito.Mockito.*
@@ -32,6 +33,19 @@ class OrganisationEmailAddressControllerSpec extends BaseUnitSpec {
   val validFormData: Map[String, String] = Map("value" -> testOrganisationEmailAddress)
 
   "OrganisationEmailAddressController.onPageLoad" should {
+
+    "redirect to manage ISAs when an ISA product change is under review" in {
+      val application = applicationBuilder(
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, organisationEmailAddressEndpoint)).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+      }
+    }
 
     "return 200 OK prefilled from the effective answers supplied by the retrieval action" in {
       val application = applicationBuilder(
@@ -59,6 +73,20 @@ class OrganisationEmailAddressControllerSpec extends BaseUnitSpec {
   }
 
   "OrganisationEmailAddressController.onSubmit" should {
+
+    "redirect to manage ISAs when an ISA product change is under review" in {
+      val application = applicationBuilder(
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(POST, organisationEmailAddressEndpoint).withHeaders("Csrf-Token" -> "nocheck")
+        val result  = route(application, request).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+      }
+    }
 
     "send a verification code, save the answer and redirect when the form is valid" in {
       when(mockEmailVerificationConnector.sendCode(any())(any())).thenReturn(Future.successful(()))

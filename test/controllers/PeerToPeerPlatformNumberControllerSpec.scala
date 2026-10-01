@@ -31,6 +31,17 @@ import scala.concurrent.Future
 
 class PeerToPeerPlatformNumberControllerSpec extends BaseUnitSpec {
 
+  private def signatoryApplicationBuilder(
+    effectiveAnswers: Answers,
+    sessionAnswers: Option[UserAnswers] = None
+  ) =
+    applicationBuilder(
+      effectiveAnswers = effectiveAnswers.copy(signatories = Some(testSignatories)),
+      originalAnswers = Some(effectiveAnswers.copy(signatories = Some(testSignatories))),
+      sessionAnswers = sessionAnswers,
+      email = Some(testSignatoryEmail)
+    )
+
   private val numberFieldName           = "value"
   private val csrfHeaderName            = "Csrf-Token"
   private val csrfHeaderValue           = "nocheck"
@@ -51,7 +62,7 @@ class PeerToPeerPlatformNumberControllerSpec extends BaseUnitSpec {
   "PeerToPeerPlatformNumberController.onPageLoad" should {
 
     "render the page with the platform name from the previous answer and pre-populate a saved number" in {
-      implicit val application: Application = applicationBuilder(
+      implicit val application: Application = signatoryApplicationBuilder(
         effectiveAnswers = eligibleAnswers.copy(p2pPlatformNumber = Some(testP2pPlatformNumber))
       ).build()
 
@@ -77,12 +88,25 @@ class PeerToPeerPlatformNumberControllerSpec extends BaseUnitSpec {
         redirectLocation(result).value should endWith(changeOfCircumstancesEndpoint)
       }
     }
+
+    "redirect a non-signatory to change of circumstances" in {
+      val application = applicationBuilder(
+        effectiveAnswers = eligibleAnswers.copy(p2pPlatformNumber = Some(testP2pPlatformNumber))
+      ).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, peerToPeerPlatformNumberEndpoint)).value
+
+        status(result)               shouldBe SEE_OTHER
+        redirectLocation(result).value should endWith(changeOfCircumstancesEndpoint)
+      }
+    }
   }
 
   "PeerToPeerPlatformNumberController.onSubmit" should {
 
     "return the exact required error, including the platform name, and not save when the number is blank" in {
-      implicit val application: Application = applicationBuilder(effectiveAnswers = eligibleAnswers).build()
+      implicit val application: Application = signatoryApplicationBuilder(effectiveAnswers = eligibleAnswers).build()
 
       running(application) {
         val result = route(
@@ -98,7 +122,7 @@ class PeerToPeerPlatformNumberControllerSpec extends BaseUnitSpec {
     }
 
     "return the invalid characters error and not save when the number contains a letter" in {
-      implicit val application: Application = applicationBuilder(effectiveAnswers = eligibleAnswers).build()
+      implicit val application: Application = signatoryApplicationBuilder(effectiveAnswers = eligibleAnswers).build()
 
       running(application) {
         val result = route(
@@ -116,7 +140,7 @@ class PeerToPeerPlatformNumberControllerSpec extends BaseUnitSpec {
     }
 
     "return the invalid characters error when the number contains a hyphen, space or apostrophe" in {
-      implicit val application: Application = applicationBuilder(effectiveAnswers = eligibleAnswers).build()
+      implicit val application: Application = signatoryApplicationBuilder(effectiveAnswers = eligibleAnswers).build()
 
       running(application) {
         Seq("123-4567", "123 4567", "123'4567").foreach { value =>
@@ -135,7 +159,7 @@ class PeerToPeerPlatformNumberControllerSpec extends BaseUnitSpec {
     }
 
     "return the pattern error and not save when the number is the wrong length" in {
-      implicit val application: Application = applicationBuilder(effectiveAnswers = eligibleAnswers).build()
+      implicit val application: Application = signatoryApplicationBuilder(effectiveAnswers = eligibleAnswers).build()
 
       running(application) {
         val result = route(
@@ -153,7 +177,7 @@ class PeerToPeerPlatformNumberControllerSpec extends BaseUnitSpec {
     }
 
     "return the pattern error when the number contains a character that is not a letter, hyphen, space or apostrophe" in {
-      implicit val application: Application = applicationBuilder(effectiveAnswers = eligibleAnswers).build()
+      implicit val application: Application = signatoryApplicationBuilder(effectiveAnswers = eligibleAnswers).build()
 
       running(application) {
         val result = route(
@@ -181,7 +205,7 @@ class PeerToPeerPlatformNumberControllerSpec extends BaseUnitSpec {
       )
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
 
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = eligibleAnswers.copy(p2pPlatformNumber = Some(previousP2pPlatformNumber)),
         sessionAnswers = Some(existingAnswers)
       ).build()
@@ -211,6 +235,25 @@ class PeerToPeerPlatformNumberControllerSpec extends BaseUnitSpec {
 
     "redirect without saving when the platform name has not been answered" in {
       val application = applicationBuilder().build()
+
+      running(application) {
+        val result = route(
+          application,
+          FakeRequest(POST, peerToPeerPlatformNumberEndpoint)
+            .withHeaders(csrfHeaderName -> csrfHeaderValue)
+            .withFormUrlEncodedBody(numberFieldName -> testP2pPlatformNumber)
+        ).value
+
+        status(result)               shouldBe SEE_OTHER
+        redirectLocation(result).value should endWith(changeOfCircumstancesEndpoint)
+        verify(mockUserAnswersRepository, never).set(any())
+      }
+    }
+
+    "redirect a non-signatory to change of circumstances without saving" in {
+      val application = applicationBuilder(
+        effectiveAnswers = eligibleAnswers.copy(p2pPlatformNumber = Some(previousP2pPlatformNumber))
+      ).build()
 
       running(application) {
         val result = route(

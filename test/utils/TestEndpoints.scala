@@ -72,6 +72,7 @@ trait TestEndpoints {
   val loginContinueEndpoint: String        =
     "http://localhost:12107/disa-account-frontend/enter-your-organisation-address"
   val basGatewaySignOutEndpoint: String    = "http://localhost:9553/bas-gateway/sign-out-without-state"
+  val signOutContinueEndpoint: String      = s"http://localhost:12104$signedOutEndpoint"
   val disaAccountBaseUrl: String           = "http://localhost:12105"
   val emailVerificationBaseUrl: String     = "http://localhost:9891"
   val disaReturnsSubmissionBaseUrl: String = "http://localhost:12103"

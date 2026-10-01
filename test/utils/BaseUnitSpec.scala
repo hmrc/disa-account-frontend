@@ -17,7 +17,7 @@
 package utils
 
 import com.typesafe.config.Config
-import controllers.actions.{FakeDataRetrievalAction, FakeIdentifierAction}
+import controllers.actions.{FakeAccountMaintenanceGuardAction, FakeDataRetrievalAction, FakeIdentifierAction}
 import org.apache.pekko.actor.ActorSystem
 import org.mockito.Mockito
 import org.scalatest.{BeforeAndAfterEach, EitherValues, OptionValues}
@@ -35,7 +35,7 @@ import play.api.test.{DefaultAwaitTimeout, FakeRequest}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.disaaccountfrontend.config.{AppConfig, InternalAuthTokenInitialiser, NoOpInternalAuthTokenInitialiser}
 import uk.gov.hmrc.disaaccountfrontend.connectors.{EmailVerificationConnector, RegistrationConnector, ReportingWindowConnector}
-import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{AuthenticatedIdentifierAction, DataRetrievalAction, IdentifierAction}
+import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{AccountMaintenanceGuardAction, AuthenticatedIdentifierAction, DataRetrievalAction, IdentifierAction}
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, UserAnswers}
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
 import uk.gov.hmrc.http.HeaderCarrier
@@ -118,7 +118,8 @@ abstract class BaseUnitSpec
     zReference: String = testZref,
     credentialId: String = testCredentialId,
     sessionId: String = testSessionId,
-    email: Option[String] = None
+    email: Option[String] = None,
+    accountMaintenanceGuard: AccountMaintenanceGuardAction = new FakeAccountMaintenanceGuardAction()
   ): GuiceApplicationBuilder = {
     val bodyParsers = stubControllerComponents().parsers
     GuiceApplicationBuilder()
@@ -131,6 +132,7 @@ abstract class BaseUnitSpec
           .toInstance(new FakeIdentifierAction(bodyParsers, zReference, credentialId, sessionId, email)),
         bind[DataRetrievalAction]
           .toInstance(new FakeDataRetrievalAction(effectiveAnswers, sessionAnswers, originalAnswers)),
+        bind[AccountMaintenanceGuardAction].toInstance(accountMaintenanceGuard),
         bind[RegistrationConnector].toInstance(mockRegistrationConnector),
         bind[UserAnswersRepository].toInstance(mockUserAnswersRepository),
         bind[EmailVerificationConnector].toInstance(mockEmailVerificationConnector),

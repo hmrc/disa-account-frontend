@@ -33,6 +33,17 @@ import scala.concurrent.Future
 
 class PeerToPeerPlatformControllerSpec extends BaseUnitSpec {
 
+  private def signatoryApplicationBuilder(
+    effectiveAnswers: Answers,
+    sessionAnswers: Option[UserAnswers] = None
+  ) =
+    applicationBuilder(
+      effectiveAnswers = effectiveAnswers.copy(signatories = Some(testSignatories)),
+      originalAnswers = Some(effectiveAnswers.copy(signatories = Some(testSignatories))),
+      sessionAnswers = sessionAnswers,
+      email = Some(testSignatoryEmail)
+    )
+
   private val platformFieldName       = "value"
   private val csrfHeaderName          = "Csrf-Token"
   private val csrfHeaderValue         = "nocheck"
@@ -51,7 +62,7 @@ class PeerToPeerPlatformControllerSpec extends BaseUnitSpec {
   "PeerToPeerPlatformController.onPageLoad" should {
 
     "render the page and pre-populate a saved platform name" in {
-      implicit val application: Application = applicationBuilder(
+      implicit val application: Application = signatoryApplicationBuilder(
         effectiveAnswers = eligibleAnswers.copy(p2pPlatform = Some(testP2pPlatform))
       ).build()
 
@@ -78,12 +89,23 @@ class PeerToPeerPlatformControllerSpec extends BaseUnitSpec {
         redirectLocation(result).value should endWith(changeOfCircumstancesEndpoint)
       }
     }
+
+    "redirect a non-signatory to change of circumstances" in {
+      val application = applicationBuilder(effectiveAnswers = eligibleAnswers).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, peerToPeerPlatformEndpoint)).value
+
+        status(result)               shouldBe SEE_OTHER
+        redirectLocation(result).value should endWith(changeOfCircumstancesEndpoint)
+      }
+    }
   }
 
   "PeerToPeerPlatformController.onSubmit" should {
 
     "return the exact required error and not save when the platform name is blank" in {
-      implicit val application: Application = applicationBuilder(effectiveAnswers = eligibleAnswers).build()
+      implicit val application: Application = signatoryApplicationBuilder(effectiveAnswers = eligibleAnswers).build()
 
       running(application) {
         val result = route(
@@ -111,7 +133,7 @@ class PeerToPeerPlatformControllerSpec extends BaseUnitSpec {
       )
       when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
 
-      val application = applicationBuilder(
+      val application = signatoryApplicationBuilder(
         effectiveAnswers = eligibleAnswers.copy(p2pPlatform = Some(previousP2pPlatform)),
         sessionAnswers = Some(existingAnswers)
       ).build()
@@ -140,6 +162,23 @@ class PeerToPeerPlatformControllerSpec extends BaseUnitSpec {
 
     "redirect without saving when the platform product is not selected" in {
       val application = applicationBuilder().build()
+
+      running(application) {
+        val result = route(
+          application,
+          FakeRequest(POST, peerToPeerPlatformEndpoint)
+            .withHeaders(csrfHeaderName -> csrfHeaderValue)
+            .withFormUrlEncodedBody(platformFieldName -> testP2pPlatform)
+        ).value
+
+        status(result)               shouldBe SEE_OTHER
+        redirectLocation(result).value should endWith(changeOfCircumstancesEndpoint)
+        verify(mockUserAnswersRepository, never).set(any())
+      }
+    }
+
+    "redirect a non-signatory to change of circumstances without saving" in {
+      val application = applicationBuilder(effectiveAnswers = eligibleAnswers).build()
 
       running(application) {
         val result = route(

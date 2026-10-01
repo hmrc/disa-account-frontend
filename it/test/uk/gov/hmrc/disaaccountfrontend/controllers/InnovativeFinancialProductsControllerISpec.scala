@@ -60,8 +60,20 @@ class InnovativeFinancialProductsControllerISpec extends BaseIntegrationSpec {
   val endpoint: String        = "/obligations/account/isa/innovative-financial-products"
   val registrationUrl: String = s"/disa-account/registration/$testZref"
 
-  val enrolledRegistrationResponse: String =
+  val signatoriesBlock: String =
     """{
+      |    "signatories": [
+      |      {
+      |        "id": "294da0a8-7484-4675-bce2-fe9195dc1bca",
+      |        "fullName": "Test Signatory",
+      |        "jobTitle": "Director",
+      |        "email": "signatory@example.com"
+      |      }
+      |    ]
+      |  }""".stripMargin
+
+  val enrolledRegistrationResponse: String =
+    s"""{
       |  "groupId": "test-group-id",
       |  "isaProducts": {
       |    "isaProducts": ["cashIsas", "innovativeFinanceIsas"],
@@ -69,15 +81,17 @@ class InnovativeFinancialProductsControllerISpec extends BaseIntegrationSpec {
       |      "peerToPeerLoansUsingAPlatformWith36HPermissions",
       |      "crowdfundedDebentures"
       |    ]
-      |  }
+      |  },
+      |  "signatories": $signatoriesBlock
       |}""".stripMargin
 
   val registrationWithoutInnovativeFinanceIsa: String =
-    """{
+    s"""{
       |  "groupId": "test-group-id",
       |  "isaProducts": {
       |    "isaProducts": ["cashIsas"]
-      |  }
+      |  },
+      |  "signatories": $signatoriesBlock
       |}""".stripMargin
 
   def authenticatedGet(): FakeRequest[AnyContentAsEmpty.type] =
@@ -143,6 +157,16 @@ class InnovativeFinancialProductsControllerISpec extends BaseIntegrationSpec {
 
       status(result)             shouldBe SEE_OTHER
       redirectLocation(result).get should include("auth-login-stub")
+    }
+
+    "redirect a non-signatory to change of circumstances" in {
+      stubAuth(testZref, testCredentialId, Some("someone.else@example.com"))
+      stubGet(registrationUrl, OK, enrolledRegistrationResponse)
+
+      val result = route(app, authenticatedGet()).get
+
+      status(result)             shouldBe SEE_OTHER
+      redirectLocation(result).get should endWith("/change-of-circumstances")
     }
   }
 

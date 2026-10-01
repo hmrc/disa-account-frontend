@@ -20,7 +20,7 @@ import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.disaaccountfrontend.controllers.PageController
-import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction, PageGuardAction}
+import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{AccountMaintenanceGuardAction, DataRetrievalAction, IdentifierAction, PageGuardAction}
 import uk.gov.hmrc.disaaccountfrontend.forms.LiaisonOfficerEmailFormProvider
 import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.LiaisonOfficers.findLiaisonOfficer
 import uk.gov.hmrc.disaaccountfrontend.models.pages.liaisonofficers.LiaisonOfficerEmailPage
@@ -38,6 +38,7 @@ class LiaisonOfficerEmailController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   guardPage: PageGuardAction,
+  accountMaintenanceGuard: AccountMaintenanceGuardAction,
   userAnswersRepository: UserAnswersRepository,
   navigator: Navigator,
   formProvider: LiaisonOfficerEmailFormProvider,
@@ -54,7 +55,7 @@ class LiaisonOfficerEmailController @Inject() (
     LiaisonOfficerEmailPage(id)
 
   private def pageAction(currentPage: LiaisonOfficerEmailPage) =
-    identify andThen getData andThen guardPage(currentPage)
+    identify andThen getData andThen accountMaintenanceGuard andThen guardPage(currentPage)
 
   def onPageLoad(id: String, mode: Mode): Action[AnyContent] = {
     val currentPage = page(id)

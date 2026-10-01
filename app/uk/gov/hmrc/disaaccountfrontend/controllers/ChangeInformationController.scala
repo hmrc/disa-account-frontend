@@ -18,10 +18,10 @@ package uk.gov.hmrc.disaaccountfrontend.controllers
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction}
+import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{AccountMaintenanceGuardAction, DataRetrievalAction, IdentifierAction}
 import uk.gov.hmrc.disaaccountfrontend.forms.ChangeInformationFormProvider
-import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
-import uk.gov.hmrc.disaaccountfrontend.models.ChangeInformationSelection.{ViewAllInformation, viewAllInformationFormValue}
+import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.{Assign, Unchanged}
+import uk.gov.hmrc.disaaccountfrontend.models.ChangeInformationSelection.{AuthorisedUsers, IsaProductInformation, OrganisationInformation, ViewAllInformation, viewAllInformationFormValue}
 import uk.gov.hmrc.disaaccountfrontend.models.{ChangeInformationSelection, SessionUpdates, UserAnswers}
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
 import uk.gov.hmrc.disaaccountfrontend.views.html.ChangeInformation
@@ -34,6 +34,7 @@ class ChangeInformationController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  accountMaintenanceGuard: AccountMaintenanceGuardAction,
   userAnswersRepository: UserAnswersRepository,
   formProvider: ChangeInformationFormProvider,
   val controllerComponents: MessagesControllerComponents,
@@ -42,7 +43,9 @@ class ChangeInformationController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData) { implicit request =>
+  private val pageAction = identify andThen getData andThen accountMaintenanceGuard
+
+  def onPageLoad(): Action[AnyContent] = pageAction { implicit request =>
     val availableSelections = ChangeInformationSelection.availableValues(request.isSignatory)
     val form                = formProvider(availableSelections)
     val preparedForm        = request.sessionAnswers
@@ -59,7 +62,7 @@ class ChangeInformationController @Inject() (
     Ok(view(preparedForm, availableSelections))
   }
 
-  def onSubmit(): Action[AnyContent] = (identify andThen getData).async { implicit request =>
+  def onSubmit(): Action[AnyContent] = pageAction.async { implicit request =>
     val availableSelections = ChangeInformationSelection.availableValues(request.isSignatory)
     val form                = formProvider(availableSelections)
 
@@ -68,12 +71,16 @@ class ChangeInformationController @Inject() (
       .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, availableSelections))),
         formValues => {
-          val selections      = ChangeInformationSelection.fromForm(formValues, availableSelections)
-          val existingUpdates = request.sessionAnswers.fold(SessionUpdates())(_.updates)
-          val updatedAnswers  = UserAnswers(
-            id = request.sessionId,
-            updates = existingUpdates.copy(changeInformationSelections = Assign(selections))
-          )
+          val selections       = ChangeInformationSelection.fromForm(formValues, availableSelections)
+          val existingUpdates  = request.sessionAnswers.fold(SessionUpdates())(_.updates)
+          val previousSelected = existingUpdates.changeInformationSelections match {
+            case Assign(previous) => Some(previous)
+            case _                => None
+          }
+          val updatedUpdates   = previousSelected
+            .fold(existingUpdates)(previous => clearHiddenSections(existingUpdates, previous, selections))
+            .copy(changeInformationSelections = Assign(selections))
+          val updatedAnswers   = UserAnswers(id = request.sessionId, updates = updatedUpdates)
 
           userAnswersRepository
             .set(updatedAnswers)
@@ -81,4 +88,38 @@ class ChangeInformationController @Inject() (
         }
       )
   }
+
+  private def clearHiddenSections(
+    updates: SessionUpdates,
+    previousSelections: Seq[ChangeInformationSelection],
+    newSelections: Seq[ChangeInformationSelection]
+  ): SessionUpdates =
+    hiddenFieldHousekeeping.foldLeft(updates) { case (acc, (section, clearFields)) =>
+      val wasShown = ChangeInformationSelection.isShown(previousSelections, section)
+      val isShown  = ChangeInformationSelection.isShown(newSelections, section)
+      if (wasShown && !isShown) clearFields(acc) else acc
+    }
+
+  private val hiddenFieldHousekeeping: Seq[(ChangeInformationSelection, SessionUpdates => SessionUpdates)] = Seq(
+    OrganisationInformation -> ((updates: SessionUpdates) =>
+      updates.copy(
+        correspondenceAddress = Unchanged,
+        organisationTelephoneNumber = Unchanged,
+        tradingName = Unchanged,
+        organisationEmailAddress = Unchanged,
+        organisationEmailVerified = Unchanged
+      )
+    ),
+    IsaProductInformation   -> ((updates: SessionUpdates) =>
+      updates.copy(
+        isaProducts = Unchanged,
+        innovativeFinancialProducts = Unchanged,
+        p2pPlatform = Unchanged,
+        p2pPlatformNumber = Unchanged,
+        fcaArticles = Unchanged,
+        financialOrganisation = Unchanged
+      )
+    ),
+    AuthorisedUsers         -> ((updates: SessionUpdates) => updates.copy(signatories = Unchanged, liaisonOfficers = Unchanged))
+  )
 }

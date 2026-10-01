@@ -16,6 +16,7 @@
 
 package controllers
 
+import controllers.actions.FakeAccountMaintenanceGuardAction
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
@@ -36,6 +37,19 @@ class FinancialOrganisationControllerSpec extends BaseUnitSpec {
     Jsoup.parse(html).select(s"input.govuk-checkboxes__input[value=${organisation.toString}]").hasAttr("checked")
 
   "FinancialOrganisationController.onPageLoad" should {
+
+    "redirect to manage ISAs when an ISA product change is under review" in {
+      val application = applicationBuilder(
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, financialOrganisationEndpoint)).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+      }
+    }
 
     "render the agreed page content and prefill effective answers" in {
       val application = applicationBuilder(
@@ -79,6 +93,20 @@ class FinancialOrganisationControllerSpec extends BaseUnitSpec {
   }
 
   "FinancialOrganisationController.onSubmit" should {
+
+    "redirect to manage ISAs when an ISA product change is under review" in {
+      val application = applicationBuilder(
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(POST, financialOrganisationEndpoint).withHeaders("Csrf-Token" -> "nocheck")
+        val result  = route(application, request).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+      }
+    }
 
     "save selections in display order, preserve existing updates and redirect to Change of Circumstances" in {
       val existingUpdates = SessionUpdates(organisationTelephoneNumber = Assign(testOrgTelephoneNumber))

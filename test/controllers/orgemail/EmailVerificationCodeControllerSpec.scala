@@ -16,6 +16,7 @@
 
 package controllers.orgemail
 
+import controllers.actions.FakeAccountMaintenanceGuardAction
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{eq as eqTo, *}
 import org.mockito.Mockito.*
@@ -33,6 +34,20 @@ class EmailVerificationCodeControllerSpec extends BaseUnitSpec {
   val effectiveAnswersWithEmail: Answers = Answers(organisationEmailAddress = Some(testOrganisationEmailAddress))
 
   "EmailVerificationCodeController.onPageLoad" should {
+
+    "redirect to manage ISAs when an ISA product change is under review" in {
+      val application = applicationBuilder(
+        effectiveAnswers = effectiveAnswersWithEmail,
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, emailVerificationCodeEndpoint)).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+      }
+    }
 
     "return 200 OK when an organisation email address is present" in {
       val application = applicationBuilder(effectiveAnswers = effectiveAnswersWithEmail).build()
@@ -59,6 +74,23 @@ class EmailVerificationCodeControllerSpec extends BaseUnitSpec {
   }
 
   "EmailVerificationCodeController.onSubmit" should {
+
+    "redirect to manage ISAs when an ISA product change is under review" in {
+      val application = applicationBuilder(
+        effectiveAnswers = effectiveAnswersWithEmail,
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(POST, emailVerificationCodeEndpoint)
+          .withFormUrlEncodedBody("value" -> "ABCDEF")
+          .withHeaders("Csrf-Token" -> "nocheck")
+        val result  = route(application, request).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+      }
+    }
 
     "redirect and save the email as verified when the code is verified" in {
       when(mockEmailVerificationConnector.verifyCode(any(), any())(any()))
@@ -151,6 +183,21 @@ class EmailVerificationCodeControllerSpec extends BaseUnitSpec {
   }
 
   "EmailVerificationCodeController.requestNewCode" should {
+
+    "redirect to manage ISAs when an ISA product change is under review" in {
+      val application = applicationBuilder(
+        effectiveAnswers = effectiveAnswersWithEmail,
+        accountMaintenanceGuard = new FakeAccountMaintenanceGuardAction(blocked = true)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(POST, requestNewCodeEndpoint).withHeaders("Csrf-Token" -> "nocheck")
+        val result  = route(application, request).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+      }
+    }
 
     "send a new code, clear any prior verification and redirect back to the entry page" in {
       when(mockEmailVerificationConnector.sendCode(any())(any())).thenReturn(Future.successful(()))

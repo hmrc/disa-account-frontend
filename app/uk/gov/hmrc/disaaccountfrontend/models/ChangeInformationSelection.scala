@@ -47,6 +47,9 @@ object ChangeInformationSelection extends Enumerable.Implicits {
   def validFormValues(availableSelections: Seq[ChangeInformationSelection]): Set[String] =
     availableSelections.map(_.toString).toSet + viewAllInformationFormValue
 
+  def isShown(selections: Seq[ChangeInformationSelection], section: ChangeInformationSelection): Boolean =
+    selections.isEmpty || selections.contains(ViewAllInformation) || selections.contains(section)
+
   def fromForm(
     formValues: Set[String],
     availableSelections: Seq[ChangeInformationSelection]
