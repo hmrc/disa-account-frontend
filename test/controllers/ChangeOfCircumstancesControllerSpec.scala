@@ -18,6 +18,9 @@ package controllers
 
 import controllers.actions.FakeAccountMaintenanceGuardAction
 import org.jsoup.Jsoup
+import org.mockito.ArgumentCaptor
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.{verify, when}
 import play.api.test.Helpers.*
 import play.api.test.*
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
@@ -29,6 +32,8 @@ import uk.gov.hmrc.disaaccountfrontend.models.liaisonofficers.{LiaisonOfficer, L
 import uk.gov.hmrc.disaaccountfrontend.models.signatories.{Signatories, Signatory}
 import uk.gov.hmrc.disaaccountfrontend.models.{Answers, ChangeInformationSelection, CorrespondenceAddress, SessionUpdates, UserAnswers}
 import utils.BaseUnitSpec
+
+import scala.concurrent.Future
 
 class ChangeOfCircumstancesControllerSpec extends BaseUnitSpec {
 
@@ -115,6 +120,45 @@ class ChangeOfCircumstancesControllerSpec extends BaseUnitSpec {
           "/obligations/account/isa/added-liaison-officers",
           "/obligations/account/isa/added-signatories"
         )
+      }
+    }
+
+    "remove incomplete contacts before displaying the current information" in {
+      val incompleteSignatory = Signatory("incomplete-signatory", Some("Partial Signatory"))
+      val incompleteOfficer   = LiaisonOfficer("incomplete-officer", Some("Partial Officer"))
+      val effectiveAnswers    = fullAnswers.copy(
+        signatories = fullAnswers.signatories.map(section =>
+          section.copy(signatories = section.signatories :+ incompleteSignatory)
+        ),
+        liaisonOfficers = fullAnswers.liaisonOfficers.map(section =>
+          section.copy(liaisonOfficers = section.liaisonOfficers :+ incompleteOfficer)
+        )
+      )
+      val updates             = SessionUpdates(
+        tradingName = Assign("ABC Bank"),
+        signatories = Assign(effectiveAnswers.signatories.value),
+        liaisonOfficers = Assign(effectiveAnswers.liaisonOfficers.value)
+      )
+      when(mockUserAnswersRepository.set(any())).thenReturn(Future.successful(true))
+      val application         = applicationBuilder(
+        effectiveAnswers = effectiveAnswers,
+        originalAnswers = Some(fullAnswers),
+        sessionAnswers = Some(UserAnswers(testSessionId, updates)),
+        email = Some(signatoryEmail)
+      ).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, changeOfCircumstancesEndpoint)).value
+        val doc    = Jsoup.parse(contentAsString(result))
+        val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+
+        status(result)                          shouldBe OK
+        doc.select("main").text()                 should not include "Partial Signatory"
+        doc.select("main").text()                 should not include "Partial Officer"
+        verify(mockUserAnswersRepository).set(captor.capture())
+        captor.getValue.updates.tradingName     shouldBe Assign("ABC Bank")
+        captor.getValue.updates.signatories     shouldBe Assign(fullAnswers.signatories.value)
+        captor.getValue.updates.liaisonOfficers shouldBe Assign(fullAnswers.liaisonOfficers.value)
       }
     }
 
