@@ -54,7 +54,7 @@ class AddedSignatoryControllerISpec extends BaseIntegrationSpec {
 
   private val signatoryId     = "294da0a8-7484-4675-bce2-fe9195dc1bca"
   private val registrationUrl = s"/disa-account/registration/$testZref"
-  private val routeUrl        = "/obligations/account/isa/added-signatories"
+  private val routeUrl        = s"$accountFrontendRoutePrefix/added-signatories"
 
   private val registrationResponseBody =
     s"""{
@@ -103,7 +103,7 @@ class AddedSignatoryControllerISpec extends BaseIntegrationSpec {
       val result = route(app, authenticatedGet).get
 
       status(result)           shouldBe SEE_OTHER
-      redirectLocation(result) shouldBe Some("/obligations/account/isa/change-of-circumstances")
+      redirectLocation(result) shouldBe Some(s"$accountFrontendRoutePrefix/change-of-circumstances")
     }
   }
 
@@ -116,7 +116,7 @@ class AddedSignatoryControllerISpec extends BaseIntegrationSpec {
       val result = route(app, authenticatedPost("yes")).get
 
       status(result)                 shouldBe SEE_OTHER
-      redirectLocation(result)       shouldBe Some("/obligations/account/isa/signatory-name")
+      redirectLocation(result)       shouldBe Some(s"$accountFrontendRoutePrefix/signatory-name")
       await(repo.get(testSessionId)) shouldBe None
     }
   }

@@ -55,7 +55,7 @@ class EnterYourOrganisationAddressControllerISpec extends BaseIntegrationSpec {
     await(repo.collection.drop().toFuture())
   }
 
-  val addressPath: String     = "/obligations/account/isa/enter-your-organisation-address"
+  val addressPath: String     = s"$accountFrontendRoutePrefix/enter-your-organisation-address"
   val registrationUrl: String = s"/disa-account/registration/$testZref"
 
   val registrationResponseBody: String =

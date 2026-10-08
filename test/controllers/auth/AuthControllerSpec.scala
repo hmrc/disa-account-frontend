@@ -39,11 +39,12 @@ class AuthControllerSpec extends BaseUnitSpec {
         val result = route(application, FakeRequest(GET, signOutEndpoint)).value
 
         val redirectUrl = redirectLocation(result).value
+        val expected    = s"continue=$signOutContinueEndpoint"
 
         status(result)                                                                 shouldBe SEE_OTHER
         redirectUrl                                                                      should startWith(basGatewaySignOutEndpoint)
-        URLDecoder.decode(URI.create(redirectUrl).getRawQuery, StandardCharsets.UTF_8) shouldBe
-          s"continue=$signOutContinueEndpoint"
+        URLDecoder.decode(URI.create(redirectUrl).getRawQuery, StandardCharsets.UTF_8) shouldBe expected
+
         verify(mockUserAnswersRepository).clear(testSessionId)
       }
     }
