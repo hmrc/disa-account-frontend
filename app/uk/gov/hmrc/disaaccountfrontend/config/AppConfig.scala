@@ -49,7 +49,7 @@ class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig
     s"$loginUrl?continue=${URLEncoder.encode(loginContinueUrl, StandardCharsets.UTF_8)}"
 
   lazy val monthlyReportSubmissionUrl: String =
-    s"${servicesConfig.baseUrl(serviceName = "disa-returns-frontend")}/manage-isas-account/monthly-report-submission"
+    s"${servicesConfig.baseUrl(serviceName = "disa-returns-frontend")}/submit-manage-isas-return/monthly-report-submission"
 
   val timeout: Int   = config.get[Int]("timeout-dialog.timeout")
   val countdown: Int = config.get[Int]("timeout-dialog.countdown")

@@ -39,7 +39,7 @@ class ManageIsasControllerSpec extends BaseUnitSpec {
   private val defaultResolvedAt: Instant  = Instant.parse("2026-07-08T09:00:00Z")
 
   private val monthlyReportSubmissionUrl: String =
-    s"http://localhost:1205$accountFrontendRoutePrefix/monthly-report-submission"
+    s"http://localhost:1205/submit-manage-isas-return/monthly-report-submission"
 
   private def application(
     windowOpen: Boolean,
