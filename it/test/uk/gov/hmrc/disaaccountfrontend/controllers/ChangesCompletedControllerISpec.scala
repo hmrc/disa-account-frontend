@@ -57,7 +57,7 @@ class ChangesCompletedControllerISpec extends BaseIntegrationSpec {
     await(repo.collection.drop().toFuture())
   }
 
-  private val endpoint: String        = "/obligations/account/isa/changes-completed"
+  private val endpoint: String        = s"$accountFrontendRoutePrefix/changes-completed"
   private val registrationUrl: String = s"/disa-account/registration/$testZref"
 
   private def authenticatedGet(): FakeRequest[AnyContentAsEmpty.type] =

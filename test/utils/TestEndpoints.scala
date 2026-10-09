@@ -18,7 +18,7 @@ package utils
 
 trait TestEndpoints {
 
-  val accountFrontendRoutePrefix: String = "/obligations/account/isa"
+  private val accountFrontendRoutePrefix: String = "/manage-isas-account"
 
   val changeInformationEndpoint: String                 = s"$accountFrontendRoutePrefix/change-information"
   val changeProductsEndpoint: String                    = s"$accountFrontendRoutePrefix/change-products"

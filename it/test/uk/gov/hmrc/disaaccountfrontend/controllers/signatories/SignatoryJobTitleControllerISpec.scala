@@ -52,7 +52,7 @@ class SignatoryJobTitleControllerISpec extends BaseIntegrationSpec {
     await(repo.collection.drop().toFuture())
   }
 
-  val signatoryJobTitlePath: String = "/obligations/account/isa/signatory-job-title"
+  val signatoryJobTitlePath: String = s"$accountFrontendRoutePrefix/signatory-job-title"
   val registrationUrl: String       = s"/disa-account/registration/$testZref"
 
   val signatoryId: String = "294da0a8-7484-4675-bce2-fe9195dc1bca"
@@ -117,7 +117,7 @@ class SignatoryJobTitleControllerISpec extends BaseIntegrationSpec {
       val result = route(app, authenticatedGet(signatoryId)).get
 
       status(result)           shouldBe SEE_OTHER
-      redirectLocation(result) shouldBe Some("/obligations/account/isa/change-of-circumstances")
+      redirectLocation(result) shouldBe Some(s"$accountFrontendRoutePrefix/change-of-circumstances")
     }
   }
 }
