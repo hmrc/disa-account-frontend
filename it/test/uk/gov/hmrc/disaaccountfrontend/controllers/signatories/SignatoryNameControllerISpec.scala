@@ -52,7 +52,7 @@ class SignatoryNameControllerISpec extends BaseIntegrationSpec {
     await(repo.collection.drop().toFuture())
   }
 
-  val signatoryNamePath: String = "/obligations/account/isa/signatory-name"
+  val signatoryNamePath: String = s"$accountFrontendRoutePrefix/signatory-name"
   val registrationUrl: String   = s"/disa-account/registration/$testZref"
 
   val signatoryId: String = "294da0a8-7484-4675-bce2-fe9195dc1bca"
@@ -116,7 +116,7 @@ class SignatoryNameControllerISpec extends BaseIntegrationSpec {
       val result = route(app, authenticatedGet(signatoryId)).get
 
       status(result)           shouldBe SEE_OTHER
-      redirectLocation(result) shouldBe Some("/obligations/account/isa/change-of-circumstances")
+      redirectLocation(result) shouldBe Some(s"$accountFrontendRoutePrefix/change-of-circumstances")
     }
   }
 }

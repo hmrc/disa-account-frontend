@@ -55,7 +55,7 @@ class OrganisationTelephoneNumberControllerISpec extends BaseIntegrationSpec {
     await(repo.collection.drop().toFuture())
   }
 
-  val telephoneNumberPath: String = "/obligations/account/isa/organisation-telephone-number"
+  val telephoneNumberPath: String = s"$accountFrontendRoutePrefix/organisation-telephone-number"
   val registrationUrl: String     = s"/disa-account/registration/$testZref"
 
   val registrationResponseBody: String =

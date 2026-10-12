@@ -57,7 +57,7 @@ class InnovativeFinancialProductsControllerISpec extends BaseIntegrationSpec {
     await(repo.collection.drop().toFuture())
   }
 
-  val endpoint: String        = "/obligations/account/isa/innovative-financial-products"
+  val endpoint: String        = s"$accountFrontendRoutePrefix/innovative-financial-products"
   val registrationUrl: String = s"/disa-account/registration/$testZref"
 
   val signatoriesBlock: String =

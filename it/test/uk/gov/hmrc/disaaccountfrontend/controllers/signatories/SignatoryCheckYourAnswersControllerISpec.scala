@@ -54,7 +54,7 @@ class SignatoryCheckYourAnswersControllerISpec extends BaseIntegrationSpec {
 
   private val signatoryId     = "294da0a8-7484-4675-bce2-fe9195dc1bca"
   private val registrationUrl = s"/disa-account/registration/$testZref"
-  private val routeUrl        = s"/obligations/account/isa/check-signatory-details?id=$signatoryId"
+  private val routeUrl        = s"$accountFrontendRoutePrefix/check-signatory-details?id=$signatoryId"
 
   private val registrationResponseBody =
     s"""{
@@ -95,7 +95,7 @@ class SignatoryCheckYourAnswersControllerISpec extends BaseIntegrationSpec {
       val result = route(app, authenticatedGet).get
 
       status(result)           shouldBe SEE_OTHER
-      redirectLocation(result) shouldBe Some("/obligations/account/isa/change-of-circumstances")
+      redirectLocation(result) shouldBe Some(s"$accountFrontendRoutePrefix/change-of-circumstances")
     }
   }
 }

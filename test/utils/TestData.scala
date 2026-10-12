@@ -34,6 +34,9 @@ import uk.gov.hmrc.disaaccountfrontend.models.signatories.{Signatories, Signator
 import java.util.concurrent.ThreadLocalRandom
 
 trait TestData {
+
+  val accountFrontendRoutePrefix: String = "/manage-isas-account"
+
   val testZref: String         = f"Z${ThreadLocalRandom.current().nextInt(10000)}%04d"
   val testCredentialId: String = "cred-1234"
   val testSessionId: String    = "session-1234"

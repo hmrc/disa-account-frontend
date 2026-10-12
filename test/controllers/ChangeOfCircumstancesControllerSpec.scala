@@ -106,14 +106,14 @@ class ChangeOfCircumstancesControllerSpec extends BaseUnitSpec {
         doc.select(".govuk-summary-list__actions a").size() shouldBe 8
 
         doc.select(".govuk-summary-list__actions a").eachAttr("href") shouldBe java.util.List.of(
-          "/obligations/account/isa/trading-name",
-          "/obligations/account/isa/enter-your-organisation-address",
-          "/obligations/account/isa/organisation-telephone-number",
-          "/obligations/account/isa/organisation-email-address",
-          "/obligations/account/isa/change-products",
-          "/obligations/account/isa/fca-articles",
-          "/obligations/account/isa/added-liaison-officers",
-          "/obligations/account/isa/added-signatories"
+          "/manage-isas-account/trading-name",
+          "/manage-isas-account/enter-your-organisation-address",
+          "/manage-isas-account/organisation-telephone-number",
+          "/manage-isas-account/organisation-email-address",
+          "/manage-isas-account/change-products",
+          "/manage-isas-account/fca-articles",
+          "/manage-isas-account/added-liaison-officers",
+          "/manage-isas-account/added-signatories"
         )
       }
     }

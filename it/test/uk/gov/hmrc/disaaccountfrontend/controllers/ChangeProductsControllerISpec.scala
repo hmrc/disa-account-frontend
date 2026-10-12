@@ -59,8 +59,8 @@ class ChangeProductsControllerISpec extends BaseIntegrationSpec {
     await(repo.collection.drop().toFuture())
   }
 
-  private val endpoint: String                   = "/obligations/account/isa/change-products"
-  private val innovativeProductsEndpoint: String = "/obligations/account/isa/innovative-financial-products"
+  private val endpoint: String                   = s"$accountFrontendRoutePrefix/change-products"
+  private val innovativeProductsEndpoint: String = s"$accountFrontendRoutePrefix/innovative-financial-products"
   private val registrationUrl: String            = s"/disa-account/registration/$testZref"
 
   private def registrationResponse(products: Seq[IsaProduct], includeDependents: Boolean = false): String = {
