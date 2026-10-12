@@ -18,8 +18,9 @@ package uk.gov.hmrc.disaaccountfrontend.controllers
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{AccountMaintenanceGuardAction, DataRetrievalAction, IdentifierAction}
+import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{AccountMaintenanceGuardAction, DataRetrievalAction, IdentifierAction, PageGuardAction, RemoveIncompleteContactsAction}
 import uk.gov.hmrc.disaaccountfrontend.connectors.RegistrationConnector
+import uk.gov.hmrc.disaaccountfrontend.models.pages.DeclarationForChangesPage
 import uk.gov.hmrc.disaaccountfrontend.models.registration.UpdateRegistrationDetailsRequest
 import uk.gov.hmrc.disaaccountfrontend.views.html.DeclarationForChangesView
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -32,6 +33,8 @@ class DeclarationForChangesController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   accountMaintenanceGuard: AccountMaintenanceGuardAction,
+  removeIncompleteContacts: RemoveIncompleteContactsAction,
+  guardPage: PageGuardAction,
   registrationConnector: RegistrationConnector,
   val controllerComponents: MessagesControllerComponents,
   view: DeclarationForChangesView
@@ -39,7 +42,10 @@ class DeclarationForChangesController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  private val pageAction = identify andThen getData andThen accountMaintenanceGuard
+  private val pageAction =
+    identify andThen getData andThen accountMaintenanceGuard andThen removeIncompleteContacts andThen guardPage(
+      DeclarationForChangesPage
+    )
 
   def onPageLoad(): Action[AnyContent] = pageAction { implicit request =>
     Ok(view(request.isaProductsUpdated))

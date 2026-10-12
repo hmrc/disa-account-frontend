@@ -18,7 +18,7 @@ package uk.gov.hmrc.disaaccountfrontend.controllers
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{AccountMaintenanceGuardAction, DataRetrievalAction, IdentifierAction}
+import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{AccountMaintenanceGuardAction, DataRetrievalAction, IdentifierAction, RemoveIncompleteContactsAction}
 import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
 import uk.gov.hmrc.disaaccountfrontend.models.ChangeInformationSelection
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
@@ -33,23 +33,25 @@ class ChangeOfCircumstancesController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   accountMaintenanceGuard: AccountMaintenanceGuardAction,
+  removeIncompleteContacts: RemoveIncompleteContactsAction,
   val controllerComponents: MessagesControllerComponents,
   view: ChangeOfCircumstancesView
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen accountMaintenanceGuard) { implicit request =>
-    Ok(
-      view(
-        ChangeOfCircumstancesViewModel(
-          originalAnswers = request.originalAnswers,
-          effectiveAnswers = request.effectiveAnswers,
-          selections = selectedSections,
-          isSignatory = request.isSignatory
+  def onPageLoad(): Action[AnyContent] =
+    (identify andThen getData andThen accountMaintenanceGuard andThen removeIncompleteContacts) { implicit request =>
+      Ok(
+        view(
+          ChangeOfCircumstancesViewModel(
+            originalAnswers = request.originalAnswers,
+            effectiveAnswers = request.effectiveAnswers,
+            selections = selectedSections,
+            isSignatory = request.isSignatory
+          )
         )
       )
-    )
-  }
+    }
 
   private def selectedSections(implicit request: DataRequest[_]): Seq[ChangeInformationSelection] =
     request.sessionAnswers

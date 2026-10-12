@@ -19,7 +19,7 @@ package uk.gov.hmrc.disaaccountfrontend
 import play.api.{Configuration, Environment}
 import play.api.inject.{Binding, Module as AppModule}
 import uk.gov.hmrc.disaaccountfrontend.config.{InternalAuthTokenInitialiser, InternalAuthTokenInitialiserImpl, NoOpInternalAuthTokenInitialiser}
-import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{AccountMaintenanceGuardAction, AccountMaintenanceGuardActionImpl, AuthenticatedIdentifierAction, DataRetrievalAction, DataRetrievalActionImpl, IdentifierAction, PageGuardAction, PageGuardActionImpl, RequireSignatoryAction, RequireSignatoryActionImpl}
+import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{AccountMaintenanceGuardAction, AccountMaintenanceGuardActionImpl, AuthenticatedIdentifierAction, DataRetrievalAction, DataRetrievalActionImpl, IdentifierAction, PageGuardAction, PageGuardActionImpl, RemoveIncompleteContactsAction, RemoveIncompleteContactsActionImpl, RequireSignatoryAction, RequireSignatoryActionImpl}
 
 import java.time.Clock
 
@@ -44,6 +44,7 @@ class Module extends AppModule {
       bind[PageGuardAction].to[PageGuardActionImpl],
       bind[RequireSignatoryAction].to[RequireSignatoryActionImpl],
       bind[AccountMaintenanceGuardAction].to[AccountMaintenanceGuardActionImpl],
+      bind[RemoveIncompleteContactsAction].to[RemoveIncompleteContactsActionImpl],
       bind[AppInitialiser].toSelf.eagerly()
     ) ++ authTokenInitialiserBindings
   }
