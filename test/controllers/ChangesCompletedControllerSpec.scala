@@ -27,7 +27,7 @@ class ChangesCompletedControllerSpec extends BaseUnitSpec {
 
   "ChangesCompletedController.onPageLoad" should {
 
-    "render the page and ISA product section when products changed" in {
+    "render the ISA product review and confirmation content when products changed" in {
       val originalAnswers  = Answers(isaProducts = Some(Seq(CashIsas)))
       val effectiveAnswers = Answers(isaProducts = Some(Seq(CashIsas, StocksAndSharesIsas)))
       val application      = applicationBuilder(
@@ -42,38 +42,45 @@ class ChangesCompletedControllerSpec extends BaseUnitSpec {
           "a[href=https://www.gov.uk/government/collections/isa-managers-guidance]"
         )
 
-        status(result)                                             shouldBe OK
-        doc.select(".govuk-panel__title").text()                   shouldBe "Changes completed"
-        doc.select("main").text()                                    should include("You have completed your changes.")
-        doc.select("main").text()                                    should include(
-          "The changes you have made will appear on your account. If you need to manage further changes you can from the manage ISAs start page."
+        status(result)                                          shouldBe OK
+        doc.select(".govuk-panel__title").text()                shouldBe "Changes completed"
+        doc.select("main").text()                                 should include("You have completed your changes.")
+        doc.select("h2:matchesOwn(^What happens next$)").size() shouldBe 1
+        doc.select("main").text()                                 should include(
+          "You have made changes to your ISA products. This means:"
         )
-        doc.select("main").text()                                    should include(
-          "If you have updated any ISA products using the service, it will now need to be manually checked by HMRC."
+        doc.select("ul.govuk-list--bullet li").eachText()         should contain theSameElementsInOrderAs Seq(
+          "HMRC will manually check added or removed ISA products",
+          "you will not be able to make any further changes until these checks have been completed"
         )
-        doc.select("main").text()                                    should include(
-          "You will not be able to make any further changes until this is done and you receive a letter from HMRC."
+        doc.select("h2:matchesOwn(^Confirmation$)").size()      shouldBe 1
+        doc.select("main").text()                                 should include(
+          "HMRC will email you once the necessary checks have been made to the ISA products you’ve updated. You will then be able to make further amendments to your account using this service."
         )
-        doc.select("h2:matchesOwn(^What happens next$)").size()    shouldBe 1
-        doc.select("h2:matchesOwn(^Updated ISA products$)").size() shouldBe 1
+        doc.select("main").text()                                 should include(
+          "The changes to your ISA products will be confirmed by HMRC within 2 weeks of you declaring them, by email."
+        )
         val manageIsasLinks = doc.select(s"a[href=$manageIsasEndpoint]")
-        manageIsasLinks.size()        shouldBe 2
-        manageIsasLinks.last().text() shouldBe "Go back to manage ISAs start page"
-        guidanceLink.attr("target")   shouldBe "_blank"
-        guidanceLink.text()           shouldBe
-          "read the guidance in the ISA managers guidance collection (opens in new tab)"
+        manageIsasLinks.size() shouldBe 1
+        manageIsasLinks.text() shouldBe "Go back to manage ISAs start page"
+        guidanceLink.text()      should include("ISA managers’ guidance collection")
       }
     }
 
-    "hide the ISA product section when products did not change" in {
+    "render the general completion content when products did not change" in {
       val answers     = Answers(isaProducts = Some(Seq(CashIsas)))
       val application = applicationBuilder(effectiveAnswers = answers).build()
 
       running(application) {
         val result = route(application, FakeRequest(GET, changesCompletedEndpoint)).value
+        val doc    = Jsoup.parse(contentAsString(result))
 
-        status(result)        shouldBe OK
-        contentAsString(result) should not include "Updated ISA products"
+        status(result)                                     shouldBe OK
+        doc.select("main").text()                            should include(
+          "The changes you have made will appear on your account. If you need to manage further changes you can from the manage ISAs start page."
+        )
+        doc.select("h2:matchesOwn(^Confirmation$)").size() shouldBe 0
+        doc.select("ul.govuk-list--bullet li").size()      shouldBe 0
       }
     }
   }

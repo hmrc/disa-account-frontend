@@ -14,7 +14,14 @@
  * limitations under the License.
  *@
 
-@this(layout: Layout, govukPanel: GovukPanel)
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcNewTabLinkHelper
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
+
+@this(
+    layout: Layout,
+    govukPanel: GovukPanel,
+    hmrcNewTabLinkHelper: HmrcNewTabLinkHelper
+)
 
 @(isaProductsUpdated: Boolean)(implicit request: RequestHeader, messages: Messages)
 
@@ -24,15 +31,21 @@
     <p class="govuk-body">@messages("changesCompleted.completed")</p>
 
     <h2 class="govuk-heading-m">@messages("changesCompleted.whatHappensNext.heading")</h2>
-    <p class="govuk-body">
-        @messages("changesCompleted.whatHappensNext.beforeLink")
-        <a class="govuk-link" href="@ManageIsasController.onPageLoad().url">@messages("changesCompleted.manageIsasStartPage")</a>.
-    </p>
-
     @if(isaProductsUpdated) {
-        <h2 class="govuk-heading-m">@messages("changesCompleted.updatedIsaProducts.heading")</h2>
-        <p class="govuk-body">@messages("changesCompleted.updatedIsaProducts.p1")</p>
-        <p class="govuk-body">@messages("changesCompleted.updatedIsaProducts.p2")</p>
+        <p class="govuk-body">@messages("changesCompleted.whatHappensNext.isaProducts")</p>
+        <ul class="govuk-list govuk-list--bullet">
+            <li>@messages("changesCompleted.whatHappensNext.isaProducts.manualCheck")</li>
+            <li>@messages("changesCompleted.whatHappensNext.isaProducts.noFurtherChanges")</li>
+        </ul>
+
+        <h2 class="govuk-heading-m">@messages("changesCompleted.confirmation.heading")</h2>
+        <p class="govuk-body">@messages("changesCompleted.confirmation.p1")</p>
+        <p class="govuk-body">@messages("changesCompleted.confirmation.p2")</p>
+    } else {
+        <p class="govuk-body">
+            @messages("changesCompleted.whatHappensNext.beforeLink")
+            <a class="govuk-link" href="@ManageIsasController.onPageLoad().url">@messages("changesCompleted.manageIsasStartPage")</a>.
+        </p>
     }
 
     <p class="govuk-body">
@@ -41,6 +54,9 @@
 
     <p class="govuk-body">
         @messages("changesCompleted.guidance.beforeLink")
-        <a class="govuk-link" href="https://www.gov.uk/government/collections/isa-managers-guidance" target="_blank" rel="noopener noreferrer">@messages("changesCompleted.guidance.link")</a>.
+        @hmrcNewTabLinkHelper(NewTabLinkHelper(
+            text = messages("changesCompleted.guidance.link"),
+            href = Some("https://www.gov.uk/government/collections/isa-managers-guidance")
+        )).
     </p>
 }

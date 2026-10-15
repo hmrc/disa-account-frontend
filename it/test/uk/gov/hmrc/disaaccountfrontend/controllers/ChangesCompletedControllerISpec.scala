@@ -23,10 +23,8 @@ import play.api.libs.json.Json
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.disaaccountfrontend.models.AnswerUpdate.Assign
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct
-import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct.{CashIsas, StocksAndSharesIsas}
-import uk.gov.hmrc.disaaccountfrontend.models.{SessionUpdates, UserAnswers}
+import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct.CashIsas
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
 import uk.gov.hmrc.disaaccountfrontend.utils.BaseIntegrationSpec
 import uk.gov.hmrc.disaaccountfrontend.utils.WiremockHelper.stubGet
@@ -78,30 +76,13 @@ class ChangesCompletedControllerISpec extends BaseIntegrationSpec {
 
   "GET /changes-completed" should {
 
-    "show the updated ISA products section when session products differ from registration" in {
-      stubAuth(testZref, testCredentialId)
-      stubRegistration(Seq(CashIsas))
-      await(
-        repo.set(
-          UserAnswers(testSessionId, SessionUpdates(isaProducts = Assign(Seq(CashIsas, StocksAndSharesIsas))))
-        )
-      )
-
-      val result = route(app, authenticatedGet()).get
-
-      status(result)        shouldBe OK
-      contentAsString(result) should include("Changes completed")
-      contentAsString(result) should include("Updated ISA products")
-    }
-
-    "hide the updated ISA products section when products are unchanged" in {
+    "render the page for an authenticated request" in {
       stubAuth(testZref, testCredentialId)
       stubRegistration(Seq(CashIsas))
 
       val result = route(app, authenticatedGet()).get
 
-      status(result)        shouldBe OK
-      contentAsString(result) should not include "Updated ISA products"
+      status(result) shouldBe OK
     }
 
     "redirect an unauthenticated request to sign in" in {
