@@ -16,8 +16,6 @@
 
 package uk.gov.hmrc.disaaccountfrontend.connectors
 
-import com.typesafe.config.Config
-import org.apache.pekko.actor.ActorSystem
 import play.api.Logging
 import play.api.libs.json.Json
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
@@ -25,35 +23,27 @@ import uk.gov.hmrc.disaaccountfrontend.config.AppConfig
 import uk.gov.hmrc.disaaccountfrontend.models.registration.{RegistrationDetails, UpdateRegistrationDetailsRequest}
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, Retries, StringContextOps, UpstreamErrorResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps, UpstreamErrorResponse}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class RegistrationConnector @Inject() (
   http: HttpClientV2,
-  appConfig: AppConfig,
-  protected val configuration: Config,
-  protected val actorSystem: ActorSystem
+  appConfig: AppConfig
 )(implicit ec: ExecutionContext)
-    extends Retries
-    with Logging {
-
-  private val retryCondition: PartialFunction[Exception, Boolean] = {
-    case UpstreamErrorResponse.Upstream5xxResponse(_) => true
-  }
+    extends Logging {
 
   def getRegistrationDetails(zref: String)(implicit hc: HeaderCarrier): Future[Option[RegistrationDetails]] = {
     val url = s"${appConfig.disaAccountBaseUrl}/disa-account/registration/$zref"
-    retryFor[RegistrationDetails]("get disa-account registration details")(retryCondition) {
-      http
-        .get(url"$url")
-        .execute[Either[UpstreamErrorResponse, RegistrationDetails]]
-        .flatMap {
-          case Right(details) => Future.successful(details)
-          case Left(error)    => Future.failed(error)
-        }
-    }.map(Some(_))
+    http
+      .get(url"$url")
+      .execute[Either[UpstreamErrorResponse, RegistrationDetails]]
+      .flatMap {
+        case Right(details) => Future.successful(details)
+        case Left(error)    => Future.failed(error)
+      }
+      .map(Some(_))
       .recover {
         case err: UpstreamErrorResponse if err.statusCode == 404 =>
           logger.info(
@@ -68,15 +58,13 @@ class RegistrationConnector @Inject() (
     details: UpdateRegistrationDetailsRequest
   )(implicit hc: HeaderCarrier): Future[Unit] = {
     val url = s"${appConfig.disaAccountBaseUrl}/disa-account/registration/$zref"
-    retryFor[HttpResponse]("update disa-account registration details")(retryCondition) {
-      http
-        .put(url"$url")
-        .withBody(Json.toJson(details))
-        .execute[Either[UpstreamErrorResponse, HttpResponse]]
-        .flatMap {
-          case Right(response) => Future.successful(response)
-          case Left(error)     => Future.failed(error)
-        }
-    }.map(_ => ())
+    http
+      .put(url"$url")
+      .withBody(Json.toJson(details))
+      .execute[Either[UpstreamErrorResponse, HttpResponse]]
+      .flatMap {
+        case Right(_)    => Future.unit
+        case Left(error) => Future.failed(error)
+      }
   }
 }

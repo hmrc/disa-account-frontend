@@ -36,7 +36,7 @@ class ReportingWindowConnectorSpec extends BaseUnitSpec {
 
   trait TestSetup {
     val connector: ReportingWindowConnector =
-      new ReportingWindowConnector(mockHttpClient, mockAppConfig, retryConfig, actorSystem)
+      new ReportingWindowConnector(mockHttpClient, mockAppConfig)
 
     when(mockAppConfig.disaReturnsSubmissionBaseUrl).thenReturn(disaReturnsSubmissionBaseUrl)
     when(mockAppConfig.internalAuthToken).thenReturn(testInternalAuthToken)
