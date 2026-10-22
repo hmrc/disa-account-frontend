@@ -16,9 +16,7 @@
 
 package utils
 
-import com.typesafe.config.Config
 import controllers.actions.{FakeAccountMaintenanceGuardAction, FakeDataRetrievalAction, FakeIdentifierAction}
-import org.apache.pekko.actor.ActorSystem
 import org.mockito.Mockito
 import org.scalatest.{BeforeAndAfterEach, EitherValues, OptionValues}
 import org.scalatest.concurrent.ScalaFutures
@@ -59,9 +57,6 @@ abstract class BaseUnitSpec
 
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
   implicit val hc: HeaderCarrier    = HeaderCarrier()
-
-  lazy val retryConfig: Config      = app.configuration.underlying
-  lazy val actorSystem: ActorSystem = app.actorSystem
 
   val mockHttpClient: HttpClientV2                               = mock[HttpClientV2]
   val mockAppConfig: AppConfig                                   = mock[AppConfig]

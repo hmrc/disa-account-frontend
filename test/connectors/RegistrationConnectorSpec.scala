@@ -31,7 +31,7 @@ class RegistrationConnectorSpec extends BaseUnitSpec {
 
   trait TestSetup {
     val connector: RegistrationConnector =
-      new RegistrationConnector(mockHttpClient, mockAppConfig, retryConfig, actorSystem)
+      new RegistrationConnector(mockHttpClient, mockAppConfig)
 
     when(mockAppConfig.disaAccountBaseUrl).thenReturn(disaAccountBaseUrl)
 

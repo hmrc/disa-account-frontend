@@ -16,42 +16,31 @@
 
 package uk.gov.hmrc.disaaccountfrontend.connectors
 
-import com.typesafe.config.Config
-import org.apache.pekko.actor.ActorSystem
 import play.api.Logging
 import uk.gov.hmrc.disaaccountfrontend.config.AppConfig
 import uk.gov.hmrc.disaaccountfrontend.models.reportingwindow.ReportingWindowStatus
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, Retries, StringContextOps, UpstreamErrorResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps, UpstreamErrorResponse}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class ReportingWindowConnector @Inject() (
   http: HttpClientV2,
-  appConfig: AppConfig,
-  protected val configuration: Config,
-  protected val actorSystem: ActorSystem
+  appConfig: AppConfig
 )(implicit ec: ExecutionContext)
-    extends Retries
-    with Logging {
-
-  private val retryCondition: PartialFunction[Exception, Boolean] = {
-    case UpstreamErrorResponse.Upstream5xxResponse(_) => true
-  }
+    extends Logging {
 
   def getReportingWindowStatus(zref: String)(implicit hc: HeaderCarrier): Future[ReportingWindowStatus] = {
     val url = s"${appConfig.disaReturnsSubmissionBaseUrl}/disa-returns-submission/reporting-window/status/$zref"
-    retryFor[ReportingWindowStatus]("GET disa-returns-submission reporting window status")(retryCondition) {
-      http
-        .get(url"$url")
-        .setHeader("Authorization" -> appConfig.internalAuthToken)
-        .execute[Either[UpstreamErrorResponse, ReportingWindowStatus]]
-        .flatMap {
-          case Right(status) => Future.successful(status)
-          case Left(error)   => Future.failed(error)
-        }
-    }
+    http
+      .get(url"$url")
+      .setHeader("Authorization" -> appConfig.internalAuthToken)
+      .execute[Either[UpstreamErrorResponse, ReportingWindowStatus]]
+      .flatMap {
+        case Right(status) => Future.successful(status)
+        case Left(error)   => Future.failed(error)
+      }
   }
 }
