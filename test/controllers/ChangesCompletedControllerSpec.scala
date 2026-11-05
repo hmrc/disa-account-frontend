@@ -18,16 +18,18 @@ package controllers
 
 import org.jsoup.Jsoup
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
-import org.mockito.Mockito.{verify, when}
+import org.mockito.Mockito.{never, verify, when}
 import play.api.test.*
 import play.api.test.Helpers.*
-import uk.gov.hmrc.disaaccountfrontend.models.Answers
+import uk.gov.hmrc.disaaccountfrontend.models.{Answers, UserAnswers}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct.{CashIsas, StocksAndSharesIsas}
 import utils.BaseUnitSpec
 
 import scala.concurrent.Future
 
 class ChangesCompletedControllerSpec extends BaseUnitSpec {
+
+  private val sessionAnswers = Some(UserAnswers(testSessionId))
 
   "ChangesCompletedController.onPageLoad" should {
 
@@ -37,7 +39,8 @@ class ChangesCompletedControllerSpec extends BaseUnitSpec {
       when(mockUserAnswersRepository.clear(any())).thenReturn(Future.successful(true))
       val application      = applicationBuilder(
         effectiveAnswers = effectiveAnswers,
-        originalAnswers = Some(originalAnswers)
+        originalAnswers = Some(originalAnswers),
+        sessionAnswers = sessionAnswers
       ).build()
 
       running(application) {
@@ -75,7 +78,7 @@ class ChangesCompletedControllerSpec extends BaseUnitSpec {
     "render the general completion content when products did not change" in {
       val answers     = Answers(isaProducts = Some(Seq(CashIsas)))
       when(mockUserAnswersRepository.clear(any())).thenReturn(Future.successful(true))
-      val application = applicationBuilder(effectiveAnswers = answers).build()
+      val application = applicationBuilder(effectiveAnswers = answers, sessionAnswers = sessionAnswers).build()
 
       running(application) {
         val result = route(application, FakeRequest(GET, changesCompletedEndpoint)).value
@@ -90,13 +93,14 @@ class ChangesCompletedControllerSpec extends BaseUnitSpec {
       }
     }
 
-    "clear the session answers and keep the ISA product content" in {
+    "render the ISA product content from the answers loaded before clearing them" in {
       val originalAnswers  = Answers(isaProducts = Some(Seq(CashIsas)))
       val effectiveAnswers = Answers(isaProducts = Some(Seq(CashIsas, StocksAndSharesIsas)))
       when(mockUserAnswersRepository.clear(any())).thenReturn(Future.successful(true))
       val application      = applicationBuilder(
         effectiveAnswers = effectiveAnswers,
-        originalAnswers = Some(originalAnswers)
+        originalAnswers = Some(originalAnswers),
+        sessionAnswers = sessionAnswers
       ).build()
 
       running(application) {
@@ -112,13 +116,25 @@ class ChangesCompletedControllerSpec extends BaseUnitSpec {
 
     "still render the page when clearing the session answers fails" in {
       when(mockUserAnswersRepository.clear(any())).thenReturn(Future.failed(new RuntimeException("boom")))
-      val application = applicationBuilder(effectiveAnswers = Answers()).build()
+      val application = applicationBuilder(effectiveAnswers = Answers(), sessionAnswers = sessionAnswers).build()
 
       running(application) {
         val result = route(application, FakeRequest(GET, changesCompletedEndpoint)).value
 
         status(result) shouldBe OK
         verify(mockUserAnswersRepository).clear(eqTo(testSessionId))
+      }
+    }
+
+    "redirect to manage ISAs without clearing when there are no session answers" in {
+      val application = applicationBuilder(sessionAnswers = None).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, changesCompletedEndpoint)).value
+
+        status(result)         shouldBe SEE_OTHER
+        redirectLocation(result) should contain(manageIsasEndpoint)
+        verify(mockUserAnswersRepository, never()).clear(any())
       }
     }
   }

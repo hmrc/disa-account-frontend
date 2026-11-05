@@ -19,7 +19,7 @@ package uk.gov.hmrc.disaaccountfrontend.controllers
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction}
+import uk.gov.hmrc.disaaccountfrontend.controllers.actions.{DataRetrievalAction, IdentifierAction, PageGuardAction}
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
 import uk.gov.hmrc.disaaccountfrontend.views.html.ChangesCompletedView
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -32,6 +32,7 @@ class ChangesCompletedController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  guardPage: PageGuardAction,
   userAnswersRepository: UserAnswersRepository,
   val controllerComponents: MessagesControllerComponents,
   view: ChangesCompletedView
@@ -40,18 +41,19 @@ class ChangesCompletedController @Inject() (
     with I18nSupport
     with Logging {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData).async { implicit request =>
-    val page = Ok(view(request.isaProductsUpdated))
+  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen guardPage.requireSessionAnswers).async {
+    implicit request =>
+      val page = Ok(view(request.isaProductsUpdated))
 
-    userAnswersRepository
-      .clear(request.sessionId)
-      .map(_ => page)
-      .recover { case NonFatal(e) =>
-        logger.warn(
-          s"[ChangesCompletedController][onPageLoad] Failed to clear session data for sessionId: [${request.sessionId}]",
-          e
-        )
-        page
-      }
+      userAnswersRepository
+        .clear(request.sessionId)
+        .map(_ => page)
+        .recover { case NonFatal(e) =>
+          logger.warn(
+            s"[ChangesCompletedController][onPageLoad] Failed to clear session data for sessionId: [${request.sessionId}]",
+            e
+          )
+          page
+        }
   }
 }

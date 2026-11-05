@@ -80,6 +80,7 @@ class ChangesCompletedControllerISpec extends BaseIntegrationSpec {
     "render the page for an authenticated request" in {
       stubAuth(testZref, testCredentialId)
       stubRegistration(Seq(CashIsas))
+      await(repo.set(UserAnswers(testSessionId)))
 
       val result = route(app, authenticatedGet()).get
 
@@ -95,6 +96,19 @@ class ChangesCompletedControllerISpec extends BaseIntegrationSpec {
 
       status(result)                 shouldBe OK
       await(repo.get(testSessionId)) shouldBe None
+    }
+
+    "redirect to manage ISAs when the page is refreshed after the session answers are cleared" in {
+      stubAuth(testZref, testCredentialId)
+      stubRegistration(Seq(CashIsas))
+      await(repo.set(UserAnswers(testSessionId)))
+
+      status(route(app, authenticatedGet()).get) shouldBe OK
+
+      val refreshed = route(app, authenticatedGet()).get
+
+      status(refreshed)           shouldBe SEE_OTHER
+      redirectLocation(refreshed) shouldBe Some(s"$accountFrontendRoutePrefix/manage-isas")
     }
 
     "redirect an unauthenticated request to sign in" in {
