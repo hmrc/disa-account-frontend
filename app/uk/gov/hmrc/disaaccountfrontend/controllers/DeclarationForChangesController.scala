@@ -43,7 +43,7 @@ class DeclarationForChangesController @Inject() (
     with I18nSupport {
 
   private val pageAction =
-    identify andThen getData andThen accountMaintenanceGuard andThen removeIncompleteContacts andThen guardPage(
+    identify andThen getData andThen accountMaintenanceGuard andThen guardPage.requireSessionAnswers andThen removeIncompleteContacts andThen guardPage(
       DeclarationForChangesPage
     )
 

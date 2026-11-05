@@ -45,6 +45,7 @@ class DeclarationForChangesControllerSpec extends BaseUnitSpec {
     Some("john@example.com")
   )
   private val liaisonOfficers    = LiaisonOfficers(Seq(completedOfficer))
+  private val sessionAnswers     = Some(UserAnswers(testSessionId))
 
   private def withRequiredContacts(answers: Answers = Answers()): Answers =
     answers.copy(signatories = Some(signatories), liaisonOfficers = Some(liaisonOfficers))
@@ -63,12 +64,25 @@ class DeclarationForChangesControllerSpec extends BaseUnitSpec {
         redirectLocation(result).value shouldBe manageIsasEndpoint
       }
     }
+
+    "redirect to manage ISAs when there are no session answers" in {
+      val application = applicationBuilder(effectiveAnswers = withRequiredContacts(), sessionAnswers = None).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, declarationForChangesEndpoint)).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+      }
+    }
+
     "use the ISA products title when ISA products changed" in {
       val originalAnswers  = withRequiredContacts(Answers(isaProducts = Some(Seq(CashIsas))))
       val effectiveAnswers = withRequiredContacts(Answers(isaProducts = Some(Seq(CashIsas, StocksAndSharesIsas))))
       val application      = applicationBuilder(
         effectiveAnswers = effectiveAnswers,
-        originalAnswers = Some(originalAnswers)
+        originalAnswers = Some(originalAnswers),
+        sessionAnswers = sessionAnswers
       ).build()
 
       running(application) {
@@ -96,7 +110,7 @@ class DeclarationForChangesControllerSpec extends BaseUnitSpec {
 
     "use the standard title when ISA products did not change" in {
       val answers     = withRequiredContacts(Answers(isaProducts = Some(Seq(CashIsas))))
-      val application = applicationBuilder(effectiveAnswers = answers).build()
+      val application = applicationBuilder(effectiveAnswers = answers, sessionAnswers = sessionAnswers).build()
 
       running(application) {
         val result = route(application, FakeRequest(GET, declarationForChangesEndpoint)).value
@@ -197,7 +211,7 @@ class DeclarationForChangesControllerSpec extends BaseUnitSpec {
       val effectiveAnswers = withRequiredContacts(Answers(tradingName = Some("Updated name")))
       when(mockRegistrationConnector.updateRegistrationDetails(any[String], any[UpdateRegistrationDetailsRequest])(any))
         .thenReturn(Future.successful(()))
-      val application      = applicationBuilder(effectiveAnswers = effectiveAnswers).build()
+      val application      = applicationBuilder(effectiveAnswers = effectiveAnswers, sessionAnswers = sessionAnswers).build()
 
       running(application) {
         val request = FakeRequest(POST, declarationForChangesEndpoint).withHeaders("Csrf-Token" -> "nocheck")
@@ -214,7 +228,8 @@ class DeclarationForChangesControllerSpec extends BaseUnitSpec {
       val exception   = new RuntimeException("boom")
       when(mockRegistrationConnector.updateRegistrationDetails(any[String], any[UpdateRegistrationDetailsRequest])(any))
         .thenReturn(Future.failed(exception))
-      val application = applicationBuilder(effectiveAnswers = withRequiredContacts()).build()
+      val application =
+        applicationBuilder(effectiveAnswers = withRequiredContacts(), sessionAnswers = sessionAnswers).build()
 
       running(application) {
         val request = FakeRequest(POST, declarationForChangesEndpoint).withHeaders("Csrf-Token" -> "nocheck")
@@ -252,9 +267,24 @@ class DeclarationForChangesControllerSpec extends BaseUnitSpec {
       }
     }
 
+    "not submit changes and redirect to manage ISAs when there are no session answers" in {
+      val application = applicationBuilder(effectiveAnswers = withRequiredContacts(), sessionAnswers = None).build()
+
+      running(application) {
+        val request = FakeRequest(POST, declarationForChangesEndpoint).withHeaders("Csrf-Token" -> "nocheck")
+        val result  = route(application, request).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe manageIsasEndpoint
+        verify(mockRegistrationConnector, never())
+          .updateRegistrationDetails(any[String], any[UpdateRegistrationDetailsRequest])(any)
+      }
+    }
+
     "not submit changes when no completed signatories remain" in {
       val application = applicationBuilder(
-        effectiveAnswers = withRequiredContacts().copy(signatories = Some(Signatories()))
+        effectiveAnswers = withRequiredContacts().copy(signatories = Some(Signatories())),
+        sessionAnswers = sessionAnswers
       ).build()
 
       running(application) {
@@ -269,7 +299,8 @@ class DeclarationForChangesControllerSpec extends BaseUnitSpec {
 
     "not submit changes when no completed liaison officers remain" in {
       val application = applicationBuilder(
-        effectiveAnswers = withRequiredContacts().copy(liaisonOfficers = Some(LiaisonOfficers()))
+        effectiveAnswers = withRequiredContacts().copy(liaisonOfficers = Some(LiaisonOfficers())),
+        sessionAnswers = sessionAnswers
       ).build()
 
       running(application) {
