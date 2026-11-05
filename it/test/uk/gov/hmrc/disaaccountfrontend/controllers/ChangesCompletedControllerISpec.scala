@@ -23,6 +23,7 @@ import play.api.libs.json.Json
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import uk.gov.hmrc.disaaccountfrontend.models.UserAnswers
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct.CashIsas
 import uk.gov.hmrc.disaaccountfrontend.repositories.UserAnswersRepository
@@ -83,6 +84,17 @@ class ChangesCompletedControllerISpec extends BaseIntegrationSpec {
       val result = route(app, authenticatedGet()).get
 
       status(result) shouldBe OK
+    }
+
+    "clear the session answers" in {
+      stubAuth(testZref, testCredentialId)
+      stubRegistration(Seq(CashIsas))
+      await(repo.set(UserAnswers(testSessionId)))
+
+      val result = route(app, authenticatedGet()).get
+
+      status(result)                 shouldBe OK
+      await(repo.get(testSessionId)) shouldBe None
     }
 
     "redirect an unauthenticated request to sign in" in {
