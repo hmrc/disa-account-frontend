@@ -21,7 +21,7 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.disaaccountfrontend.controllers.actions.PageGuardActionImpl
-import uk.gov.hmrc.disaaccountfrontend.models.Answers
+import uk.gov.hmrc.disaaccountfrontend.models.{Answers, UserAnswers}
 import uk.gov.hmrc.disaaccountfrontend.models.isaproducts.IsaProduct.{CashIsas, InnovativeFinanceIsas}
 import uk.gov.hmrc.disaaccountfrontend.models.pages.InnovativeFinancialProductsPage
 import uk.gov.hmrc.disaaccountfrontend.models.requests.DataRequest
@@ -72,16 +72,41 @@ class PageGuardActionSpec extends BaseUnitSpec {
       status(result)         shouldBe SEE_OTHER
       redirectLocation(result) should contain(redirect.url)
     }
+
+    "continue with the request when session answers exist" in {
+      val result = action.requireSessionAnswers.invokeBlock(
+        dataRequest(Answers(), sessionAnswers = Some(UserAnswers(testSessionId))),
+        _ => Future.successful(Ok)
+      )
+
+      status(result) shouldBe OK
+    }
+
+    "redirect to manage ISAs when there are no session answers" in {
+      val originalRoutePrefix = _root_.app.RoutesPrefix.prefix
+
+      try {
+        _root_.app.RoutesPrefix.setPrefix(accountFrontendRoutePrefix)
+
+        val result = action.requireSessionAnswers.invokeBlock(dataRequest(Answers()), _ => Future.successful(Ok))
+
+        status(result)         shouldBe SEE_OTHER
+        redirectLocation(result) should contain(manageIsasEndpoint)
+      } finally _root_.app.RoutesPrefix.setPrefix(originalRoutePrefix)
+    }
   }
 
-  private def dataRequest(answers: Answers): DataRequest[play.api.mvc.AnyContentAsEmpty.type] =
+  private def dataRequest(
+    answers: Answers,
+    sessionAnswers: Option[UserAnswers] = None
+  ): DataRequest[play.api.mvc.AnyContentAsEmpty.type] =
     DataRequest(
       FakeRequest(),
       testZref,
       testCredentialId,
       None,
       testSessionId,
-      sessionAnswers = None,
+      sessionAnswers = sessionAnswers,
       originalAnswers = Answers(),
       effectiveAnswers = answers
     )
